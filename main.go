@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/idprm/go-payment/src/cmd"
 
+func main() {
+	cmd.Execute()
 }

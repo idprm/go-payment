@@ -20,6 +20,24 @@ type Secret struct {
 	Db struct {
 		Source string `yaml:"source"`
 	} `yaml:"db"`
+	DragonPay struct {
+		Url string `yaml:"url"`
+	} `yaml:"dragonpay"`
+	JazzCash struct {
+		Url string `yaml:"url"`
+	} `yaml:"jazzcash"`
+	Midtrans struct {
+		Url string `yaml:"url"`
+	} `yaml:"midtrans"`
+	Momo struct {
+		Url string `yaml:"url"`
+	} `yaml:"momo"`
+	Nicepay struct {
+		Url string `yaml:"url"`
+	} `yaml:"nicepay"`
+	Razer struct {
+		Url string `yaml:"url"`
+	} `yaml:"razer"`
 	Log struct {
 		Path string `yaml:"path"`
 	}
