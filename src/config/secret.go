@@ -21,22 +21,39 @@ type Secret struct {
 		Source string `yaml:"source"`
 	} `yaml:"db"`
 	DragonPay struct {
-		Url string `yaml:"url"`
+		Url        string `yaml:"url"`
+		MerchantId string `yaml:"merchantid"`
+		Password   string `yaml:"password"`
+		Postback   string `yaml:"postback"`
 	} `yaml:"dragonpay"`
 	JazzCash struct {
-		Url string `yaml:"url"`
+		Url            string `yaml:"url"`
+		MerchantId     string `yaml:"merchantid"`
+		Password       string `yaml:"password"`
+		IntegeritySalt string `yaml:"integeritysalt"`
 	} `yaml:"jazzcash"`
 	Midtrans struct {
-		Url string `yaml:"url"`
+		Url        string `yaml:"url"`
+		MerchantId string `yaml:"merchantid"`
+		ClientKey  string `yaml:"clientkey"`
+		ServerKey  string `yaml:"serverkey"`
 	} `yaml:"midtrans"`
 	Momo struct {
-		Url string `yaml:"url"`
+		Url         string `yaml:"url"`
+		PartnerCode string `yaml:"partnercode"`
+		AccessKey   string `yaml:"accesskey"`
+		SecretKey   string `yaml:"secretkey"`
 	} `yaml:"momo"`
 	Nicepay struct {
-		Url string `yaml:"url"`
+		Url         string `yaml:"url"`
+		MerchantId  string `yaml:"merchantid"`
+		MerchantKey string `yaml:"merchantkey"`
 	} `yaml:"nicepay"`
 	Razer struct {
-		Url string `yaml:"url"`
+		Url        string `yaml:"url"`
+		MerchantId string `yaml:"merchantid"`
+		VerifyKey  string `yaml:"verifykey"`
+		SecretKey  string `yaml:"secretkey"`
 	} `yaml:"razer"`
 	Log struct {
 		Path string `yaml:"path"`
