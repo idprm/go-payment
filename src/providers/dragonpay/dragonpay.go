@@ -27,7 +27,7 @@ func NewDragonPay(
 }
 
 func (p *DragonPay) Payment() ([]byte, error) {
-	url := p.conf.DragonPay.Url + p.order.Number + "/post"
+	url := p.conf.DragonPay.Url + p.order.GetNumber() + "/post"
 	var request entity.DragonPayRequestBody
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))

@@ -1,14 +1,22 @@
 package momo
 
-import "github.com/idprm/go-payment/src/config"
+import (
+	"github.com/idprm/go-payment/src/config"
+	"github.com/idprm/go-payment/src/domain/entity"
+)
 
 type Momo struct {
-	conf *config.Secret
+	conf  *config.Secret
+	order *entity.Order
 }
 
-func NewMomo(conf *config.Secret) *Momo {
+func NewMomo(
+	conf *config.Secret,
+	order *entity.Order,
+) *Momo {
 	return &Momo{
-		conf: conf,
+		conf:  conf,
+		order: order,
 	}
 }
 

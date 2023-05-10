@@ -1,14 +1,22 @@
 package razer
 
-import "github.com/idprm/go-payment/src/config"
+import (
+	"github.com/idprm/go-payment/src/config"
+	"github.com/idprm/go-payment/src/domain/entity"
+)
 
 type Razer struct {
-	conf *config.Secret
+	conf  *config.Secret
+	order *entity.Order
 }
 
-func NewRazer(conf *config.Secret) *Razer {
+func NewRazer(
+	conf *config.Secret,
+	order *entity.Order,
+) *Razer {
 	return &Razer{
-		conf: conf,
+		conf:  conf,
+		order: order,
 	}
 }
 
