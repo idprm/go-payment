@@ -59,7 +59,15 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	paymentService := services.NewPaymentService(paymentRepo)
 	notifyHandler := handler.NewNotifyHandler(u.cfg, orderService, paymentService)
 
+	// init base
+	baseHandler := handler.NewBaseHandler(u.cfg)
+
 	router.Static("/static", path+"/public")
+
+	/**
+	 * Routes Base
+	 */
+	router.Get("/", baseHandler.Base)
 
 	/**
 	 * Routes Order & Notify
@@ -85,8 +93,8 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	nicepay.Post("notification", notifyHandler.Nicepay)
 
 	razer := router.Group("razer")
-	razer.Post("razer", orderHandler.Razer)
-	razer.Post("razer", notifyHandler.Razer)
+	razer.Post("order", orderHandler.Razer)
+	razer.Post("notification", notifyHandler.Razer)
 
 	return router
 }

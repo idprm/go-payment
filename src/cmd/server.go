@@ -5,7 +5,8 @@ import (
 
 	"github.com/idprm/go-payment/src/app"
 	"github.com/idprm/go-payment/src/config"
-	"github.com/idprm/go-payment/src/datasource/pgsql/db"
+	"github.com/idprm/go-payment/src/datasource/mysql/db"
+	"github.com/idprm/go-payment/src/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +28,7 @@ var serverCmd = &cobra.Command{
 		/**
 		 * Init DB
 		 */
-		db, err := db.InitDB(cfg)
+		db, err := db.InitMySQL(cfg)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -36,9 +37,9 @@ var serverCmd = &cobra.Command{
 		/**
 		 * Init Log
 		 */
-		// logger := logger.InitLogger(conf)
+		logger := logger.InitLogger(cfg)
 
-		application := app.NewApplication(cfg, db)
+		application := app.NewApplication(cfg, db, logger)
 		router := application.Start()
 		log.Fatal(router.Listen(":" + cfg.App.Port))
 	},

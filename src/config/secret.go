@@ -18,7 +18,8 @@ type Secret struct {
 		TimeZone string `yaml:"timezone"`
 	} `yaml:"app"`
 	Db struct {
-		Source string `yaml:"source"`
+		SourcePgSql string `yaml:"sourcepgsql"`
+		SourceMySql string `yaml:"sourcemysql"`
 	} `yaml:"db"`
 	DragonPay struct {
 		Url        string `yaml:"url"`

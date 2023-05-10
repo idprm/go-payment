@@ -3,14 +3,14 @@ package db
 import (
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func InitPgSQL(conf *config.Secret) (*gorm.DB, error) {
+func InitMySQL(conf *config.Secret) (*gorm.DB, error) {
 
-	db, err := gorm.Open(postgres.Open(conf.Db.SourcePgSql), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(conf.Db.SourceMySql), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
