@@ -1,9 +1,15 @@
 package entity
 
 type OrderRequestBody struct {
-	Msisdn string `json:"msisdn"`
-	Email  string `json:"email"`
-	Number string `json:"number"`
+	Msisdn string  `json:"msisdn"`
+	Email  string  `json:"email"`
+	Number string  `json:"number"`
+	Amount float64 `json:"amount"`
+}
+
+type RefundRequestBody struct {
+	Number string  `json:"number"`
+	Amount float64 `json:"amount"`
 }
 
 type DragonPayRequestBody struct {

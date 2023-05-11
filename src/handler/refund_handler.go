@@ -9,59 +9,56 @@ import (
 	"github.com/idprm/go-payment/src/services"
 )
 
-type PaymentHandler struct {
+type RefundHandler struct {
 	cfg                *config.Secret
-	paymentService     services.IPaymentService
+	refundService      services.IRefundService
 	transactionService services.ITransactionService
-	callbackService    services.ICallbackService
 }
 
-func NewPaymentHandler(
+func NewRefundHandler(
 	cfg *config.Secret,
-	paymentService services.IPaymentService,
+	refundService services.IRefundService,
 	transactionService services.ITransactionService,
-	callbackService services.ICallbackService,
-) *PaymentHandler {
-	return &PaymentHandler{
+) *RefundHandler {
+	return &RefundHandler{
 		cfg:                cfg,
-		paymentService:     paymentService,
+		refundService:      refundService,
 		transactionService: transactionService,
-		callbackService:    callbackService,
 	}
 }
 
-func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
-	req := new(entity.NotifDragonPayRequestBody)
+func (h *RefundHandler) DragonPay(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
-func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
-	req := new(entity.NotifJazzCashRequestBody)
+func (h *RefundHandler) JazzCash(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
-func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
-	req := new(entity.NotifMidtransRequestBody)
+func (h *RefundHandler) Midtrans(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
-func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
-	req := new(entity.NotifMomoRequestBody)
+func (h *RefundHandler) Momo(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
-func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
-	req := new(entity.NotifNicepayRequestBody)
+func (h *RefundHandler) Nicepay(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
-func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
-	req := new(entity.NotifRazerRequestBody)
+func (h *RefundHandler) Razer(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }

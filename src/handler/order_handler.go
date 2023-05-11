@@ -19,17 +19,20 @@ const (
 )
 
 type OrderHandler struct {
-	cfg          *config.Secret
-	orderService services.IOrderService
+	cfg                *config.Secret
+	orderService       services.IOrderService
+	transactionService services.ITransactionService
 }
 
 func NewOrderHandler(
 	cfg *config.Secret,
 	orderService services.IOrderService,
+	transactionService services.ITransactionService,
 ) *OrderHandler {
 	return &OrderHandler{
-		cfg:          cfg,
-		orderService: orderService,
+		cfg:                cfg,
+		orderService:       orderService,
+		transactionService: transactionService,
 	}
 }
 

@@ -48,21 +48,33 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	if err != nil {
 		panic(err)
 	}
+	router.Static("/static", path+"/public")
+
+	// init transaction
+	transactionRepo := repository.NewTransactionRepository(u.db)
+	transactionService := services.NewTransactionService(transactionRepo)
 
 	// init order
 	orderRepo := repository.NewOrderRepository(u.db)
 	orderService := services.NewOrderService(orderRepo)
-	orderHandler := handler.NewOrderHandler(u.cfg, orderService)
+	orderHandler := handler.NewOrderHandler(u.cfg, orderService, transactionService)
+
+	// init callback
+	callbackRepo := repository.NewCallbackRepository(u.db)
+	callbackService := services.NewCallbackService(callbackRepo)
 
 	// init payment
 	paymentRepo := repository.NewPaymentRepository(u.db)
-	paymentService := services.NewPaymentService(paymentRepo)
-	notifyHandler := handler.NewNotifyHandler(u.cfg, orderService, paymentService)
+	paymentService := services.NewPaymentService(orderRepo, paymentRepo)
+	paymentHandler := handler.NewPaymentHandler(u.cfg, paymentService, transactionService, callbackService)
+
+	// init refund
+	refundRepo := repository.NewRefundRepository(u.db)
+	refundService := services.NewRefundService(orderRepo, refundRepo)
+	refundHandler := handler.NewRefundHandler(u.cfg, refundService, transactionService)
 
 	// init base
 	baseHandler := handler.NewBaseHandler(u.cfg)
-
-	router.Static("/static", path+"/public")
 
 	/**
 	 * Routes Base
@@ -74,27 +86,33 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	 */
 	dragopay := router.Group("dragonpay")
 	dragopay.Post("order", orderHandler.DragonPay)
-	dragopay.Post("notification", notifyHandler.DragonPay)
+	dragopay.Post("notification", paymentHandler.DragonPay)
+	dragopay.Post("refund", refundHandler.DragonPay)
 
 	jazzcash := router.Group("jazzcash")
 	jazzcash.Post("order", orderHandler.JazzCash)
-	jazzcash.Post("notification", notifyHandler.JazzCash)
+	jazzcash.Post("notification", paymentHandler.JazzCash)
+	jazzcash.Post("refund", refundHandler.JazzCash)
 
 	midtrans := router.Group("midtrans")
 	midtrans.Post("order", orderHandler.Midtrans)
-	midtrans.Post("notification", notifyHandler.Midtrans)
+	midtrans.Post("notification", paymentHandler.Midtrans)
+	midtrans.Post("refund", refundHandler.Midtrans)
 
 	momo := router.Group("momo")
 	momo.Post("order", orderHandler.Momo)
-	momo.Post("notification", notifyHandler.Momo)
+	momo.Post("notification", paymentHandler.Momo)
+	momo.Post("refund", refundHandler.Momo)
 
 	nicepay := router.Group("nicepay")
 	nicepay.Post("order", orderHandler.Nicepay)
-	nicepay.Post("notification", notifyHandler.Nicepay)
+	nicepay.Post("notification", paymentHandler.Nicepay)
+	nicepay.Post("refund", refundHandler.Nicepay)
 
 	razer := router.Group("razer")
 	razer.Post("order", orderHandler.Razer)
-	razer.Post("notification", notifyHandler.Razer)
+	razer.Post("notification", paymentHandler.Razer)
+	razer.Post("refund", refundHandler.Razer)
 
 	return router
 }
