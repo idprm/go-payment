@@ -27,7 +27,23 @@ func NewMidtrans(
 	}
 }
 
-// payment
+type MidtransRequestBody struct {
+	ReqTransaction struct {
+		OrderId     string `json:"order_id"`
+		GrossAmount int    `json:"gross_amount"`
+	} `json:"transaction_details"`
+	ReqCustomer struct {
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Phone     string `json:"phone"`
+		Email     string `json:"email"`
+	} `json:"customer_details"`
+	ReqCallback struct {
+		Finish string `json:"finish"`
+	} `json:"callbacks"`
+}
+
+// order
 func (p *Midtrans) Payment() ([]byte, error) {
 	url := p.conf.Midtrans.Url + "/transactions"
 
@@ -43,9 +59,49 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	payload, _ := json.Marshal(&request)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(p.conf.Midtrans.ServerKey)))
 	req.Header.Add("X-Override-Notification", p.conf.App.Url+"/midtrans/notification")
 	req.Header.Set("Content-Type", "application/json")
+
+	tr := &http.Transport{
+		Proxy:              http.ProxyFromEnvironment,
+		MaxIdleConns:       10,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
+	}
+
+	client := &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: tr,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
+// refund
+func (p *Midtrans) Refund() ([]byte, error) {
+	url := p.conf.Midtrans.Url + "/refunds"
+
+	var request entity.MidtransPaymentRequestBody
+	request.ReqCustomer.FirstName = p.order.GetNumber()
+	payload, _ := json.Marshal(&request)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}

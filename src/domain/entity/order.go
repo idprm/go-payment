@@ -6,9 +6,12 @@ type Order struct {
 	ID            int64 `gorm:"primaryKey" json:"id"`
 	ApplicationID int64 `json:"application_id"`
 	Application   *Application
+	ChannelID     int64 `json:"channel_id"`
+	Channel       *Channel
 	Number        string  `gorm:"size:56" json:"number"`
 	Msisdn        string  `gorm:"size:25" json:"msisdn"`
-	Email         string  `gorm:"size:56" json:"email"`
+	Email         string  `gorm:"size:100" json:"email"`
+	Name          string  `gorm:"size:150" json:"name"`
 	Amount        float64 `gorm:"size:15" json:"amount"`
 	Description   string  `gorm:"size:100" json:"description"`
 	IpAddress     string  `gorm:"size:25" json:"ip_address"`
@@ -25,6 +28,10 @@ func (e *Order) GetMsisdn() string {
 
 func (e *Order) GetEmail() string {
 	return e.Email
+}
+
+func (e *Order) GetName() string {
+	return e.Name
 }
 
 func (e *Order) GetDescription() string {

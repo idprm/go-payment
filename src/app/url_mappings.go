@@ -81,38 +81,63 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	 */
 	router.Get("/", baseHandler.Base)
 
+	authenticated := router.Group("auth")
+
 	/**
-	 * Routes Order & Notify
+	 * Routes Order & Notify (version 1)
 	 */
-	dragopay := router.Group("dragonpay")
+	v1 := router.Group("v1")
+
+	dragopay := v1.Group("dragonpay")
 	dragopay.Post("order", orderHandler.DragonPay)
 	dragopay.Post("notification", paymentHandler.DragonPay)
 	dragopay.Post("refund", refundHandler.DragonPay)
 
-	jazzcash := router.Group("jazzcash")
+	jazzcash := v1.Group("jazzcash")
 	jazzcash.Post("order", orderHandler.JazzCash)
 	jazzcash.Post("notification", paymentHandler.JazzCash)
 	jazzcash.Post("refund", refundHandler.JazzCash)
 
-	midtrans := router.Group("midtrans")
+	midtrans := v1.Group("midtrans")
 	midtrans.Post("order", orderHandler.Midtrans)
 	midtrans.Post("notification", paymentHandler.Midtrans)
 	midtrans.Post("refund", refundHandler.Midtrans)
 
-	momo := router.Group("momo")
+	momo := v1.Group("momo")
 	momo.Post("order", orderHandler.Momo)
 	momo.Post("notification", paymentHandler.Momo)
 	momo.Post("refund", refundHandler.Momo)
 
-	nicepay := router.Group("nicepay")
+	nicepay := v1.Group("nicepay")
 	nicepay.Post("order", orderHandler.Nicepay)
 	nicepay.Post("notification", paymentHandler.Nicepay)
 	nicepay.Post("refund", refundHandler.Nicepay)
 
-	razer := router.Group("razer")
+	razer := v1.Group("razer")
 	razer.Post("order", orderHandler.Razer)
 	razer.Post("notification", paymentHandler.Razer)
 	razer.Post("refund", refundHandler.Razer)
+
+	/**
+	 * AUTHENTICATED ROUTING
+	 */
+	authOrders := authenticated.Group("orders")
+	authOrders.Get("/", orderHandler.GetAll)
+	authOrders.Get("/:id", orderHandler.Get)
+	authOrders.Put("/", orderHandler.Update)
+	authOrders.Delete("/:id", orderHandler.Delete)
+
+	authPayments := authenticated.Group("payments")
+	authPayments.Get("/", paymentHandler.GetAll)
+	authPayments.Get("/:id", paymentHandler.Get)
+	authPayments.Put("/", paymentHandler.Update)
+	authPayments.Delete("/:id", paymentHandler.Delete)
+
+	authRefunds := authenticated.Group("refunds")
+	authRefunds.Get("/", refundHandler.GetAll)
+	authRefunds.Get("/:id", refundHandler.Get)
+	authRefunds.Put("/", refundHandler.Update)
+	authRefunds.Delete("/:id", refundHandler.Delete)
 
 	return router
 }

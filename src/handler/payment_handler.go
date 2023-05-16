@@ -65,3 +65,19 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 	log.Println(req)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
+
+func (h *PaymentHandler) GetAll(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *PaymentHandler) Get(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *PaymentHandler) Update(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *PaymentHandler) Delete(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}

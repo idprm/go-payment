@@ -69,3 +69,19 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	log.Println(req)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"status": "OK"})
 }
+
+func (h *OrderHandler) GetAll(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *OrderHandler) Get(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *OrderHandler) Update(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *OrderHandler) Delete(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
