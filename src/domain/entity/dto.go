@@ -1,11 +1,36 @@
 package entity
 
 type OrderRequestBody struct {
-	AppCode string  `json:"app_code"`
-	Msisdn  string  `json:"msisdn"`
-	Email   string  `json:"email"`
-	Number  string  `json:"number"`
-	Amount  float64 `json:"amount"`
+	Channel     string  `json:"channel"`
+	Msisdn      string  `json:"msisdn"`
+	Email       string  `json:"email"`
+	Number      string  `json:"number"`
+	Amount      float64 `json:"amount"`
+	UrlCallback string  `json:"url_callback"`
+}
+
+func (r *OrderRequestBody) GetChannel() string {
+	return r.Channel
+}
+
+func (r *OrderRequestBody) GetMsisdn() string {
+	return r.Msisdn
+}
+
+func (r *OrderRequestBody) GetEmail() string {
+	return r.Email
+}
+
+func (r *OrderRequestBody) GetNumber() string {
+	return r.Number
+}
+
+func (r *OrderRequestBody) GetAmount() float64 {
+	return r.Amount
+}
+
+func (r *OrderRequestBody) GetUrlCallback() string {
+	return r.UrlCallback
 }
 
 type RefundRequestBody struct {
