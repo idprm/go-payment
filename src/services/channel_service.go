@@ -21,8 +21,13 @@ func NewChannelService(
 }
 
 type IChannelService interface {
+	GetAllByGateway(int) (*[]entity.Channel, error)
 	CountBySlug(string) bool
 	GetBySlug(string) (*entity.Channel, error)
+}
+
+func (s *ChannelService) GetAllByGateway(gateId int) (*[]entity.Channel, error) {
+	return s.channelRepo.GetAll(gateId)
 }
 
 func (s *ChannelService) CountBySlug(slug string) bool {

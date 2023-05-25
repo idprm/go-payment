@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 type OrderRequestBody struct {
 	Channel     string  `json:"channel"`
 	Msisdn      string  `json:"msisdn"`
@@ -289,7 +291,8 @@ type RazerResponsePayload struct {
 type NotifRazerRequestBody struct {
 }
 
-type PostbackRequestBody struct {
-	Msisdn string `json:"msisdn"`
-	Number string `json:"number"`
+type CallbackRequestBody struct {
+	Number string    `json:"number"`
+	IsPaid bool      `json:"is_paid"`
+	Time   time.Time `json:"time"`
 }

@@ -16,7 +16,7 @@ func NewChannelRepository(db *gorm.DB) *ChannelRepository {
 }
 
 type IChannelRepository interface {
-	GetAll() (*[]entity.Channel, error)
+	GetAll(int) (*[]entity.Channel, error)
 	GetBySlug(string) (*entity.Channel, error)
 	CountBySlug(string) (int64, error)
 	Save(*entity.Channel) (*entity.Channel, error)
@@ -24,9 +24,9 @@ type IChannelRepository interface {
 	Delete(int) error
 }
 
-func (r *ChannelRepository) GetAll() (*[]entity.Channel, error) {
+func (r *ChannelRepository) GetAll(gateId int) (*[]entity.Channel, error) {
 	var channels []entity.Channel
-	err := r.db.Order("id asc").Find(&channels).Error
+	err := r.db.Where("gateway_id = ?", gateId).Preload("Gateway").Order("id asc").Find(&channels).Error
 	if err != nil {
 		return nil, err
 	}

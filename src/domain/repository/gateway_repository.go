@@ -34,7 +34,7 @@ func (r *GatewayRepository) GetAll() (*[]entity.Gateway, error) {
 
 func (r *GatewayRepository) GetByCode(code string) (*entity.Gateway, error) {
 	var gateway entity.Gateway
-	err := r.db.Where("code = ?", code).Joins("Channel").Take(&gateway).Error
+	err := r.db.Where("code = ?", code).Take(&gateway).Error
 	if err != nil {
 		return nil, err
 	}
