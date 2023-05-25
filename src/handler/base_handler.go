@@ -5,6 +5,18 @@ import (
 	"github.com/idprm/go-payment/src/config"
 )
 
+const (
+	ORDER     = "ORDER_"
+	PAYMENT   = "PAYMENT_"
+	REFUND    = "REFUND_"
+	DRAGONPAY = "DRAGONPAY"
+	JAZZCASH  = "JAZZCASH"
+	MIDTRANS  = "MIDTRANS"
+	MOMO      = "MOMO"
+	NICEPAY   = "NICEPAY"
+	RAZER     = "RAZER"
+)
+
 type BaseHandler struct {
 	cfg *config.Secret
 }

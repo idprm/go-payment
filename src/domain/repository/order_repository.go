@@ -18,7 +18,8 @@ func NewOrderRepository(db *gorm.DB) *OrderRepository {
 type IOrderRepository interface {
 	GetAll() (*[]entity.Order, error)
 	GetById(int) (*entity.Order, error)
-	GetByNumber(string) (*entity.Order, error)
+	GetByNumber(int, string) (*entity.Order, error)
+	CountByNumber(int, string) (int64, error)
 	Save(*entity.Order) (*entity.Order, error)
 	Update(*entity.Order) (*entity.Order, error)
 	Delete(int) error
@@ -42,13 +43,22 @@ func (r *OrderRepository) GetById(id int) (*entity.Order, error) {
 	return &order, err
 }
 
-func (r *OrderRepository) GetByNumber(number string) (*entity.Order, error) {
+func (r *OrderRepository) GetByNumber(appId int, number string) (*entity.Order, error) {
 	var order entity.Order
-	err := r.db.Where("number = ?", number).Preload("Application").Preload("Channel").Take(&order).Error
+	err := r.db.Where("application_id = ?", appId).Where("number = ?", number).Preload("Application").Preload("Channel").Take(&order).Error
 	if err != nil {
 		return nil, err
 	}
 	return &order, err
+}
+
+func (r *OrderRepository) CountByNumber(appId int, number string) (int64, error) {
+	var count int64
+	err := r.db.Model(&entity.Order{}).Where("application_id = ?", appId).Where("number = ?", number).Count(&count).Error
+	if err != nil {
+		return count, err
+	}
+	return count, nil
 }
 
 func (r *OrderRepository) Save(order *entity.Order) (*entity.Order, error) {

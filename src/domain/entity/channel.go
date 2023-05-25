@@ -19,3 +19,23 @@ func (e *Channel) GetId() int64 {
 func (e *Channel) GetName() string {
 	return e.Name
 }
+
+func (e *Channel) GetSlug() string {
+	return e.Slug
+}
+
+func (e *Channel) GetLogo() string {
+	return e.Logo
+}
+
+func (e *Channel) GetType() string {
+	return e.Type
+}
+
+func (e *Channel) GetParam() string {
+	return e.Param
+}
+
+func (e *Channel) GetIsActive() bool {
+	return e.IsActive
+}
