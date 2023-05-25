@@ -7,18 +7,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type Logger struct {
-	cfg *config.Secret
-}
-
-func NewLogger(cfg *config.Secret) *Logger {
-	return &Logger{
-		cfg: cfg,
-	}
-}
-
-func (l *Logger) InitLogger() *zap.SugaredLogger {
-	writerSyncer := getLogWriter(l.cfg)
+func InitLogger(cfg *config.Secret) *zap.SugaredLogger {
+	writerSyncer := getLogWriter(cfg)
 	encoder := getEncoder()
 	core := zapcore.NewCore(encoder, writerSyncer, zapcore.DebugLevel)
 	logger := zap.New(core, zap.AddCaller())
@@ -34,7 +24,7 @@ func getEncoder() zapcore.Encoder {
 
 func getLogWriter(cfg *config.Secret) zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   cfg.Log.Path + "/logs" + ".log",
+		Filename:   cfg.Log.Path + "/logging" + ".log",
 		MaxSize:    10,
 		MaxBackups: 5,
 		MaxAge:     30,

@@ -38,9 +38,9 @@ var serverCmd = &cobra.Command{
 		 * Init Log
 		 */
 		lg := logger.NewLogger(cfg)
-		lg.InitLogger()
+		zap := logger.InitLogger(cfg)
 
-		application := app.NewApplication(cfg, db, lg)
+		application := app.NewApplication(cfg, db, lg, zap)
 		router := application.Start()
 		log.Fatal(router.Listen(":" + cfg.App.Port))
 	},

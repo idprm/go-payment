@@ -73,7 +73,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init order
 	orderRepo := repository.NewOrderRepository(u.db)
 	orderService := services.NewOrderService(orderRepo)
-	orderHandler := handler.NewOrderHandler(u.cfg, u.logger, applicationService, channelService, orderService, transactionService)
+	orderHandler := handler.NewOrderHandler(u.cfg, u.logger, u.zap, applicationService, channelService, orderService, transactionService)
 
 	// init callback
 	callbackRepo := repository.NewCallbackRepository(u.db)
@@ -82,12 +82,12 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init payment
 	paymentRepo := repository.NewPaymentRepository(u.db)
 	paymentService := services.NewPaymentService(orderRepo, paymentRepo)
-	paymentHandler := handler.NewPaymentHandler(u.cfg, paymentService, transactionService, callbackService)
+	paymentHandler := handler.NewPaymentHandler(u.cfg, u.logger, u.zap, paymentService, transactionService, callbackService)
 
 	// init refund
 	refundRepo := repository.NewRefundRepository(u.db)
 	refundService := services.NewRefundService(orderRepo, refundRepo)
-	refundHandler := handler.NewRefundHandler(u.cfg, refundService, transactionService)
+	refundHandler := handler.NewRefundHandler(u.cfg, u.logger, u.zap, refundService, transactionService)
 
 	// init base
 	baseHandler := handler.NewBaseHandler(u.cfg)
@@ -124,6 +124,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	momo := v1.Group("momo")
 	momo.Get("/", gatewayHandler.Momo)
 	momo.Post("order", orderHandler.Momo)
+	momo.Get("notification", paymentHandler.Momo)
 	momo.Post("notification", paymentHandler.Momo)
 	momo.Post("refund", refundHandler.Momo)
 
@@ -131,11 +132,13 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	nicepay.Get("/", gatewayHandler.Nicepay)
 	nicepay.Post("order", orderHandler.Nicepay)
 	nicepay.Post("notification", paymentHandler.Nicepay)
+	nicepay.Post("notification", paymentHandler.Nicepay)
 	nicepay.Post("refund", refundHandler.Nicepay)
 
 	razer := v1.Group("razer")
 	razer.Get("/", gatewayHandler.Razer)
 	razer.Post("order", orderHandler.Razer)
+	razer.Get("notification", paymentHandler.Razer)
 	razer.Post("notification", paymentHandler.Razer)
 	razer.Post("refund", refundHandler.Razer)
 

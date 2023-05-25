@@ -14,11 +14,13 @@ import (
 	"github.com/idprm/go-payment/src/providers/nicepay"
 	"github.com/idprm/go-payment/src/providers/razer"
 	"github.com/idprm/go-payment/src/services"
+	"go.uber.org/zap"
 )
 
 type OrderHandler struct {
 	cfg                *config.Secret
 	logger             *logger.Logger
+	zap                *zap.SugaredLogger
 	applicationService services.IApplicationService
 	channelService     services.IChannelService
 	orderService       services.IOrderService
@@ -28,6 +30,7 @@ type OrderHandler struct {
 func NewOrderHandler(
 	cfg *config.Secret,
 	logger *logger.Logger,
+	zap *zap.SugaredLogger,
 	applicationService services.IApplicationService,
 	channelService services.IChannelService,
 	orderService services.IOrderService,
@@ -36,6 +39,7 @@ func NewOrderHandler(
 	return &OrderHandler{
 		cfg:                cfg,
 		logger:             logger,
+		zap:                zap,
 		applicationService: applicationService,
 		channelService:     channelService,
 		orderService:       orderService,

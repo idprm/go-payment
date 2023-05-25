@@ -6,22 +6,30 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/services"
+	"go.uber.org/zap"
 )
 
 type RefundHandler struct {
 	cfg                *config.Secret
+	logger             *logger.Logger
+	zap                *zap.SugaredLogger
 	refundService      services.IRefundService
 	transactionService services.ITransactionService
 }
 
 func NewRefundHandler(
 	cfg *config.Secret,
+	logger *logger.Logger,
+	zap *zap.SugaredLogger,
 	refundService services.IRefundService,
 	transactionService services.ITransactionService,
 ) *RefundHandler {
 	return &RefundHandler{
 		cfg:                cfg,
+		logger:             logger,
+		zap:                zap,
 		refundService:      refundService,
 		transactionService: transactionService,
 	}

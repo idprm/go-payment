@@ -4,7 +4,19 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/idprm/go-payment/src/config"
 )
+
+type Logger struct {
+	cfg *config.Secret
+}
+
+func NewLogger(cfg *config.Secret) *Logger {
+	return &Logger{
+		cfg: cfg,
+	}
+}
 
 func (l *Logger) Writer(data interface{}) {
 	//create your file with desired read/write permissions
