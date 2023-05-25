@@ -10,20 +10,24 @@ import (
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
 )
 
 type Midtrans struct {
-	conf  *config.Secret
-	order *entity.Order
+	conf   *config.Secret
+	logger *logger.Logger
+	order  *entity.Order
 }
 
 func NewMidtrans(
 	conf *config.Secret,
+	logger *logger.Logger,
 	order *entity.Order,
 ) *Midtrans {
 	return &Midtrans{
-		conf:  conf,
-		order: order,
+		conf:   conf,
+		logger: logger,
+		order:  order,
 	}
 }
 
@@ -48,7 +52,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	url := p.conf.Midtrans.Url + "/transactions"
 
 	var request entity.MidtransPaymentRequestBody
-	request.ReqCustomer.FirstName = p.order.GetNumber()
+	request.ReqCustomer.FirstName = p.order.GetName()
 	request.ReqCustomer.LastName = ""
 	request.ReqCustomer.Phone = p.order.GetMsisdn()
 	request.ReqCustomer.Email = p.order.GetEmail()
@@ -65,31 +69,27 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(p.conf.Midtrans.ServerKey)))
 	req.Header.Add("X-Override-Notification", p.conf.App.Url+"/midtrans/notification")
 	req.Header.Set("Content-Type", "application/json")
-
 	tr := &http.Transport{
 		Proxy:              http.ProxyFromEnvironment,
 		MaxIdleConns:       10,
 		IdleConnTimeout:    30 * time.Second,
 		DisableCompression: true,
 	}
-
 	client := &http.Client{
 		Timeout:   30 * time.Second,
 		Transport: tr,
 	}
-
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-
 	defer resp.Body.Close()
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-
+	p.logger.Writer(string(body))
 	return body, nil
 }
 

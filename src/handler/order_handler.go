@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/providers/dragonpay"
 	"github.com/idprm/go-payment/src/providers/jazzcash"
 	"github.com/idprm/go-payment/src/providers/midtrans"
@@ -17,6 +18,7 @@ import (
 
 type OrderHandler struct {
 	cfg                *config.Secret
+	logger             *logger.Logger
 	applicationService services.IApplicationService
 	channelService     services.IChannelService
 	orderService       services.IOrderService
@@ -25,6 +27,7 @@ type OrderHandler struct {
 
 func NewOrderHandler(
 	cfg *config.Secret,
+	logger *logger.Logger,
 	applicationService services.IApplicationService,
 	channelService services.IChannelService,
 	orderService services.IOrderService,
@@ -32,6 +35,7 @@ func NewOrderHandler(
 ) *OrderHandler {
 	return &OrderHandler{
 		cfg:                cfg,
+		logger:             logger,
 		applicationService: applicationService,
 		channelService:     channelService,
 		orderService:       orderService,
@@ -80,13 +84,14 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 		ChannelID:     channel.GetId(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Amount:        req.GetAmount(),
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := dragonpay.NewDragonPay(h.cfg, order)
+	provider := dragonpay.NewDragonPay(h.cfg, h.logger, order)
 	dp, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error dragonpay"})
@@ -152,13 +157,14 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		ChannelID:     channel.GetId(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Amount:        req.GetAmount(),
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := jazzcash.NewJazzCash(h.cfg, order)
+	provider := jazzcash.NewJazzCash(h.cfg, h.logger, order)
 	jz, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error jazzcash"})
@@ -226,13 +232,14 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 		ChannelID:     channel.GetId(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Amount:        req.GetAmount(),
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := midtrans.NewMidtrans(h.cfg, order)
+	provider := midtrans.NewMidtrans(h.cfg, h.logger, order)
 	mt, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error midtrans"})
@@ -286,7 +293,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if !h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -295,13 +302,14 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 		ChannelID:     channel.GetId(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Amount:        req.GetAmount(),
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := momo.NewMomo(h.cfg, order)
+	provider := momo.NewMomo(h.cfg, h.logger, order)
 	mm, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error momopay"})
@@ -368,13 +376,14 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		ChannelID:     channel.GetId(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Amount:        req.GetAmount(),
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := nicepay.NewNicepay(h.cfg, order)
+	provider := nicepay.NewNicepay(h.cfg, h.logger, order)
 	np, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error nicepay"})
@@ -441,13 +450,14 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 		ChannelID:     channel.GetId(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Amount:        req.GetAmount(),
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := razer.NewRazer(h.cfg, order)
+	provider := razer.NewRazer(h.cfg, h.logger, order, channel)
 	rz, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error razer"})

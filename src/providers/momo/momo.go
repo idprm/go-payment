@@ -13,20 +13,25 @@ import (
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
 )
 
 type Momo struct {
-	conf  *config.Secret
-	order *entity.Order
+	conf   *config.Secret
+	logger *logger.Logger
+	order  *entity.Order
 }
 
 func NewMomo(
 	conf *config.Secret,
+	logger *logger.Logger,
 	order *entity.Order,
 ) *Momo {
 	return &Momo{
-		conf:  conf,
-		order: order,
+		conf:   conf,
+		logger: logger,
+		order:  order,
 	}
 }
 
@@ -72,7 +77,7 @@ func (p *Momo) Payment() ([]byte, error) {
 	url := p.conf.Momo.Url + "/v2/gateway/api/create"
 	accessKey := p.conf.Momo.AccessKey
 	partnerCode := p.conf.Momo.PartnerCode
-	requestId := ""
+	requestId := utils.GenerateTransactionId()
 
 	request := &PaymentRequestBody{
 		PartnerName: "Test",
@@ -107,15 +112,18 @@ func (p *Momo) Payment() ([]byte, error) {
 		Timeout:   30 * time.Second,
 		Transport: tr,
 	}
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
+	p.logger.Writer(string(body))
 	return body, nil
 }
 
@@ -153,6 +161,7 @@ func (p *Momo) Refund() ([]byte, error) {
 		Timeout:   30 * time.Second,
 		Transport: tr,
 	}
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -162,6 +171,7 @@ func (p *Momo) Refund() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	p.logger.Writer(string(body))
 	return body, nil
 }
 

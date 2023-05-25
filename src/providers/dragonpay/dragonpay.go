@@ -9,20 +9,24 @@ import (
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
 )
 
 type DragonPay struct {
-	conf  *config.Secret
-	order *entity.Order
+	conf   *config.Secret
+	logger *logger.Logger
+	order  *entity.Order
 }
 
 func NewDragonPay(
 	conf *config.Secret,
+	logger *logger.Logger,
 	order *entity.Order,
 ) *DragonPay {
 	return &DragonPay{
-		conf:  conf,
-		order: order,
+		conf:   conf,
+		logger: logger,
+		order:  order,
 	}
 }
 

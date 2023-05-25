@@ -3,6 +3,7 @@ package entity
 type OrderRequestBody struct {
 	Channel     string  `json:"channel"`
 	Msisdn      string  `json:"msisdn"`
+	Name        string  `json:"name"`
 	Email       string  `json:"email"`
 	Number      string  `json:"number"`
 	Amount      float64 `json:"amount"`
@@ -17,6 +18,10 @@ func (r *OrderRequestBody) GetChannel() string {
 
 func (r *OrderRequestBody) GetMsisdn() string {
 	return r.Msisdn
+}
+
+func (r *OrderRequestBody) GetName() string {
+	return r.Name
 }
 
 func (r *OrderRequestBody) GetEmail() string {

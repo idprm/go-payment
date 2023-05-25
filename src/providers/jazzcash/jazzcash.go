@@ -15,17 +15,24 @@ import (
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
 )
 
 type JazzCash struct {
-	conf  *config.Secret
-	order *entity.Order
+	conf   *config.Secret
+	logger *logger.Logger
+	order  *entity.Order
 }
 
-func NewJazzCash(conf *config.Secret, order *entity.Order) *JazzCash {
+func NewJazzCash(
+	conf *config.Secret,
+	logger *logger.Logger,
+	order *entity.Order,
+) *JazzCash {
 	return &JazzCash{
-		conf:  conf,
-		order: order,
+		conf:   conf,
+		logger: logger,
+		order:  order,
 	}
 }
 
@@ -70,6 +77,8 @@ func (p *JazzCash) Payment() ([]byte, error) {
 		Transport: tr,
 	}
 
+	p.logger.Writer(req)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New(err.Error())
@@ -81,7 +90,7 @@ func (p *JazzCash) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-
+	p.logger.Writer(string(body))
 	return body, nil
 }
 

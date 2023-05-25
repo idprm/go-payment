@@ -73,7 +73,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init order
 	orderRepo := repository.NewOrderRepository(u.db)
 	orderService := services.NewOrderService(orderRepo)
-	orderHandler := handler.NewOrderHandler(u.cfg, applicationService, channelService, orderService, transactionService)
+	orderHandler := handler.NewOrderHandler(u.cfg, u.logger, applicationService, channelService, orderService, transactionService)
 
 	// init callback
 	callbackRepo := repository.NewCallbackRepository(u.db)

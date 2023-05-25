@@ -10,21 +10,25 @@ import (
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
+	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/utils"
 )
 
 type Nicepay struct {
-	conf  *config.Secret
-	order *entity.Order
+	conf   *config.Secret
+	logger *logger.Logger
+	order  *entity.Order
 }
 
 func NewNicepay(
 	conf *config.Secret,
+	logger *logger.Logger,
 	order *entity.Order,
 ) *Nicepay {
 	return &Nicepay{
-		conf:  conf,
-		order: order,
+		conf:   conf,
+		logger: logger,
+		order:  order,
 	}
 }
 
@@ -63,12 +67,9 @@ type Item struct {
 
 func (p *Nicepay) Payment() ([]byte, error) {
 	url := p.conf.Nicepay.Url + "/nicepay/direct/v2/registration"
-	timeStamp := ""
-	valueToken := []byte(timeStamp + p.conf.Nicepay.MerchantId + p.order.Number + strconv.Itoa(int(p.order.Amount)) + p.conf.Nicepay.MerchantKey)
-	encryptToken := utils.EncryptSHA256(valueToken)
 
 	request := &PaymentRequestBody{
-		TimeStamp:         timeStamp,
+		TimeStamp:         p.TimeStamp(),
 		MerchantId:        p.conf.Nicepay.MerchantId,
 		PaymentMethod:     "05",
 		MitraCode:         p.order.Channel.Param,
@@ -85,10 +86,10 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		BillingPostNumber: "12345",
 		BillingCountry:    "Indonesia",
 		NotificationUrl:   p.conf.App.Url + "/v1/nicepay/notify",
-		MerchantToken:     encryptToken,
+		MerchantToken:     p.Token(),
 	}
 
-	// if order.Method.Param == "OVOE" {
+	// if p.order.Method.Param == "OVOE" {
 	// 	request.CartData = "{}"
 	// } else {
 	// 	request.CartData = "{\"count\":\"1\",\"item\":[{\"goods_name\":\"Consultation\",\"goods_detail\":\"Consultation with Doctor\",\"goods_amt\":\"" + strconv.Itoa(order.Total) + "\",\"goods_quantity\":\"1\",\"img_url\":\"-\"}]}"
@@ -110,6 +111,7 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		Timeout:   30 * time.Second,
 		Transport: tr,
 	}
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -119,5 +121,16 @@ func (p *Nicepay) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	p.logger.Writer(string(body))
 	return body, nil
+}
+
+func (p *Nicepay) Token() string {
+	valueToken := []byte(p.TimeStamp() + p.conf.Nicepay.MerchantId + p.order.Number + strconv.Itoa(int(p.order.Amount)) + p.conf.Nicepay.MerchantKey)
+	return utils.EncryptSHA256(valueToken)
+}
+
+func (p *Nicepay) TimeStamp() string {
+	return utils.TimeStamp()
 }

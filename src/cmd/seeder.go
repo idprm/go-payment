@@ -36,9 +36,9 @@ var seederCmd = &cobra.Command{
 		var channel []entity.Channel
 
 		var applications = []entity.Application{
-			{Code: "SEHATCEPAT", Name: "Sehat Cepat", Url: "https://www.sehatcepat.com", UrlCallback: ""},
-			{Code: "SURATSAKIT", Name: "Surat Sakit", Url: "https://www.suratsakit.com", UrlCallback: ""},
-			{Code: "CPMOMO", Name: "CP MOMO", Url: "", UrlCallback: ""},
+			{Code: "SEHATCEPAT", Name: "Sehat Cepat", Url: "https://www.sehatcepat.com", UrlCallback: "https://www.sehatcepat.com/payment/callback"},
+			{Code: "SURATSAKIT", Name: "Surat Sakit", Url: "https://www.suratsakit.com", UrlCallback: "https://www.sehatcepat.com/payment/callback"},
+			{Code: "CPMOMO", Name: "CP MOMO", Url: "https://www.sehatcepat.com/payment/callback", UrlCallback: "https://www.sehatcepat.com/payment/callback"},
 		}
 
 		var gateways = []entity.Gateway{

@@ -3,20 +3,20 @@ package app
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
-	"go.uber.org/zap"
+	"github.com/idprm/go-payment/src/logger"
 	"gorm.io/gorm"
 )
 
 type Application struct {
 	cfg    *config.Secret
 	db     *gorm.DB
-	logger *zap.SugaredLogger
+	logger *logger.Logger
 }
 
 func NewApplication(
 	cfg *config.Secret,
 	db *gorm.DB,
-	logger *zap.SugaredLogger,
+	logger *logger.Logger,
 ) *Application {
 	return &Application{
 		cfg:    cfg,
@@ -28,13 +28,13 @@ func NewApplication(
 type UrlMappings struct {
 	cfg    *config.Secret
 	db     *gorm.DB
-	logger *zap.SugaredLogger
+	logger *logger.Logger
 }
 
 func NewUrlMappings(
 	cfg *config.Secret,
 	db *gorm.DB,
-	logger *zap.SugaredLogger,
+	logger *logger.Logger,
 ) *UrlMappings {
 	return &UrlMappings{
 		cfg:    cfg,
