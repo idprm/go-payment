@@ -75,7 +75,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if !h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -148,7 +148,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if !h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -223,7 +223,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if !h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -367,7 +367,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if !h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -441,7 +441,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if !h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
