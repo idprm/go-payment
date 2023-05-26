@@ -63,7 +63,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 
 	// init channel
 	channelRepo := repository.NewChannelRepository(u.db)
-	channelService := services.NewChannelService(gatewayRepo, channelRepo)
+	channelService := services.NewChannelService(u.cfg, gatewayRepo, channelRepo)
 	gatewayHandler := handler.NewGatewayHandler(u.cfg, countryService, gatewayService, channelService)
 
 	// init application
