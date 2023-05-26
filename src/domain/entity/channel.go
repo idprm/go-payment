@@ -2,7 +2,7 @@ package entity
 
 type Channel struct {
 	ID        int64    `gorm:"primaryKey" json:"id"`
-	GatewayID int64    `json:"gateway_id"`
+	GatewayID int64    `json:"-"`
 	Gateway   *Gateway `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"gateway,omitempty"`
 	Name      string   `gorm:"size:80" json:"name"`
 	Slug      string   `gorm:"size:60" json:"slug"`
@@ -28,8 +28,8 @@ func (e *Channel) GetLogo() string {
 	return e.Logo
 }
 
-func (e *Channel) SetLogo(url string) {
-	e.Logo = url + "/images/payments/" + e.Logo
+func (e *Channel) SetLogo(url, logo string) {
+	e.Logo = url + "/images/payments/" + logo
 }
 
 func (e *Channel) GetType() string {

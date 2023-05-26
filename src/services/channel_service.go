@@ -26,38 +26,57 @@ func NewChannelService(
 
 type IChannelService interface {
 	GetAllByGateway(int) (*[]entity.Channel, error)
-	CountBySlug(string) bool
-	GetBySlug(string) (*entity.Channel, error)
+	CountBySlug(int, string) bool
+	GetBySlug(int, string) (*entity.Channel, error)
 }
 
 func (s *ChannelService) GetAllByGateway(gateId int) (*[]entity.Channel, error) {
-	return s.channelRepo.GetAll(gateId)
-
+	result, err := s.channelRepo.GetAll(gateId)
+	if err != nil {
+		return nil, err
+	}
+	var channels []entity.Channel
+	if len(*result) > 0 {
+		for _, a := range *result {
+			channel := entity.Channel{
+				ID:       a.GetId(),
+				Name:     a.GetName(),
+				Slug:     a.GetSlug(),
+				Type:     a.GetType(),
+				Param:    a.GetParam(),
+				Gateway:  a.Gateway,
+				IsActive: a.GetIsActive(),
+			}
+			channel.SetLogo(s.cfg.App.Url, a.GetLogo())
+			channels = append(channels, channel)
+		}
+	}
+	return &channels, nil
 }
 
-func (s *ChannelService) CountBySlug(slug string) bool {
-	count, _ := s.channelRepo.CountBySlug(slug)
+func (s *ChannelService) CountBySlug(gateId int, slug string) bool {
+	count, _ := s.channelRepo.CountBySlug(gateId, slug)
 	return count > 0
 }
 
-func (s *ChannelService) GetBySlug(slug string) (*entity.Channel, error) {
-	result, err := s.channelRepo.GetBySlug(slug)
+func (s *ChannelService) GetBySlug(gateId int, slug string) (*entity.Channel, error) {
+	result, err := s.channelRepo.GetBySlug(gateId, slug)
 	if err != nil {
 		return nil, err
 	}
 	var channel entity.Channel
 	if result != nil {
-
 		channel = entity.Channel{
+			ID:       result.GetId(),
 			Name:     result.GetName(),
 			Slug:     result.GetSlug(),
-			Logo:     result.GetLogo(),
 			Type:     result.GetType(),
 			Param:    result.GetParam(),
+			Gateway:  result.Gateway,
 			IsActive: result.GetIsActive(),
 		}
 
-		channel.SetLogo(s.cfg.App.Url)
+		channel.SetLogo(s.cfg.App.Url, result.GetLogo())
 	}
 	return &channel, nil
 }

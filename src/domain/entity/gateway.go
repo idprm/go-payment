@@ -8,3 +8,7 @@ type Gateway struct {
 	Name      string     `gorm:"size:60" json:"name"`
 	Channel   *[]Channel `gorm:"foreignKey:gateway_id" json:"channels,omitempty"`
 }
+
+func (e *Gateway) GetId() int64 {
+	return e.ID
+}

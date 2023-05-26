@@ -60,18 +60,17 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	if !h.IsValidApplication(req.GetUrlCallback()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
 	}
-	/**
-	 * checking channel
-	 */
-	if !h.IsValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
-	}
-
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
-	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	/**
+	 * checking channel
+	 */
+	if !h.IsValidChannel(int(application.GetId()), req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+	}
+	channel, err := h.channelService.GetBySlug(int(application.GetId()), req.GetChannel())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
@@ -133,18 +132,17 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	if !h.IsValidApplication(req.GetUrlCallback()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
 	}
-	/**
-	 * checking channel
-	 */
-	if !h.IsValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
-	}
-
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
-	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	/**
+	 * checking channel
+	 */
+	if !h.IsValidChannel(int(application.GetId()), req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+	}
+	channel, err := h.channelService.GetBySlug(int(application.GetId()), req.GetChannel())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
@@ -208,18 +206,17 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	if !h.IsValidApplication(req.GetUrlCallback()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
 	}
-	/**
-	 * checking channel
-	 */
-	if !h.IsValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
-	}
-
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
-	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	/**
+	 * checking channel
+	 */
+	if !h.IsValidChannel(int(application.GetId()), req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+	}
+	channel, err := h.channelService.GetBySlug(int(application.GetId()), req.GetChannel())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
@@ -278,18 +275,23 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
+	/**
+	 * checking application
+	 */
 	if !h.IsValidApplication(req.GetUrlCallback()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
 	}
-	if !h.IsValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
-	}
-
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
-	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	/**
+	 * checking channel
+	 */
+	if !h.IsValidChannel(int(application.GetId()), req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+	}
+	channel, err := h.channelService.GetBySlug(int(application.GetId()), req.GetChannel())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
@@ -352,18 +354,17 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	if !h.IsValidApplication(req.GetUrlCallback()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
 	}
-	/**
-	 * checking channel
-	 */
-	if !h.IsValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
-	}
-
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
-	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	/**
+	 * checking channel
+	 */
+	if !h.IsValidChannel(int(application.GetId()), req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+	}
+	channel, err := h.channelService.GetBySlug(int(application.GetId()), req.GetChannel())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
@@ -426,18 +427,17 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	if !h.IsValidApplication(req.GetUrlCallback()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
 	}
-	/**
-	 * checking channel
-	 */
-	if !h.IsValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
-	}
-
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
-	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	/**
+	 * checking channel
+	 */
+	if !h.IsValidChannel(int(application.GetId()), req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+	}
+	channel, err := h.channelService.GetBySlug(int(application.GetId()), req.GetChannel())
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
@@ -486,8 +486,8 @@ func (h *OrderHandler) IsValidApplication(urlCallback string) bool {
 	return h.applicationService.CountByUrlCallback(urlCallback)
 }
 
-func (h *OrderHandler) IsValidChannel(slug string) bool {
-	return h.channelService.CountBySlug(slug)
+func (h *OrderHandler) IsValidChannel(gateId int, slug string) bool {
+	return h.channelService.CountBySlug(gateId, slug)
 }
 
 func (h *OrderHandler) IsValidOrderNumber(appId int, number string) bool {

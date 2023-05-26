@@ -64,7 +64,9 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init channel
 	channelRepo := repository.NewChannelRepository(u.db)
 	channelService := services.NewChannelService(u.cfg, gatewayRepo, channelRepo)
+
 	gatewayHandler := handler.NewGatewayHandler(u.cfg, countryService, gatewayService, channelService)
+	channelHandler := handler.NewChannelHandler(u.cfg, gatewayService, channelService)
 
 	// init application
 	applicationRepo := repository.NewApplicationRepository(u.db)
@@ -113,24 +115,28 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 
 	dragopay := v1.Group("dragonpay")
 	dragopay.Get("/", gatewayHandler.Dragonpay)
+	dragopay.Get("/:slug", channelHandler.Dragonpay)
 	dragopay.Post("order", orderHandler.DragonPay)
 	dragopay.Post("notification", paymentHandler.DragonPay)
 	dragopay.Post("refund", refundHandler.DragonPay)
 
 	jazzcash := v1.Group("jazzcash")
 	jazzcash.Get("/", gatewayHandler.Jazzcash)
+	jazzcash.Get("/:slug", channelHandler.Jazzcash)
 	jazzcash.Post("order", orderHandler.JazzCash)
 	jazzcash.Post("notification", paymentHandler.JazzCash)
 	jazzcash.Post("refund", refundHandler.JazzCash)
 
 	midtrans := v1.Group("midtrans")
 	midtrans.Get("/", gatewayHandler.Midtrans)
+	midtrans.Get("/:slug", channelHandler.Midtrans)
 	midtrans.Post("order", orderHandler.Midtrans)
 	midtrans.Post("notification", paymentHandler.Midtrans)
 	midtrans.Post("refund", refundHandler.Midtrans)
 
 	momo := v1.Group("momo")
 	momo.Get("/", gatewayHandler.Momo)
+	momo.Get("/:slug", channelHandler.Momo)
 	momo.Post("order", orderHandler.Momo)
 	momo.Get("notification", paymentHandler.Momo)
 	momo.Post("notification", paymentHandler.Momo)
@@ -138,6 +144,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 
 	nicepay := v1.Group("nicepay")
 	nicepay.Get("/", gatewayHandler.Nicepay)
+	nicepay.Get("/:slug", channelHandler.Nicepay)
 	nicepay.Post("order", orderHandler.Nicepay)
 	nicepay.Post("notification", paymentHandler.Nicepay)
 	nicepay.Post("notification", paymentHandler.Nicepay)
@@ -145,6 +152,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 
 	razer := v1.Group("razer")
 	razer.Get("/", gatewayHandler.Razer)
+	razer.Get("/:slug", channelHandler.Razer)
 	razer.Post("order", orderHandler.Razer)
 	razer.Get("notification", paymentHandler.Razer)
 	razer.Post("notification", paymentHandler.Razer)
