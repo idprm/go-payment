@@ -29,7 +29,7 @@ func (e *Channel) GetLogo() string {
 }
 
 func (e *Channel) SetLogo(url, logo string) {
-	e.Logo = url + "/images/payments/" + logo
+	e.Logo = url + "/static/images/payment/" + logo
 }
 
 func (e *Channel) GetType() string {
