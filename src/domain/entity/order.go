@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Order struct {
 	ID            int64        `gorm:"primaryKey" json:"id"`
-	ApplicationID int64        `json:"application_id"`
+	ApplicationID int64        `json:"-"`
 	Application   *Application `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"application,omitempty"`
-	ChannelID     int64        `json:"channel_id"`
+	ChannelID     int64        `json:"-"`
 	Channel       *Channel     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"channel,omitempty"`
 	Number        string       `gorm:"size:56" json:"number"`
 	Msisdn        string       `gorm:"size:25" json:"msisdn"`

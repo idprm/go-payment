@@ -53,6 +53,10 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	}
 	router.Static("/static", path+"/public")
 
+	// init country
+	countryRepo := repository.NewCountryRepository(u.db)
+	countryService := services.NewCountryService(countryRepo)
+
 	// init gateway
 	gatewayRepo := repository.NewGatewayRepository(u.db)
 	gatewayService := services.NewGatewayService(gatewayRepo)
@@ -60,7 +64,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init channel
 	channelRepo := repository.NewChannelRepository(u.db)
 	channelService := services.NewChannelService(gatewayRepo, channelRepo)
-	gatewayHandler := handler.NewGatewayHandler(u.cfg, gatewayService, channelService)
+	gatewayHandler := handler.NewGatewayHandler(u.cfg, countryService, gatewayService, channelService)
 
 	// init application
 	applicationRepo := repository.NewApplicationRepository(u.db)
@@ -102,6 +106,10 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	 * Routes Order & Notify (version 1)
 	 */
 	v1 := router.Group("v1")
+
+	country := router.Group("country")
+	country.Get("/", gatewayHandler.Country)
+	country.Get("/:locale", gatewayHandler.Locale)
 
 	dragopay := v1.Group("dragonpay")
 	dragopay.Get("/", gatewayHandler.Dragonpay)

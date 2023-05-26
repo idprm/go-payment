@@ -21,12 +21,14 @@ func InitMySQL(conf *config.Secret) (*gorm.DB, error) {
 	// TODO: Add migrations
 	db.AutoMigrate(
 		&entity.Application{},
+		&entity.Country{},
 		&entity.Gateway{},
 		&entity.Channel{},
 		&entity.Order{},
-		&entity.Transaction{},
 		&entity.Payment{},
 		&entity.Callback{},
+		&entity.Refund{},
+		&entity.Transaction{},
 	)
 	if err != nil {
 		return nil, err

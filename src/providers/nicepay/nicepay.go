@@ -79,7 +79,7 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		GoodsName:         p.order.GetDescription(),
 		BuyerName:         p.order.GetName(),
 		BuyerPhone:        p.order.GetMsisdn(),
-		BuyerEmail:        "help@sehatcepat.com",
+		BuyerEmail:        p.order.GetEmail(),
 		BuyerAddress:      "Billing Address",
 		BuyerCity:         "Jakarta",
 		BillingState:      "Jakarta",
@@ -87,6 +87,10 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		BillingCountry:    "Indonesia",
 		NotificationUrl:   p.conf.App.Url + "/v1/nicepay/notify",
 		MerchantToken:     p.Token(),
+	}
+
+	if p.order.Channel.GetParam() != "OVOE" {
+		request.CartData.Count = "1"
 	}
 
 	// if p.order.Method.Param == "OVOE" {

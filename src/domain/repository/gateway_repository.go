@@ -25,7 +25,7 @@ type IGatewayRepository interface {
 
 func (r *GatewayRepository) GetAll() (*[]entity.Gateway, error) {
 	var gateways []entity.Gateway
-	err := r.db.Order("id asc").Find(&gateways).Error
+	err := r.db.Order("id asc").Preload("Channel").Find(&gateways).Error
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (r *GatewayRepository) GetAll() (*[]entity.Gateway, error) {
 
 func (r *GatewayRepository) GetByCode(code string) (*entity.Gateway, error) {
 	var gateway entity.Gateway
-	err := r.db.Where("code = ?", code).Take(&gateway).Error
+	err := r.db.Where("code = ?", code).Preload("Channel").Take(&gateway).Error
 	if err != nil {
 		return nil, err
 	}

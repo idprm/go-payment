@@ -1,11 +1,14 @@
 package entity
 
 type Application struct {
-	ID          int64  `gorm:"primaryKey" json:"id"`
-	Code        string `gorm:"size:20" json:"code"`
-	Name        string `gorm:"size:60" json:"name"`
-	Url         string `gorm:"size:50" json:"url"`
-	UrlCallback string `gorm:"size:150" json:"url_callback"`
+	ID          int64          `gorm:"primaryKey" json:"id"`
+	Code        string         `gorm:"size:20" json:"code"`
+	Name        string         `gorm:"size:60" json:"name"`
+	Url         string         `gorm:"size:50" json:"url"`
+	UrlCallback string         `gorm:"size:200" json:"url_callback"`
+	UrlReturn   string         `gorm:"size:200" json:"url_return"`
+	Order       *[]Order       `gorm:"foreignKey:application_id" json:"transaction,omitempty"`
+	Transaction *[]Transaction `gorm:"foreignKey:application_id" json:"callback,omitempty"`
 }
 
 func (e *Application) GetId() int64 {

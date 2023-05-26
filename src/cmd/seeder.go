@@ -31,23 +31,51 @@ var seederCmd = &cobra.Command{
 			return
 		}
 
+		var country []entity.Country
 		var application []entity.Application
 		var gateway []entity.Gateway
 		var channel []entity.Channel
 
+		var countries = []entity.Country{
+			{Name: "Indonesia", Locale: "id", Prefix: "62", Flag: "indonesia.png"},
+			{Name: "Philippine", Locale: "ph", Prefix: "63", Flag: "philippine.png"},
+			{Name: "Pakistan", Locale: "pk", Prefix: "92", Flag: "pakistan.png"},
+			{Name: "Vietnam", Locale: "vn", Prefix: "84", Flag: "vietnam.png"},
+			{Name: "Malaysia", Locale: "my", Prefix: "60", Flag: "malaysia.png"},
+			{Name: "Thailand", Locale: "th", Prefix: "66", Flag: "thailand.png"},
+		}
+
 		var applications = []entity.Application{
-			{Code: "SEHATCEPAT", Name: "Sehat Cepat", Url: "https://www.sehatcepat.com", UrlCallback: "https://www.sehatcepat.com/payment/callback"},
-			{Code: "SURATSAKIT", Name: "Surat Sakit", Url: "https://www.suratsakit.com", UrlCallback: "https://www.sehatcepat.com/payment/callback"},
-			{Code: "CPMOMO", Name: "CP MOMO", Url: "https://www.sehatcepat.com/payment/callback", UrlCallback: "https://www.sehatcepat.com/payment/callback"},
+			{
+				Code:        "SEHATCEPAT",
+				Name:        "Sehat Cepat",
+				Url:         "https://www.sehatcepat.com",
+				UrlCallback: "https://www.sehatcepat.com/payment/callback",
+				UrlReturn:   "https://www.sehatcepat.com/order",
+			},
+			{
+				Code:        "SURATSAKIT",
+				Name:        "Surat Sakit",
+				Url:         "https://www.suratsakit.com",
+				UrlCallback: "https://www.suratsakit.com/payment/callback",
+				UrlReturn:   "https://www.suratsakit.com/order",
+			},
+			{
+				Code:        "GEMEZZVN",
+				Name:        "CP GEMEZZ",
+				Url:         "https://vngemezz.exmp.app",
+				UrlCallback: "https://vngemezz.exmp.app",
+				UrlReturn:   "https://vngemezz.exmp.app",
+			},
 		}
 
 		var gateways = []entity.Gateway{
-			{Code: "MIDTRANS", Name: "Midtrans"},
-			{Code: "NICEPAY", Name: "Nicepay"},
-			{Code: "DRAGONPAY", Name: "Dragon Pay"},
-			{Code: "JAZZCASH", Name: "Jazz Cash"},
-			{Code: "MOMO", Name: "Momo Payment"},
-			{Code: "RAZER", Name: "Razer"},
+			{CountryID: 1, Code: "MIDTRANS", Name: "Midtrans"},
+			{CountryID: 1, Code: "NICEPAY", Name: "Nicepay"},
+			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay"},
+			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash"},
+			{CountryID: 4, Code: "MOMO", Name: "Momo Payment"},
+			{CountryID: 5, Code: "RAZER", Name: "Razer"},
 		}
 
 		var channels = []entity.Channel{
@@ -85,6 +113,13 @@ var seederCmd = &cobra.Command{
 			{GatewayID: 6, Name: "AmOnline", Slug: "am-online", Logo: "am-online.png", Type: "wallet", Param: "amb.php", IsActive: true},
 			{GatewayID: 6, Name: "Razer Pay", Slug: "razer-pay", Logo: "razer-pay.png", Type: "wallet", Param: "RazerPay.php", IsActive: true},
 			{GatewayID: 6, Name: "Affin Bank", Slug: "affin-bank", Logo: "affin-bank.png", Type: "transfer", Param: "affin-epg.php", IsActive: true},
+		}
+
+		if db.Find(&country).RowsAffected == 0 {
+			for i, _ := range countries {
+				db.Model(&entity.Country{}).Create(&countries[i])
+			}
+			log.Println("countries migrated")
 		}
 
 		if db.Find(&application).RowsAffected == 0 {

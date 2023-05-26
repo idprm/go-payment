@@ -8,20 +8,42 @@ import (
 
 type GatewayHandler struct {
 	cfg            *config.Secret
+	countryService services.ICountryService
 	gatewayService services.IGatewayService
 	channelService services.IChannelService
 }
 
 func NewGatewayHandler(
 	cfg *config.Secret,
+	countryService services.ICountryService,
 	gatewayService services.IGatewayService,
 	channelService services.IChannelService,
 ) *GatewayHandler {
 	return &GatewayHandler{
 		cfg:            cfg,
+		countryService: countryService,
 		gatewayService: gatewayService,
 		channelService: channelService,
 	}
+}
+
+func (h *GatewayHandler) Country(c *fiber.Ctx) error {
+	countries, err := h.countryService.GetAll()
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error countries"})
+	}
+	return c.Status(fiber.StatusOK).JSON(countries)
+}
+
+func (h *GatewayHandler) Locale(c *fiber.Ctx) error {
+	if !h.IsValidCountry(c.Params("locale")) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Country not found"})
+	}
+	locales, err := h.countryService.GetByLocale(c.Params("locale"))
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error country"})
+	}
+	return c.Status(fiber.StatusOK).JSON(locales)
 }
 
 func (h *GatewayHandler) Midtrans(c *fiber.Ctx) error {
@@ -94,4 +116,8 @@ func (h *GatewayHandler) Razer(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
+}
+
+func (h *GatewayHandler) IsValidCountry(locale string) bool {
+	return h.countryService.CountByLocale(locale)
 }
