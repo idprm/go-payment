@@ -47,13 +47,31 @@ var seederCmd = &cobra.Command{
 
 		var applications = []entity.Application{
 			{
-				Code:        "SEHATCEPAT",
+				CountryID:   1,
+				Code:        "sehatcepat",
 				Name:        "Sehat Cepat",
 				Url:         "https://www.sehatcepat.com",
 				UrlCallback: "https://www.sehatcepat.com/payment/callback",
 				UrlReturn:   "https://www.sehatcepat.com/order",
 			},
 			{
+				CountryID:   2,
+				Code:        "pagalingkaagad",
+				Name:        "Pagalingkaagad",
+				Url:         "https://www.pagalingkaagad.com",
+				UrlCallback: "https://www.pagalingkaagad.com/payment/callback",
+				UrlReturn:   "https://www.pagalingkaagad.com/order",
+			},
+			{
+				CountryID:   2,
+				Code:        "pagalingkaagad",
+				Name:        "Pagalingkaagad",
+				Url:         "https://www.pagalingkaagad.com",
+				UrlCallback: "https://www.pagalingkaagad.com/payment/callback",
+				UrlReturn:   "https://www.pagalingkaagad.com/order",
+			},
+			{
+				CountryID:   1,
 				Code:        "SURATSAKIT",
 				Name:        "Surat Sakit",
 				Url:         "https://www.suratsakit.com",
@@ -61,6 +79,7 @@ var seederCmd = &cobra.Command{
 				UrlReturn:   "https://www.suratsakit.com/order",
 			},
 			{
+				CountryID:   2,
 				Code:        "GEMEZZVN",
 				Name:        "CP GEMEZZ",
 				Url:         "https://vngemezz.exmp.app",
@@ -70,12 +89,12 @@ var seederCmd = &cobra.Command{
 		}
 
 		var gateways = []entity.Gateway{
-			{CountryID: 1, Code: "MIDTRANS", Name: "Midtrans"},
-			{CountryID: 1, Code: "NICEPAY", Name: "Nicepay"},
-			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay"},
-			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash"},
-			{CountryID: 4, Code: "MOMO", Name: "Momo Payment"},
-			{CountryID: 5, Code: "RAZER", Name: "Razer"},
+			{CountryID: 1, Code: "MIDTRANS", Name: "Midtrans", Currency: "IDR"},
+			{CountryID: 1, Code: "NICEPAY", Name: "Nicepay", Currency: "IDR"},
+			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay", Currency: ""},
+			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash", Currency: ""},
+			{CountryID: 4, Code: "MOMO", Name: "Momo Payment", Currency: "VND"},
+			{CountryID: 5, Code: "RAZER", Name: "Razer", Currency: "MYR"},
 		}
 
 		var channels = []entity.Channel{

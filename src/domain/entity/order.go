@@ -34,6 +34,10 @@ func (e *Order) GetName() string {
 	return e.Name
 }
 
+func (e *Order) GetAmount() float64 {
+	return e.Amount
+}
+
 func (e *Order) GetDescription() string {
 	return e.Description
 }

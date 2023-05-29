@@ -15,66 +15,36 @@ import (
 )
 
 type Nicepay struct {
-	conf   *config.Secret
-	logger *logger.Logger
-	order  *entity.Order
+	conf    *config.Secret
+	logger  *logger.Logger
+	gateway *entity.Gateway
+	order   *entity.Order
 }
 
 func NewNicepay(
 	conf *config.Secret,
 	logger *logger.Logger,
+	gateway *entity.Gateway,
 	order *entity.Order,
 ) *Nicepay {
 	return &Nicepay{
-		conf:   conf,
-		logger: logger,
-		order:  order,
+		conf:    conf,
+		logger:  logger,
+		gateway: gateway,
+		order:   order,
 	}
-}
-
-type PaymentRequestBody struct {
-	TimeStamp         string `json:"timeStamp"`
-	MerchantId        string `json:"iMid"`
-	PaymentMethod     string `json:"payMethod"`
-	MitraCode         string `json:"mitraCd"`
-	Currency          string `json:"currency"`
-	PaymentAmount     string `json:"amt"`
-	ReferenceNo       string `json:"referenceNo"`
-	GoodsName         string `json:"goodsNm"`
-	BuyerName         string `json:"billingNm"`
-	BuyerPhone        string `json:"billingPhone"`
-	BuyerEmail        string `json:"billingEmail"`
-	BuyerAddress      string `json:"billingAddr"`
-	BuyerCity         string `json:"billingCity"`
-	BillingState      string `json:"billingState"`
-	BillingPostNumber string `json:"billingPostCd"`
-	BillingCountry    string `json:"billingCountry"`
-	NotificationUrl   string `json:"dbProcessUrl"`
-	MerchantToken     string `json:"merchantToken"`
-	CartData          struct {
-		Count string   `json:"count"`
-		Item  []string `json:"item"`
-	} `json:"cartData"`
-}
-
-type Item struct {
-	GoodsName     string `json:"goods_name"`
-	GoodsDetail   string `json:"goods_detail"`
-	GoodsAmt      int    `json:"goods_amt"`
-	GoodsQuantity int    `json:"goods_quantity"`
-	ImgUrl        string `json:"img_url"`
 }
 
 func (p *Nicepay) Payment() ([]byte, error) {
 	url := p.conf.Nicepay.Url + "/nicepay/direct/v2/registration"
 
-	request := &PaymentRequestBody{
+	request := &entity.NicepayRequestBody{
 		TimeStamp:         p.TimeStamp(),
 		MerchantId:        p.conf.Nicepay.MerchantId,
 		PaymentMethod:     "05",
 		MitraCode:         p.order.Channel.Param,
-		Currency:          "IDR",
-		PaymentAmount:     strconv.Itoa(int(p.order.Amount)),
+		Currency:          p.gateway.GetCurrency(),
+		PaymentAmount:     strconv.Itoa(int(p.order.GetAmount())),
 		ReferenceNo:       p.order.GetNumber(),
 		GoodsName:         p.order.GetDescription(),
 		BuyerName:         p.order.GetName(),
@@ -89,8 +59,9 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		MerchantToken:     p.Token(),
 	}
 
-	if p.order.Channel.GetParam() != "OVOE" {
+	if p.order.Channel.GetParam() == "OVOE" {
 		request.CartData.Count = "1"
+		request.CartData.NicepayRequestBodyItem = append(request.CartData.NicepayRequestBodyItem, "Consultation", "Consultation with Doctor", strconv.Itoa(int(p.order.GetAmount())), "1", "-")
 	}
 
 	// if p.order.Method.Param == "OVOE" {

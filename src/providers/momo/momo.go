@@ -18,59 +18,24 @@ import (
 )
 
 type Momo struct {
-	conf   *config.Secret
-	logger *logger.Logger
-	order  *entity.Order
+	conf        *config.Secret
+	logger      *logger.Logger
+	application *entity.Application
+	order       *entity.Order
 }
 
 func NewMomo(
 	conf *config.Secret,
 	logger *logger.Logger,
+	application *entity.Application,
 	order *entity.Order,
 ) *Momo {
 	return &Momo{
-		conf:   conf,
-		logger: logger,
-		order:  order,
+		conf:        conf,
+		logger:      logger,
+		application: application,
+		order:       order,
 	}
-}
-
-type PaymentRequestBody struct {
-	PartnerCode string `json:"partnerCode"`
-	PartnerName string `json:"partnerName"`
-	StoreId     string `json:"storeId"`
-	RequestId   string `json:"requestId"`
-	Amount      int    `json:"amount"`
-	OrderId     string `json:"orderId"`
-	OrderInfo   string `json:"orderInfo"`
-	RedirectUrl string `json:"redirectUrl"`
-	IpnUrl      string `json:"ipnUrl"`
-	RequestType string `json:"requestType"`
-	ExtraData   string `json:"extraData"`
-	Lang        string `json:"lang"`
-	AutoCapture bool   `json:"autoCapture"`
-	Signature   string `json:"signature"`
-}
-
-type PaymentResponseBody struct {
-	PartnerCode  string `json:"partnerCode"`
-	OrderId      string `json:"orderId"`
-	Amount       int    `json:"amount"`
-	ResponseTime int    `json:"responseTime"`
-	Message      string `json:"message"`
-	ResultCode   int    `json:"resultCode"`
-	PayUrl       string `json:"payUrl"`
-}
-
-type RefundRequestBody struct {
-	PartnerCode string `json:"partnerCode"`
-	OrderId     string `json:"orderId"`
-	RequestId   string `json:"requestId"`
-	Amount      int    `json:"amount"`
-	TransId     int    `json:"transId"`
-	Lang        string `json:"lang"`
-	Description string `json:"description"`
-	Signature   string `json:"signature"`
 }
 
 func (p *Momo) Payment() ([]byte, error) {
@@ -79,14 +44,14 @@ func (p *Momo) Payment() ([]byte, error) {
 	partnerCode := p.conf.Momo.PartnerCode
 	requestId := utils.GenerateTransactionId()
 
-	request := &PaymentRequestBody{
+	request := &entity.MomoRequestBody{
 		PartnerName: "Test",
 		PartnerCode: partnerCode,
 		StoreId:     partnerCode,
 		RequestId:   requestId,
-		Amount:      int(p.order.Amount),
-		OrderId:     p.order.Number,
-		OrderInfo:   p.order.Description,
+		Amount:      int(p.order.GetAmount()),
+		OrderId:     p.order.GetName(),
+		OrderInfo:   p.order.GetDescription(),
 		RedirectUrl: "https://momo.vn",
 		IpnUrl:      "https://webhook.site/94e534cb-a54a-4313-8e91-c42f7aa2e145",
 		RequestType: "captureWallet",
@@ -133,17 +98,17 @@ func (p *Momo) Refund() ([]byte, error) {
 	partnerCode := p.conf.Momo.PartnerCode
 	requestId := ""
 
-	request := &RefundRequestBody{
+	request := &entity.MomoRefundRequestBody{
 		PartnerCode: partnerCode,
-		OrderId:     p.order.Number,
+		OrderId:     p.order.GetNumber(),
 		RequestId:   requestId,
-		Amount:      int(p.order.Amount),
+		Amount:      int(p.order.GetAmount()),
 		TransId:     1683179398467,
-		Lang:        "en",
-		Description: p.order.Description,
+		Lang:        p.application.Country.GetLocale(),
+		Description: p.order.GetDescription(),
 	}
 
-	request.Signature = p.HashRefund(accessKey, int(p.order.Amount), p.order.Description, p.order.Number, partnerCode, requestId, 1683179398467)
+	request.Signature = p.HashRefund(accessKey, int(p.order.Amount), p.order.GetDescription(), p.order.GetNumber(), partnerCode, requestId, 1683179398467)
 
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))

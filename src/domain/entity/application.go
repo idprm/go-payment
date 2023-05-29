@@ -2,6 +2,8 @@ package entity
 
 type Application struct {
 	ID          int64          `gorm:"primaryKey" json:"id"`
+	CountryID   int64          `json:"-"`
+	Country     *Country       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"country,omitempty"`
 	Code        string         `gorm:"size:20" json:"code"`
 	Name        string         `gorm:"size:60" json:"name"`
 	Url         string         `gorm:"size:50" json:"url"`
@@ -29,4 +31,8 @@ func (e *Application) GetUrl() string {
 
 func (e *Application) GetUrlCallback() string {
 	return e.UrlCallback
+}
+
+func (e *Application) GetUrlReturn() string {
+	return e.UrlReturn
 }

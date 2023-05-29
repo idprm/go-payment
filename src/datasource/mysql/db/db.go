@@ -20,8 +20,8 @@ func InitMySQL(conf *config.Secret) (*gorm.DB, error) {
 
 	// TODO: Add migrations
 	db.AutoMigrate(
-		&entity.Application{},
 		&entity.Country{},
+		&entity.Application{},
 		&entity.Gateway{},
 		&entity.Channel{},
 		&entity.Order{},

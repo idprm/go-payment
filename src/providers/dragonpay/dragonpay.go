@@ -13,26 +13,42 @@ import (
 )
 
 type DragonPay struct {
-	conf   *config.Secret
-	logger *logger.Logger
-	order  *entity.Order
+	conf        *config.Secret
+	logger      *logger.Logger
+	application *entity.Application
+	gateway     *entity.Gateway
+	order       *entity.Order
 }
 
 func NewDragonPay(
 	conf *config.Secret,
 	logger *logger.Logger,
+	application *entity.Application,
+	gateway *entity.Gateway,
 	order *entity.Order,
 ) *DragonPay {
 	return &DragonPay{
-		conf:   conf,
-		logger: logger,
-		order:  order,
+		conf:        conf,
+		logger:      logger,
+		application: application,
+		gateway:     gateway,
+		order:       order,
 	}
 }
 
 func (p *DragonPay) Payment() ([]byte, error) {
 	url := p.conf.DragonPay.Url + p.order.GetNumber() + "/post"
-	var request entity.DragonPayRequestBody
+	request := &entity.DragonPayRequestBody{
+		Amount:      0,
+		Currency:    "",
+		Description: "",
+		Email:       "",
+		MobileNo:    "",
+		ProcId:      "",
+		Param1:      "",
+		Param2:      "",
+		IpAddress:   "",
+	}
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {

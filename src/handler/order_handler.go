@@ -94,7 +94,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := dragonpay.NewDragonPay(h.cfg, h.logger, order)
+	provider := dragonpay.NewDragonPay(h.cfg, h.logger, application, order)
 	dp, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error dragonpay"})
@@ -166,7 +166,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := jazzcash.NewJazzCash(h.cfg, h.logger, order)
+	provider := jazzcash.NewJazzCash(h.cfg, h.logger, application, order)
 	jz, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error jazzcash"})
@@ -240,7 +240,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := midtrans.NewMidtrans(h.cfg, h.logger, order)
+	provider := midtrans.NewMidtrans(h.cfg, h.logger, application, order)
 	mt, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error midtrans"})
@@ -315,7 +315,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := momo.NewMomo(h.cfg, h.logger, order)
+	provider := momo.NewMomo(h.cfg, h.logger, application, order)
 	mm, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error momopay"})
@@ -388,7 +388,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := nicepay.NewNicepay(h.cfg, h.logger, order)
+	provider := nicepay.NewNicepay(h.cfg, h.logger, application, order)
 	np, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error nicepay"})
@@ -461,7 +461,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := razer.NewRazer(h.cfg, h.logger, order, channel)
+	provider := razer.NewRazer(h.cfg, h.logger, application, order, channel)
 	rz, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error razer"})
