@@ -64,6 +64,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error application"})
 	}
+
 	/**
 	 * checking channel
 	 */
@@ -78,7 +79,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -94,7 +95,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := dragonpay.NewDragonPay(h.cfg, h.logger, application, order)
+	provider := dragonpay.NewDragonPay(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	dp, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error dragonpay"})
@@ -150,7 +151,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -166,7 +167,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := jazzcash.NewJazzCash(h.cfg, h.logger, application, order)
+	provider := jazzcash.NewJazzCash(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	jz, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error jazzcash"})
@@ -187,7 +188,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"error":        false,
 			"message":      res.GetResponseMessage(),
-			"redirect_url": nil,
+			"redirect_url": application.GetUrlReturn(),
 		})
 	}
 
@@ -224,7 +225,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -240,7 +241,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := midtrans.NewMidtrans(h.cfg, h.logger, application, order)
+	provider := midtrans.NewMidtrans(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	mt, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error midtrans"})
@@ -299,7 +300,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -315,7 +316,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := momo.NewMomo(h.cfg, h.logger, application, order)
+	provider := momo.NewMomo(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	mm, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error momopay"})
@@ -372,7 +373,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -388,7 +389,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := nicepay.NewNicepay(h.cfg, h.logger, application, order)
+	provider := nicepay.NewNicepay(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	np, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error nicepay"})
@@ -405,10 +406,12 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
 
+		redirectUrl := h.cfg.Nicepay.Url + "/nicepay/direct/v2/payment?timeStamp=" + provider.TimeStamp() + "&tXid=" + res.GetTransactionId() + "&merchantToken=" + provider.Token() + "&callBackUrl=" + application.GetUrlReturn()
+
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"error":        false,
 			"message":      "Success",
-			"redirect_url": "",
+			"redirect_url": redirectUrl,
 		})
 	}
 
@@ -445,7 +448,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	/**
 	 * checking order number
 	 */
-	if h.IsValidOrderNumber(int(application.GetId()), req.GetNumber()) {
+	if h.IsValidOrderNumber(req.GetNumber()) {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
 	}
 
@@ -461,7 +464,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 		IpAddress:     req.GetIpAddress(),
 	}
 
-	provider := razer.NewRazer(h.cfg, h.logger, application, order, channel)
+	provider := razer.NewRazer(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	rz, err := provider.Payment()
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error razer"})
@@ -490,8 +493,8 @@ func (h *OrderHandler) IsValidChannel(gateId int, slug string) bool {
 	return h.channelService.CountBySlug(gateId, slug)
 }
 
-func (h *OrderHandler) IsValidOrderNumber(appId int, number string) bool {
-	return h.orderService.CountByNumber(appId, number)
+func (h *OrderHandler) IsValidOrderNumber(number string) bool {
+	return h.orderService.CountByNumber(number)
 }
 
 func (h *OrderHandler) GetAll(c *fiber.Ctx) error {

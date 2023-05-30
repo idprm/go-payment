@@ -18,6 +18,10 @@ type Order struct {
 	gorm.Model
 }
 
+func (e *Order) GetId() int64 {
+	return e.ID
+}
+
 func (e *Order) GetNumber() string {
 	return e.Number
 }

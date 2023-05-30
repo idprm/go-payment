@@ -15,23 +15,29 @@ import (
 )
 
 type Nicepay struct {
-	conf    *config.Secret
-	logger  *logger.Logger
-	gateway *entity.Gateway
-	order   *entity.Order
+	conf        *config.Secret
+	logger      *logger.Logger
+	application *entity.Application
+	gateway     *entity.Gateway
+	channel     *entity.Channel
+	order       *entity.Order
 }
 
 func NewNicepay(
 	conf *config.Secret,
 	logger *logger.Logger,
+	application *entity.Application,
 	gateway *entity.Gateway,
+	channel *entity.Channel,
 	order *entity.Order,
 ) *Nicepay {
 	return &Nicepay{
-		conf:    conf,
-		logger:  logger,
-		gateway: gateway,
-		order:   order,
+		conf:        conf,
+		logger:      logger,
+		application: application,
+		gateway:     gateway,
+		channel:     channel,
+		order:       order,
 	}
 }
 
@@ -63,12 +69,6 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		request.CartData.Count = "1"
 		request.CartData.NicepayRequestBodyItem = append(request.CartData.NicepayRequestBodyItem, "Consultation", "Consultation with Doctor", strconv.Itoa(int(p.order.GetAmount())), "1", "-")
 	}
-
-	// if p.order.Method.Param == "OVOE" {
-	// 	request.CartData = "{}"
-	// } else {
-	// 	request.CartData = "{\"count\":\"1\",\"item\":[{\"goods_name\":\"Consultation\",\"goods_detail\":\"Consultation with Doctor\",\"goods_amt\":\"" + strconv.Itoa(order.Total) + "\",\"goods_quantity\":\"1\",\"img_url\":\"-\"}]}"
-	// }
 
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))

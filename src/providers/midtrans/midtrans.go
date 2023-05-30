@@ -14,20 +14,29 @@ import (
 )
 
 type Midtrans struct {
-	conf   *config.Secret
-	logger *logger.Logger
-	order  *entity.Order
+	conf        *config.Secret
+	logger      *logger.Logger
+	application *entity.Application
+	gateway     *entity.Gateway
+	channel     *entity.Channel
+	order       *entity.Order
 }
 
 func NewMidtrans(
 	conf *config.Secret,
 	logger *logger.Logger,
+	application *entity.Application,
+	gateway *entity.Gateway,
+	channel *entity.Channel,
 	order *entity.Order,
 ) *Midtrans {
 	return &Midtrans{
-		conf:   conf,
-		logger: logger,
-		order:  order,
+		conf:        conf,
+		logger:      logger,
+		application: application,
+		gateway:     gateway,
+		channel:     channel,
+		order:       order,
 	}
 }
 

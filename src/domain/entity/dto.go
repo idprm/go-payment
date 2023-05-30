@@ -186,6 +186,10 @@ func (r *NotifDragonPayRequestBody) GetDigest() string {
 	return r.Digest
 }
 
+func (r *NotifDragonPayRequestBody) IsValid() bool {
+	return r.GetReferenceNo() != "" || r.GetStatus() != ""
+}
+
 type JazzCashPaymentRequest struct {
 	Language          string `json:"pp_Language"`
 	MerchantID        string `json:"pp_MerchantID"`
@@ -440,6 +444,30 @@ func (r *MidtransResponsePayload) SetRedirectUrl(param string) {
 }
 
 type NotifMidtransRequestBody struct {
+	TransactionStatus string `json:"transaction_status"`
+	TransactionId     string `json:"transaction_id"`
+	OrderId           string `json:"order_id"`
+	FraudStatus       string `json:"fraud_status"`
+}
+
+func (r *NotifMidtransRequestBody) GetTransactionStatus() string {
+	return r.TransactionStatus
+}
+
+func (r *NotifMidtransRequestBody) GetTransactionId() string {
+	return r.TransactionId
+}
+
+func (r *NotifMidtransRequestBody) GetOrderId() string {
+	return r.OrderId
+}
+
+func (r *NotifMidtransRequestBody) GetFraudStatus() string {
+	return r.FraudStatus
+}
+
+func (r *NotifMidtransRequestBody) IsValid() bool {
+	return r.GetTransactionStatus() == "settlement" || r.GetTransactionStatus() == "capture"
 }
 
 type MomoRequestBody struct {
@@ -710,6 +738,75 @@ func (r *NicepayResponsePayload) IsValid() bool {
 }
 
 type NotifNicepayRequestBody struct {
+	TransactionId   string `json:"tXid" form:"tXid"`
+	ReferenceNo     string `json:"referenceNo" form:"referenceNo"`
+	PaymentMethod   string `json:"payMethod" form:"payMethod"`
+	PaymentAmount   string `json:"amt" form:"amt"`
+	TransactionDate string `json:"transDt" form:"transDt"`
+	TransactionTime string `json:"transTm" form:"transTm"`
+	Currency        string `json:"currency" form:"currency"`
+	GoodsName       string `json:"goodsNm" form:"goodsNm"`
+	BuyerName       string `json:"billingNm" form:"billingNm"`
+	MatchFlag       string `json:"matchCl" form:"matchCl"`
+	Status          string `json:"status" form:"status"`
+	MerchantToken   string `json:"merchantToken" form:"merchantToken"`
+	MitraCode       string `json:"mitraCd" form:"mitraCd"`
+}
+
+func (r *NotifNicepayRequestBody) GetTransactionId() string {
+	return r.TransactionId
+}
+
+func (r *NotifNicepayRequestBody) GetReferenceNo() string {
+	return r.ReferenceNo
+}
+
+func (r *NotifNicepayRequestBody) GetPaymentMethod() string {
+	return r.PaymentMethod
+}
+
+func (r *NotifNicepayRequestBody) GetPaymentAmount() string {
+	return r.PaymentAmount
+}
+
+func (r *NotifNicepayRequestBody) GetTransactionDate() string {
+	return r.TransactionDate
+}
+
+func (r *NotifNicepayRequestBody) GetTransactionTime() string {
+	return r.TransactionTime
+}
+
+func (r *NotifNicepayRequestBody) GetCurrency() string {
+	return r.Currency
+}
+
+func (r *NotifNicepayRequestBody) GetGoodsName() string {
+	return r.GoodsName
+}
+
+func (r *NotifNicepayRequestBody) GetBuyerName() string {
+	return r.BuyerName
+}
+
+func (r *NotifNicepayRequestBody) GetMatchFlag() string {
+	return r.MatchFlag
+}
+
+func (r *NotifNicepayRequestBody) GetStatus() string {
+	return r.Status
+}
+
+func (r *NotifNicepayRequestBody) GetMerchantToken() string {
+	return r.MerchantToken
+}
+
+func (r *NotifNicepayRequestBody) GetMitraCode() string {
+	return r.MitraCode
+}
+
+func (r *NotifNicepayRequestBody) IsValid() bool {
+	return r.GetStatus() == "0"
 }
 
 type RazerRequestBody struct {

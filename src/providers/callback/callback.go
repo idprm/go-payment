@@ -1,4 +1,4 @@
-package postback
+package callback
 
 import (
 	"bytes"

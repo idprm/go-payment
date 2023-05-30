@@ -21,6 +21,8 @@ type Momo struct {
 	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
+	gateway     *entity.Gateway
+	channel     *entity.Channel
 	order       *entity.Order
 }
 
@@ -28,12 +30,16 @@ func NewMomo(
 	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
+	gateway *entity.Gateway,
+	channel *entity.Channel,
 	order *entity.Order,
 ) *Momo {
 	return &Momo{
 		conf:        conf,
 		logger:      logger,
 		application: application,
+		gateway:     gateway,
+		channel:     channel,
 		order:       order,
 	}
 }

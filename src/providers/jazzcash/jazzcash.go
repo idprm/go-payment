@@ -19,20 +19,29 @@ import (
 )
 
 type JazzCash struct {
-	conf   *config.Secret
-	logger *logger.Logger
-	order  *entity.Order
+	conf        *config.Secret
+	logger      *logger.Logger
+	application *entity.Application
+	gateway     *entity.Gateway
+	channel     *entity.Channel
+	order       *entity.Order
 }
 
 func NewJazzCash(
 	conf *config.Secret,
 	logger *logger.Logger,
+	application *entity.Application,
+	gateway *entity.Gateway,
+	channel *entity.Channel,
 	order *entity.Order,
 ) *JazzCash {
 	return &JazzCash{
-		conf:   conf,
-		logger: logger,
-		order:  order,
+		conf:        conf,
+		logger:      logger,
+		application: application,
+		gateway:     gateway,
+		channel:     channel,
+		order:       order,
 	}
 }
 

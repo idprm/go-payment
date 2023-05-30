@@ -10,3 +10,11 @@ type Payment struct {
 	Callback   *Callback `gorm:"foreignKey:payment_id" json:"callback,omitempty"`
 	gorm.Model `json:"model"`
 }
+
+func (e *Payment) GetId() int64 {
+	return e.ID
+}
+
+func (e *Payment) GetIsPaid() bool {
+	return e.IsPaid
+}

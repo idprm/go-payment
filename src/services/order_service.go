@@ -16,18 +16,18 @@ func NewOrderService(orderRepo repository.IOrderRepository) *OrderService {
 }
 
 type IOrderService interface {
-	GetByNumber(int, string) (*entity.Order, error)
-	CountByNumber(int, string) bool
+	GetByNumber(string) (*entity.Order, error)
+	CountByNumber(string) bool
 	Save(*entity.Order) (*entity.Order, error)
 	Update(*entity.Order) (*entity.Order, error)
 }
 
-func (s *OrderService) GetByNumber(appId int, number string) (*entity.Order, error) {
-	return s.orderRepo.GetByNumber(appId, number)
+func (s *OrderService) GetByNumber(number string) (*entity.Order, error) {
+	return s.orderRepo.GetByNumber(number)
 }
 
-func (s *OrderService) CountByNumber(appId int, number string) bool {
-	count, _ := s.orderRepo.CountByNumber(appId, number)
+func (s *OrderService) CountByNumber(number string) bool {
+	count, _ := s.orderRepo.CountByNumber(number)
 	return count > 0
 }
 

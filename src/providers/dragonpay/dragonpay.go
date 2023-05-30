@@ -17,6 +17,7 @@ type DragonPay struct {
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
+	channel     *entity.Channel
 	order       *entity.Order
 }
 
@@ -25,6 +26,7 @@ func NewDragonPay(
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
+	channel *entity.Channel,
 	order *entity.Order,
 ) *DragonPay {
 	return &DragonPay{
@@ -32,6 +34,7 @@ func NewDragonPay(
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
+		channel:     channel,
 		order:       order,
 	}
 }

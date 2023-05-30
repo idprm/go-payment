@@ -11,26 +11,29 @@ import (
 )
 
 type Razer struct {
-	conf    *config.Secret
-	logger  *logger.Logger
-	gateway *entity.Gateway
-	channel *entity.Channel
-	order   *entity.Order
+	conf        *config.Secret
+	logger      *logger.Logger
+	application *entity.Application
+	gateway     *entity.Gateway
+	channel     *entity.Channel
+	order       *entity.Order
 }
 
 func NewRazer(
 	conf *config.Secret,
 	logger *logger.Logger,
+	application *entity.Application,
 	gateway *entity.Gateway,
 	channel *entity.Channel,
 	order *entity.Order,
 ) *Razer {
 	return &Razer{
-		conf:    conf,
-		logger:  logger,
-		gateway: gateway,
-		channel: channel,
-		order:   order,
+		conf:        conf,
+		logger:      logger,
+		application: application,
+		gateway:     gateway,
+		channel:     channel,
+		order:       order,
 	}
 }
 
