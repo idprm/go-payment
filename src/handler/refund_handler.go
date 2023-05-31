@@ -15,6 +15,7 @@ type RefundHandler struct {
 	cfg                *config.Secret
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
+	orderService       services.IOrderService
 	refundService      services.IRefundService
 	transactionService services.ITransactionService
 }
@@ -23,6 +24,7 @@ func NewRefundHandler(
 	cfg *config.Secret,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
+	orderService services.IOrderService,
 	refundService services.IRefundService,
 	transactionService services.ITransactionService,
 ) *RefundHandler {
@@ -30,6 +32,7 @@ func NewRefundHandler(
 		cfg:                cfg,
 		logger:             logger,
 		zap:                zap,
+		orderService:       orderService,
 		refundService:      refundService,
 		transactionService: transactionService,
 	}

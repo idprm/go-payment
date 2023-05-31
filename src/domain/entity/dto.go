@@ -617,7 +617,75 @@ func (r *MomoResponsePayload) IsValid() bool {
 }
 
 type NotifMomoRequestBody struct {
-	// not yet
+	PartnerCode  string `json:"partnerCode"`
+	OrderId      string `json:"orderId"`
+	RequestId    string `json:"requestId"`
+	Amount       string `json:"amount"`
+	OrderInfo    string `json:"orderInfo"`
+	OrderType    string `json:"orderType"`
+	TransId      string `json:"transId"`
+	ResultCode   int    `json:"resultCode"`
+	Message      string `json:"message"`
+	PayType      string `json:"payType"`
+	ResponseTime string `json:"responseTime"`
+	ExtraData    string `json:"extraData"`
+	Signature    string `json:"signature"`
+}
+
+func (r *NotifMomoRequestBody) GetPartnerCode() string {
+	return r.PartnerCode
+}
+
+func (r *NotifMomoRequestBody) GetOrderId() string {
+	return r.OrderId
+}
+
+func (r *NotifMomoRequestBody) GetRequestId() string {
+	return r.RequestId
+}
+
+func (r *NotifMomoRequestBody) GetAmount() string {
+	return r.Amount
+}
+
+func (r *NotifMomoRequestBody) GetOrderInfo() string {
+	return r.OrderInfo
+}
+
+func (r *NotifMomoRequestBody) GetOrderType() string {
+	return r.OrderType
+}
+
+func (r *NotifMomoRequestBody) GetTransId() string {
+	return r.TransId
+}
+
+func (r *NotifMomoRequestBody) GetResultCode() int {
+	return r.ResultCode
+}
+
+func (r *NotifMomoRequestBody) GetMessage() string {
+	return r.Message
+}
+
+func (r *NotifMomoRequestBody) GetPayType() string {
+	return r.PayType
+}
+
+func (r *NotifMomoRequestBody) GetResponseTime() string {
+	return r.ResponseTime
+}
+
+func (r *NotifMomoRequestBody) GetExtraData() string {
+	return r.ExtraData
+}
+
+func (r *NotifMomoRequestBody) GetSignature() string {
+	return r.Signature
+}
+
+func (r *NotifMomoRequestBody) IsValid() bool {
+	return r.GetResultCode() == 0
 }
 
 type NicepayRequestBody struct {
