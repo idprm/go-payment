@@ -221,10 +221,10 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 	h.zap.Info(c.Body())
 	h.zap.Info(c.AllParams())
-	req := new(entity.NotifRazerRequestBody)
-	if err := c.BodyParser(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
-	}
+	// req := new(entity.NotifRazerRequestBody)
+	// if err := c.BodyParser(req); err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	// }
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
