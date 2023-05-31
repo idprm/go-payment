@@ -87,6 +87,6 @@ func (p *DragonPay) Payment() ([]byte, error) {
 		return nil, err
 	}
 
-	p.logger.Writer(body)
+	p.logger.Writer(string(body))
 	return body, nil
 }

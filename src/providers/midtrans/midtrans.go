@@ -99,7 +99,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.logger.Writer(body)
+	p.logger.Writer(string(body))
 	return body, nil
 }
 
@@ -127,7 +127,7 @@ func (p *Midtrans) Refund() ([]byte, error) {
 		Timeout:   30 * time.Second,
 		Transport: tr,
 	}
-
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -139,6 +139,6 @@ func (p *Midtrans) Refund() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	p.logger.Writer(string(body))
 	return body, nil
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -44,11 +45,12 @@ func NewNicepay(
 func (p *Nicepay) Payment() ([]byte, error) {
 	url := p.conf.Nicepay.Url + "/nicepay/direct/v2/registration"
 
+	log.Println(p.gateway)
 	request := &entity.NicepayRequestBody{
 		TimeStamp:         p.TimeStamp(),
 		MerchantId:        p.conf.Nicepay.MerchantId,
 		PaymentMethod:     "05",
-		MitraCode:         p.order.Channel.Param,
+		MitraCode:         p.channel.GetParam(),
 		Currency:          p.gateway.GetCurrency(),
 		PaymentAmount:     strconv.Itoa(int(p.order.GetAmount())),
 		ReferenceNo:       p.order.GetNumber(),
@@ -65,9 +67,10 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		MerchantToken:     p.Token(),
 	}
 
-	if p.order.Channel.GetParam() == "OVOE" {
-		request.CartData.Count = "1"
-		request.CartData.NicepayRequestBodyItem = append(request.CartData.NicepayRequestBodyItem, "Consultation", "Consultation with Doctor", strconv.Itoa(int(p.order.GetAmount())), "1", "-")
+	if p.channel.GetParam() == "OVOE" {
+		request.CartData = "{}"
+	} else {
+		request.CartData = "{\"count\":\"1\",\"item\":[{\"goods_name\":\"Consultation\",\"goods_detail\":\"Consultation with Doctor\",\"goods_amt\":\"" + strconv.Itoa(int(p.order.Amount)) + "\",\"goods_quantity\":\"1\",\"img_url\":\"-\"}]}"
 	}
 
 	payload, _ := json.Marshal(&request)

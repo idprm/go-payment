@@ -69,6 +69,6 @@ func (p *Callback) Hit() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.logger.Writer(body)
+	p.logger.Writer(string(body))
 	return body, nil
 }

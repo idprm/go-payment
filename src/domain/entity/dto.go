@@ -707,10 +707,7 @@ type NicepayRequestBody struct {
 	BillingCountry    string `json:"billingCountry"`
 	NotificationUrl   string `json:"dbProcessUrl"`
 	MerchantToken     string `json:"merchantToken"`
-	CartData          struct {
-		Count                  string   `json:"count"`
-		NicepayRequestBodyItem []string `json:"item"`
-	} `json:"cartData"`
+	CartData          string `json:"cartData"`
 }
 
 type NicepayRequestBodyItem struct {

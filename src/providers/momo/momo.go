@@ -56,15 +56,15 @@ func (p *Momo) Payment() ([]byte, error) {
 		StoreId:     partnerCode,
 		RequestId:   requestId,
 		Amount:      int(p.order.GetAmount()),
-		OrderId:     p.order.GetName(),
+		OrderId:     p.order.GetNumber(),
 		OrderInfo:   p.order.GetDescription(),
 		RedirectUrl: p.application.GetUrlReturn(),
 		IpnUrl:      p.conf.App.Url + "/v1/momo/notification",
 		RequestType: "captureWallet",
 		ExtraData:   "",
-		Lang:        p.gateway.Country.GetLocale(),
+		Lang:        "en",
 		AutoCapture: true,
-		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", p.conf.App.Url+"/v1/momo/notification", p.order.Number, p.order.Description, partnerCode, "https://momo.vn", requestId, "captureWallet"),
+		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", p.conf.App.Url+"/v1/momo/notification", p.order.GetNumber(), p.order.GetDescription(), partnerCode, p.application.GetUrlReturn(), requestId, "captureWallet"),
 	}
 
 	payload, _ := json.Marshal(&request)
@@ -94,7 +94,7 @@ func (p *Momo) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.logger.Writer(body)
+	p.logger.Writer(string(body))
 	return body, nil
 }
 

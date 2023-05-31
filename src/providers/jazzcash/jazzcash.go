@@ -93,7 +93,7 @@ func (p *JazzCash) Payment() ([]byte, error) {
 		return nil, errors.New(err.Error())
 	}
 
-	p.logger.Writer(body)
+	p.logger.Writer(string(body))
 	return body, nil
 }
 
