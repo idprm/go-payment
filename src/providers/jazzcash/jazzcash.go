@@ -58,12 +58,12 @@ func (p *JazzCash) Payment() ([]byte, error) {
 		Password:          password,
 		TxnRefNo:          p.order.GetNumber(),
 		Amount:            strconv.Itoa(int(p.order.Amount)),
-		TxnCurrency:       "PKR",
+		TxnCurrency:       p.gateway.GetCurrency(),
 		TxnDateTime:       p.TxTime(),
 		BillReference:     "billRef",
 		Description:       p.order.GetDescription(),
 		TxnExpiryDateTime: p.TxTimeExp(),
-		SecureHash:        p.Hash(strconv.Itoa(int(p.order.Amount)), "billRef", 345678, p.order.GetDescription(), "EN", merchantId, p.PrefixMsisdn(), password, "PKR", orderInfo),
+		SecureHash:        p.Hash(strconv.Itoa(int(p.order.Amount)), "billRef", 345678, p.order.GetDescription(), "EN", merchantId, p.PrefixMsisdn(), password, p.gateway.GetCurrency(), orderInfo),
 		MobileNumber:      p.PrefixMsisdn(),
 		CNIC:              345678,
 	})
@@ -92,7 +92,8 @@ func (p *JazzCash) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	p.logger.Writer(string(body))
+
+	p.logger.Writer(body)
 	return body, nil
 }
 

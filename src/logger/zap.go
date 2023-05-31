@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"time"
+
 	"github.com/idprm/go-payment/src/config"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
@@ -24,7 +26,7 @@ func getEncoder() zapcore.Encoder {
 
 func getLogWriter(cfg *config.Secret) zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   cfg.Log.Path + "/logging" + ".log",
+		Filename:   cfg.Log.Path + "/logging-" + time.Now().Format("2006-01-02") + ".log",
 		MaxSize:    10,
 		MaxBackups: 5,
 		MaxAge:     30,

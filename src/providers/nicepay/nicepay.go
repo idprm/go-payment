@@ -61,7 +61,7 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		BillingState:      "Jakarta",
 		BillingPostNumber: "12345",
 		BillingCountry:    "Indonesia",
-		NotificationUrl:   p.conf.App.Url + "/v1/nicepay/notify",
+		NotificationUrl:   p.conf.App.Url + "/v1/nicepay/notification",
 		MerchantToken:     p.Token(),
 	}
 

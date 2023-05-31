@@ -91,8 +91,8 @@ var seederCmd = &cobra.Command{
 		var gateways = []entity.Gateway{
 			{CountryID: 1, Code: "MIDTRANS", Name: "Midtrans", Currency: "IDR"},
 			{CountryID: 1, Code: "NICEPAY", Name: "Nicepay", Currency: "IDR"},
-			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay", Currency: ""},
-			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash", Currency: ""},
+			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay", Currency: "PHP"},
+			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash", Currency: "PKR"},
 			{CountryID: 4, Code: "MOMO", Name: "Momo Payment", Currency: "VND"},
 			{CountryID: 5, Code: "RAZER", Name: "Razer", Currency: "MYR"},
 		}

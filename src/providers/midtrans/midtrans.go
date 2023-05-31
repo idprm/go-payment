@@ -67,7 +67,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	request.ReqCustomer.Email = p.order.GetEmail()
 	request.ReqTransaction.OrderId = p.order.GetNumber()
 	request.ReqTransaction.GrossAmount = int(p.order.Amount)
-	request.ReqCallback.Finish = ""
+	request.ReqCallback.Finish = p.application.GetUrlReturn()
 
 	payload, _ := json.Marshal(&request)
 
@@ -75,8 +75,9 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(p.conf.Midtrans.ServerKey)))
-	req.Header.Add("X-Override-Notification", p.conf.App.Url+"/midtrans/notification")
+	var basic = "Basic " + base64.StdEncoding.EncodeToString([]byte(p.conf.Midtrans.ServerKey))
+	req.Header.Add("Authorization", basic)
+	req.Header.Add("X-Override-Notification", p.conf.App.Url+"/v1/midtrans/notification")
 	req.Header.Set("Content-Type", "application/json")
 	tr := &http.Transport{
 		Proxy:              http.ProxyFromEnvironment,
@@ -98,7 +99,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.logger.Writer(string(body))
+	p.logger.Writer(body)
 	return body, nil
 }
 

@@ -58,13 +58,13 @@ func (p *Momo) Payment() ([]byte, error) {
 		Amount:      int(p.order.GetAmount()),
 		OrderId:     p.order.GetName(),
 		OrderInfo:   p.order.GetDescription(),
-		RedirectUrl: "https://momo.vn",
-		IpnUrl:      "https://webhook.site/94e534cb-a54a-4313-8e91-c42f7aa2e145",
+		RedirectUrl: p.application.GetUrlReturn(),
+		IpnUrl:      p.conf.App.Url + "/v1/momo/notification",
 		RequestType: "captureWallet",
 		ExtraData:   "",
-		Lang:        "en",
+		Lang:        p.gateway.Country.GetLocale(),
 		AutoCapture: true,
-		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", "https://webhook.site/94e534cb-a54a-4313-8e91-c42f7aa2e145", p.order.Number, p.order.Description, partnerCode, "https://momo.vn", requestId, "captureWallet"),
+		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", p.conf.App.Url+"/v1/momo/notification", p.order.Number, p.order.Description, partnerCode, "https://momo.vn", requestId, "captureWallet"),
 	}
 
 	payload, _ := json.Marshal(&request)
@@ -94,7 +94,7 @@ func (p *Momo) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.logger.Writer(string(body))
+	p.logger.Writer(body)
 	return body, nil
 }
 
@@ -102,7 +102,7 @@ func (p *Momo) Refund() ([]byte, error) {
 	url := p.conf.Momo.Url + "/v2/gateway/api/refund"
 	accessKey := p.conf.Momo.AccessKey
 	partnerCode := p.conf.Momo.PartnerCode
-	requestId := ""
+	requestId := utils.GenerateTransactionId()
 
 	request := &entity.MomoRefundRequestBody{
 		PartnerCode: partnerCode,
@@ -110,7 +110,7 @@ func (p *Momo) Refund() ([]byte, error) {
 		RequestId:   requestId,
 		Amount:      int(p.order.GetAmount()),
 		TransId:     1683179398467,
-		Lang:        p.application.Country.GetLocale(),
+		Lang:        p.gateway.Country.GetLocale(),
 		Description: p.order.GetDescription(),
 	}
 

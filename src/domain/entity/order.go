@@ -45,3 +45,7 @@ func (e *Order) GetAmount() float64 {
 func (e *Order) GetDescription() string {
 	return e.Description
 }
+
+func (e *Order) GetIpAddress() string {
+	return e.IpAddress
+}

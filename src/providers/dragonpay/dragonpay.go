@@ -2,6 +2,7 @@ package dragonpay
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -42,22 +43,24 @@ func NewDragonPay(
 func (p *DragonPay) Payment() ([]byte, error) {
 	url := p.conf.DragonPay.Url + p.order.GetNumber() + "/post"
 	request := &entity.DragonPayRequestBody{
-		Amount:      0,
-		Currency:    "",
-		Description: "",
-		Email:       "",
-		MobileNo:    "",
-		ProcId:      "",
-		Param1:      "",
-		Param2:      "",
-		IpAddress:   "",
+		Amount:      int(p.order.GetAmount()),
+		Currency:    p.gateway.GetCurrency(),
+		Description: p.order.GetDescription(),
+		Email:       p.order.GetEmail(),
+		MobileNo:    p.order.GetMsisdn(),
+		ProcId:      p.channel.GetParam(),
+		Param1:      p.application.GetUrlReturn(),
+		Param2:      p.application.GetUrlReturn(),
+		IpAddress:   p.order.GetIpAddress(),
 	}
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "basic")
+
+	var basic = "Basic " + base64.StdEncoding.EncodeToString([]byte(p.conf.DragonPay.MerchantId+":"+p.conf.DragonPay.Password))
+	req.Header.Add("Authorization", basic)
 	req.Header.Set("Content-Type", "application/json")
 
 	tr := &http.Transport{
@@ -72,6 +75,7 @@ func (p *DragonPay) Payment() ([]byte, error) {
 		Transport: tr,
 	}
 
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -82,5 +86,7 @@ func (p *DragonPay) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	p.logger.Writer(body)
 	return body, nil
 }

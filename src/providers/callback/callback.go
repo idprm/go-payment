@@ -58,6 +58,7 @@ func (p *Callback) Hit() ([]byte, error) {
 		Transport: tr,
 	}
 
+	p.logger.Writer(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -68,5 +69,6 @@ func (p *Callback) Hit() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	p.logger.Writer(body)
 	return body, nil
 }

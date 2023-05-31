@@ -52,7 +52,7 @@ func (p *Razer) Payment() (string, error) {
 	q.Add("bill_email", p.order.GetEmail())
 	q.Add("bill_mobile", "+"+p.order.GetMsisdn())
 	q.Add("bill_desc", p.order.GetDescription())
-	q.Add("cur", "MYR")
+	q.Add("cur", p.gateway.GetCurrency())
 	q.Add("vcode", utils.GetMD5Hash(str))
 	p.logger.Writer(req)
 	req.URL.RawQuery = q.Encode()

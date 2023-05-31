@@ -617,19 +617,19 @@ func (r *MomoResponsePayload) IsValid() bool {
 }
 
 type NotifMomoRequestBody struct {
-	PartnerCode  string `json:"partnerCode"`
-	OrderId      string `json:"orderId"`
-	RequestId    string `json:"requestId"`
-	Amount       string `json:"amount"`
-	OrderInfo    string `json:"orderInfo"`
-	OrderType    string `json:"orderType"`
-	TransId      string `json:"transId"`
-	ResultCode   int    `json:"resultCode"`
-	Message      string `json:"message"`
-	PayType      string `json:"payType"`
-	ResponseTime string `json:"responseTime"`
-	ExtraData    string `json:"extraData"`
-	Signature    string `json:"signature"`
+	PartnerCode  string `json:"partnerCode" query:"partnerCode"`
+	OrderId      string `json:"orderId" query:"orderId"`
+	RequestId    string `json:"requestId" query:"requestId"`
+	Amount       string `json:"amount" query:"amount"`
+	OrderInfo    string `json:"orderInfo" query:"orderInfo"`
+	OrderType    string `json:"orderType" query:"orderType"`
+	TransId      string `json:"transId" query:"transId"`
+	ResultCode   int    `json:"resultCode" query:"resultCode"`
+	Message      string `json:"message" query:"message"`
+	PayType      string `json:"payType" query:"payType"`
+	ResponseTime string `json:"responseTime" query:"responseTime"`
+	ExtraData    string `json:"extraData" query:"extraData"`
+	Signature    string `json:"signature" query:"signature"`
 }
 
 func (r *NotifMomoRequestBody) GetPartnerCode() string {
@@ -929,6 +929,55 @@ func (r *RazerResponsePayload) GetRedirectUrl() string {
 }
 
 type NotifRazerRequestBody struct {
+	TranId   string `json:"tranID" form:"tranID"`
+	OrderId  string `json:"orderid" form:"orderid"`
+	Status   string `json:"status" form:"status"`
+	Domain   string `json:"domain" form:"domain"`
+	Amount   string `json:"amount" form:"amount"`
+	Currency string `json:"currency" form:"currency"`
+	AppCode  string `json:"appcode" form:"appcode"`
+	PayDate  string `json:"paydate" form:"paydate"`
+	Skey     string `json:"skey" form:"skey"`
+}
+
+func (r *NotifRazerRequestBody) GetTranId() string {
+	return r.TranId
+}
+
+func (r *NotifRazerRequestBody) GetOrderId() string {
+	return r.OrderId
+}
+
+func (r *NotifRazerRequestBody) GetStatus() string {
+	return r.Status
+}
+
+func (r *NotifRazerRequestBody) GetDomain() string {
+	return r.Domain
+}
+
+func (r *NotifRazerRequestBody) GetAmount() string {
+	return r.Amount
+}
+
+func (r *NotifRazerRequestBody) GetCurrency() string {
+	return r.Currency
+}
+
+func (r *NotifRazerRequestBody) GetAppCode() string {
+	return r.AppCode
+}
+
+func (r *NotifRazerRequestBody) GetPayDate() string {
+	return r.PayDate
+}
+
+func (r *NotifRazerRequestBody) GetSkey() string {
+	return r.Skey
+}
+
+func (r *NotifRazerRequestBody) IsValid() bool {
+	return r.GetStatus() == "00"
 }
 
 type CallbackRequestBody struct {

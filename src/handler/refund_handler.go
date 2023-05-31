@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
@@ -38,39 +36,63 @@ func NewRefundHandler(
 	}
 }
 
-func (h *RefundHandler) DragonPay(c *fiber.Ctx) error {
-	req := new(entity.RefundRequestBody)
-	log.Println(req)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
-}
-
-func (h *RefundHandler) JazzCash(c *fiber.Ctx) error {
-	req := new(entity.RefundRequestBody)
-	log.Println(req)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
-}
-
 func (h *RefundHandler) Midtrans(c *fiber.Ctx) error {
 	req := new(entity.RefundRequestBody)
-	log.Println(req)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
-}
-
-func (h *RefundHandler) Momo(c *fiber.Ctx) error {
-	req := new(entity.RefundRequestBody)
-	log.Println(req)
+	if err := c.BodyParser(req); err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	}
+	h.zap.Info(c.Body())
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
 func (h *RefundHandler) Nicepay(c *fiber.Ctx) error {
 	req := new(entity.RefundRequestBody)
-	log.Println(req)
+	if err := c.BodyParser(req); err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	}
+	h.zap.Info(c.Body())
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *RefundHandler) DragonPay(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
+	if err := c.BodyParser(req); err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	}
+	h.zap.Info(c.Body())
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *RefundHandler) JazzCash(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
+	if err := c.BodyParser(req); err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	}
+	h.zap.Info(c.Body())
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *RefundHandler) Momo(c *fiber.Ctx) error {
+	req := new(entity.RefundRequestBody)
+	if err := c.BodyParser(req); err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	}
+	h.zap.Info(c.Body())
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
 func (h *RefundHandler) Razer(c *fiber.Ctx) error {
 	req := new(entity.RefundRequestBody)
-	log.Println(req)
+	if err := c.BodyParser(req); err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+	}
+	h.zap.Info(c.Body())
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
