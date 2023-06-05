@@ -21,6 +21,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	 */
 	router := fiber.New()
 
+	// set cors
 	router.Use(cors.New())
 
 	/**
