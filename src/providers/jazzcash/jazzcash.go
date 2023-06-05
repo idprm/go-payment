@@ -45,7 +45,9 @@ func NewJazzCash(
 	}
 }
 
-// payment
+/**
+ * Payment Method
+ */
 func (p *JazzCash) Payment() ([]byte, error) {
 	merchantId := p.conf.JazzCash.MerchantId
 	password := p.conf.JazzCash.Password
@@ -95,6 +97,13 @@ func (p *JazzCash) Payment() ([]byte, error) {
 
 	p.logger.Writer(string(body))
 	return body, nil
+}
+
+/**
+ * Refund Method
+ */
+func (p *JazzCash) Refund() ([]byte, error) {
+	return nil, nil
 }
 
 func (p *JazzCash) TxTime() string {

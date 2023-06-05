@@ -56,7 +56,9 @@ type MidtransRequestBody struct {
 	} `json:"callbacks"`
 }
 
-// order
+/**
+ * Payment Method
+ */
 func (p *Midtrans) Payment() ([]byte, error) {
 	url := p.conf.Midtrans.Url + "/transactions"
 
@@ -103,7 +105,9 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	return body, nil
 }
 
-// refund
+/**
+ * Refund Method
+ */
 func (p *Midtrans) Refund() ([]byte, error) {
 	url := p.conf.Midtrans.Url + "/refunds"
 

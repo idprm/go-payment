@@ -52,6 +52,7 @@ type Secret struct {
 	} `yaml:"nicepay"`
 	Razer struct {
 		Url        string `yaml:"url"`
+		UrlApi     string `yaml:"url_api"`
 		MerchantId string `yaml:"merchantid"`
 		VerifyKey  string `yaml:"verifykey"`
 		SecretKey  string `yaml:"secretkey"`

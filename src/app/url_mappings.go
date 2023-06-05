@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	log_access "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
@@ -19,6 +20,8 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	 * Init Fiber
 	 */
 	router := fiber.New()
+
+	router.Use(cors.New())
 
 	/**
 	 * Access log on browser

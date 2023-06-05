@@ -1,6 +1,7 @@
 package razer
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -37,10 +38,14 @@ func NewRazer(
 	}
 }
 
+/**
+ * Payment Method
+ */
 func (p *Razer) Payment() (string, error) {
 	url := p.conf.Razer.Url + "/RMS/pay/" + p.conf.Razer.MerchantId + "/" + p.channel.GetParam()
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
+		p.logger.Writer(err)
 		return "", err
 	}
 	req.Header.Add("Accept-Charset", "utf-8")
@@ -59,4 +64,17 @@ func (p *Razer) Payment() (string, error) {
 	returnUrl := url + "?" + q.Encode()
 	p.logger.Writer(returnUrl)
 	return returnUrl, nil
+}
+
+/**
+ * Refund Method
+ */
+func (p *Razer) Refund() ([]byte, error) {
+	url := p.conf.Razer.UrlApi + "/RMS/API/refundAPI/refund.php"
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(req)
+	return nil, nil
 }

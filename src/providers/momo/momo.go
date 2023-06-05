@@ -44,6 +44,9 @@ func NewMomo(
 	}
 }
 
+/**
+ * Payment Method
+ */
 func (p *Momo) Payment() ([]byte, error) {
 	url := p.conf.Momo.Url + "/v2/gateway/api/create"
 	accessKey := p.conf.Momo.AccessKey
@@ -98,6 +101,9 @@ func (p *Momo) Payment() ([]byte, error) {
 	return body, nil
 }
 
+/**
+ * Refund Method
+ */
 func (p *Momo) Refund() ([]byte, error) {
 	url := p.conf.Momo.Url + "/v2/gateway/api/refund"
 	accessKey := p.conf.Momo.AccessKey

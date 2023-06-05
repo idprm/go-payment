@@ -46,7 +46,7 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Number not found"})
@@ -94,7 +94,7 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetReferenceNo()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Number not found"})
@@ -142,7 +142,7 @@ func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetTransactionId()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Number not found"})
@@ -201,7 +201,7 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Number not found"})
@@ -249,7 +249,7 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Number not found"})

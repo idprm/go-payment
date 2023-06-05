@@ -90,3 +90,7 @@ func (p *DragonPay) Payment() ([]byte, error) {
 	p.logger.Writer(string(body))
 	return body, nil
 }
+
+func (p *DragonPay) Refund() ([]byte, error) {
+	return nil, nil
+}

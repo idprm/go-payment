@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -42,10 +41,12 @@ func NewNicepay(
 	}
 }
 
+/**
+ * Payment Method
+ */
 func (p *Nicepay) Payment() ([]byte, error) {
 	url := p.conf.Nicepay.Url + "/nicepay/direct/v2/registration"
 
-	log.Println(p.gateway)
 	request := &entity.NicepayRequestBody{
 		TimeStamp:         p.TimeStamp(),
 		MerchantId:        p.conf.Nicepay.MerchantId,
@@ -102,6 +103,14 @@ func (p *Nicepay) Payment() ([]byte, error) {
 
 	p.logger.Writer(string(body))
 	return body, nil
+}
+
+/**
+ * Refund Method
+ */
+func (p *Nicepay) Refund() ([]byte, error) {
+	
+	return nil, nil
 }
 
 func (p *Nicepay) Token() string {
