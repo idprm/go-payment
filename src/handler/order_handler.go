@@ -53,7 +53,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	/**
 	 * checking application
 	 */
@@ -217,7 +217,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	/**
 	 * checking application
 	 */
@@ -297,7 +297,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	/**
 	 * checking application
 	 */
@@ -378,7 +378,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	/**
 	 * checking application
 	 */
@@ -457,7 +457,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
-	h.zap.Info(c.Body())
+	h.zap.Info(string(c.Body()))
 	/**
 	 * checking application
 	 */
