@@ -32,8 +32,9 @@ var seederCmd = &cobra.Command{
 		}
 
 		var country []entity.Country
-		var application []entity.Application
 		var gateway []entity.Gateway
+		var credential []entity.Credential
+		var application []entity.Application
 		var channel []entity.Channel
 
 		var countries = []entity.Country{
@@ -43,6 +44,66 @@ var seederCmd = &cobra.Command{
 			{Name: "Vietnam", Locale: "vn", Prefix: "84", Flag: "vietnam.png"},
 			{Name: "Malaysia", Locale: "my", Prefix: "60", Flag: "malaysia.png"},
 			{Name: "Thailand", Locale: "th", Prefix: "66", Flag: "thailand.png"},
+		}
+
+		var gateways = []entity.Gateway{
+			{CountryID: 1, Code: "MIDTRANS", Name: "Midtrans", Currency: "IDR"},
+			{CountryID: 1, Code: "NICEPAY", Name: "Nicepay", Currency: "IDR"},
+			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay", Currency: "PHP"},
+			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash", Currency: "PKR"},
+			{CountryID: 4, Code: "MOMO", Name: "Momo Payment", Currency: "VND"},
+			{CountryID: 5, Code: "RAZER", Name: "Razer", Currency: "MYR"},
+		}
+
+		var credentials = []entity.Credential{
+			{
+				GatewayID:   1,
+				Url:         "https://app.midtrans.com/snap/v1",
+				MerchantId:  "G531825822",
+				Password:    "-",
+				MerchantKey: "Mid-client-V-7wPVYvklEsfAeZ",
+				SecretKey:   "Mid-server-66NO-3UzboqB0aT84UoqzhUo",
+			},
+			{
+				GatewayID:   2,
+				Url:         "https://www.nicepay.co.id",
+				MerchantId:  "CEPATSEH4T",
+				Password:    "-",
+				MerchantKey: "5n4l80sUZ9i43H02QlBqCK2ai3Yh9NZ+D+J1ZdS8azyfpyQyGokwmc1aFnbHDgGAHDmVKx77kQcr+VL7QmORfA==",
+				SecretKey:   "-",
+			},
+			{
+				GatewayID:   3,
+				Url:         "https://gw.dragonpay.ph/api/collect/v2/",
+				MerchantId:  "KBPI",
+				Password:    "5b7CDbEEqeyCaRu",
+				MerchantKey: "-",
+				SecretKey:   "-",
+			},
+			{
+				GatewayID:   4,
+				Url:         "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/2.0/Purchase/DoMWalletTransaction",
+				MerchantId:  "MC54619",
+				Password:    "y4s81wb0y3",
+				MerchantKey: "vsb2vd08x9",
+				SecretKey:   "-",
+			},
+			{
+				GatewayID:   5,
+				Url:         "https://test-payment.momo.vn",
+				MerchantId:  "MOMO7QZS20210426",
+				Password:    "-",
+				MerchantKey: "D7D24rDGsR7WIRfz",
+				SecretKey:   "ZUdYxTBYOlvM72klT6pFL8W4KfbgYeFL",
+			},
+			{
+				GatewayID:   6,
+				Url:         "https://pay.merchant.razer.com",
+				MerchantId:  "lInkit360_Dev",
+				Password:    "-",
+				MerchantKey: "b41cd1e0162fe2b65ae11afcc8348721",
+				SecretKey:   "f2ab735144b947d60901b5454bb462e4",
+			},
 		}
 
 		var applications = []entity.Application{
@@ -86,15 +147,6 @@ var seederCmd = &cobra.Command{
 				UrlCallback: "https://vngemezz.exmp.app",
 				UrlReturn:   "https://vngemezz.exmp.app",
 			},
-		}
-
-		var gateways = []entity.Gateway{
-			{CountryID: 1, Code: "MIDTRANS", Name: "Midtrans", Currency: "IDR"},
-			{CountryID: 1, Code: "NICEPAY", Name: "Nicepay", Currency: "IDR"},
-			{CountryID: 2, Code: "DRAGONPAY", Name: "Dragon Pay", Currency: "PHP"},
-			{CountryID: 3, Code: "JAZZCASH", Name: "Jazz Cash", Currency: "PKR"},
-			{CountryID: 4, Code: "MOMO", Name: "Momo Payment", Currency: "VND"},
-			{CountryID: 5, Code: "RAZER", Name: "Razer", Currency: "MYR"},
 		}
 
 		var channels = []entity.Channel{
@@ -141,18 +193,25 @@ var seederCmd = &cobra.Command{
 			log.Println("countries migrated")
 		}
 
-		if db.Find(&application).RowsAffected == 0 {
-			for i, _ := range applications {
-				db.Model(&entity.Application{}).Create(&applications[i])
-			}
-			log.Println("applications migrated")
-		}
-
 		if db.Find(&gateway).RowsAffected == 0 {
 			for i, _ := range gateways {
 				db.Model(&entity.Gateway{}).Create(&gateways[i])
 			}
 			log.Println("gateways migrated")
+		}
+
+		if db.Find(&credential).RowsAffected == 0 {
+			for i, _ := range credentials {
+				db.Model(&entity.Credential{}).Create(&credentials[i])
+			}
+			log.Println("credentials migrated")
+		}
+
+		if db.Find(&application).RowsAffected == 0 {
+			for i, _ := range applications {
+				db.Model(&entity.Application{}).Create(&applications[i])
+			}
+			log.Println("applications migrated")
 		}
 
 		if db.Find(&channel).RowsAffected == 0 {

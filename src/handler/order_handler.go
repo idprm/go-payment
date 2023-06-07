@@ -104,7 +104,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 
 	var res entity.MidtransResponsePayload
 	json.Unmarshal(mt, &res)
-	h.zap.Info(mt)
+	h.zap.Info(string(mt))
 
 	if res.IsValid() {
 		transaction := &entity.Transaction{
@@ -270,7 +270,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	}
 	var res entity.DragonPayResponsePayload
 	json.Unmarshal(dp, &res)
-	h.zap.Info(dp)
+	h.zap.Info(string(dp))
 
 	if res.IsValid() {
 		transaction := &entity.Transaction{
@@ -349,7 +349,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 
 	var res entity.JazzCashResponsePayload
 	json.Unmarshal(jz, &res)
-	h.zap.Info(jz)
+	h.zap.Info(string(jz))
 
 	if res.IsValid() {
 		transaction := &entity.Transaction{
@@ -435,7 +435,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 
 	var res entity.MomoResponsePayload
 	json.Unmarshal(mm, &res)
-	h.zap.Info(mm)
+	h.zap.Info(string(mm))
 
 	if res.IsValid() {
 		h.orderService.Save(order)
