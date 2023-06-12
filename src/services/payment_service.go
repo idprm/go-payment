@@ -22,12 +22,23 @@ func NewPaymentService(
 
 type IPaymentService interface {
 	GetById(int) (*entity.Payment, error)
+	GetByOrderId(int) (*entity.Payment, error)
+	CountByOrderId(int) bool
 	Save(*entity.Payment) (*entity.Payment, error)
 	Update(*entity.Payment) (*entity.Payment, error)
 }
 
 func (s *PaymentService) GetById(id int) (*entity.Payment, error) {
 	return s.paymentRepo.GetById(id)
+}
+
+func (s *PaymentService) GetByOrderId(id int) (*entity.Payment, error) {
+	return s.paymentRepo.GetByOrderId(id)
+}
+
+func (s *PaymentService) CountByOrderId(id int) bool {
+	count, _ := s.paymentRepo.CountByOrderId(id)
+	return count > 0
 }
 
 func (s *PaymentService) Save(payment *entity.Payment) (*entity.Payment, error) {
