@@ -51,17 +51,12 @@ func (r *OrderRequestBody) GetIpAddress() string {
 }
 
 type RefundRequestBody struct {
-	Number      string  `json:"number"`
-	Amount      float64 `json:"amount"`
-	UrlCallback string  `json:"url_callback"`
+	Number      string `json:"number"`
+	UrlCallback string `json:"url_callback"`
 }
 
 func (r *RefundRequestBody) GetNumber() string {
 	return r.Number
-}
-
-func (r *RefundRequestBody) GetAmount() float64 {
-	return r.Amount
 }
 
 func (r *RefundRequestBody) GetUrlCallback() string {
@@ -975,6 +970,28 @@ func (r *NotifRazerRequestBody) GetSkey() string {
 
 func (r *NotifRazerRequestBody) IsValid() bool {
 	return r.GetStatus() == "00"
+}
+
+type RefundRazerRequestBody struct {
+	TransactionId string `json:"TxnID" form:"TxnID"`
+	MerchantID    string `json:"MerchantID" form:"MerchantID"`
+	Signature     string `json:"Signature" form:"Signature"`
+}
+
+func (r *RefundRazerRequestBody) GetTransactionId() string {
+	return r.TransactionId
+}
+
+func (r *RefundRazerRequestBody) GetMerchantId() string {
+	return r.MerchantID
+}
+
+func (r *RefundRazerRequestBody) GetSignature() string {
+	return r.Signature
+}
+
+func (r *RefundRazerRequestBody) SetSignature(data string) {
+	r.Signature = data
 }
 
 type CallbackRequestBody struct {

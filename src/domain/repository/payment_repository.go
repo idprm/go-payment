@@ -18,6 +18,8 @@ func NewPaymentRepository(db *gorm.DB) *PaymentRepository {
 type IPaymentRepository interface {
 	GetAll() (*[]entity.Payment, error)
 	GetById(int) (*entity.Payment, error)
+	GetByOrderId(int) (*entity.Payment, error)
+	CountByOrderId(int) (int64, error)
 	Save(*entity.Payment) (*entity.Payment, error)
 	Update(*entity.Payment) (*entity.Payment, error)
 	Delete(int) error
@@ -39,6 +41,24 @@ func (r *PaymentRepository) GetById(id int) (*entity.Payment, error) {
 		return nil, err
 	}
 	return &payment, err
+}
+
+func (r *PaymentRepository) GetByOrderId(id int) (*entity.Payment, error) {
+	var payment entity.Payment
+	err := r.db.Where("order_id = ?", id).Preload("Order").Take(&payment).Error
+	if err != nil {
+		return nil, err
+	}
+	return &payment, err
+}
+
+func (r *PaymentRepository) CountByOrderId(id int) (int64, error) {
+	var count int64
+	err := r.db.Model(&entity.Order{}).Where("order_id = ?", id).Count(&count).Error
+	if err != nil {
+		return count, err
+	}
+	return count, nil
 }
 
 func (r *PaymentRepository) Save(payment *entity.Payment) (*entity.Payment, error) {

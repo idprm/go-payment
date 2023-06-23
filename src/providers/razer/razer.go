@@ -1,9 +1,12 @@
 package razer
 
 import (
-	"log"
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
@@ -18,6 +21,7 @@ type Razer struct {
 	gateway     *entity.Gateway
 	channel     *entity.Channel
 	order       *entity.Order
+	payment     *entity.Payment
 }
 
 func NewRazer(
@@ -27,6 +31,7 @@ func NewRazer(
 	gateway *entity.Gateway,
 	channel *entity.Channel,
 	order *entity.Order,
+	payment *entity.Payment,
 ) *Razer {
 	return &Razer{
 		conf:        conf,
@@ -35,6 +40,7 @@ func NewRazer(
 		gateway:     gateway,
 		channel:     channel,
 		order:       order,
+		payment:     payment,
 	}
 }
 
@@ -71,10 +77,39 @@ func (p *Razer) Payment() (string, error) {
  */
 func (p *Razer) Refund() ([]byte, error) {
 	url := p.conf.Razer.UrlApi + "/RMS/API/refundAPI/refund.php"
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	request := &entity.RefundRazerRequestBody{
+		TransactionId: p.payment.GetTransactionId(),
+		MerchantID:    p.conf.Razer.MerchantId,
+	}
+	var str = p.payment.GetTransactionId() + p.conf.Razer.MerchantId + p.conf.Razer.VerifyKey
+	request.SetSignature(utils.GetMD5Hash(str))
+	payload, _ := json.Marshal(&request)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
-	log.Println(req)
-	return nil, nil
+	req.Header.Set("Content-Type", "application/json")
+	tr := &http.Transport{
+		Proxy:              http.ProxyFromEnvironment,
+		MaxIdleConns:       10,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
+	}
+	client := &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: tr,
+	}
+	p.logger.Writer(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	p.logger.Writer(string(body))
+	return body, nil
 }

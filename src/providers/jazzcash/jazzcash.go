@@ -65,9 +65,9 @@ func (p *JazzCash) Payment() ([]byte, error) {
 		BillReference:     "billRef",
 		Description:       p.order.GetDescription(),
 		TxnExpiryDateTime: p.TxTimeExp(),
-		SecureHash:        p.Hash(strconv.Itoa(int(p.order.Amount)), "billRef", 345678, p.order.GetDescription(), "EN", merchantId, p.PrefixMsisdn(), password, p.gateway.GetCurrency(), orderInfo),
+		SecureHash:        p.Hash(strconv.Itoa(int(p.order.Amount)), "billRef", 247643, p.order.GetDescription(), "EN", merchantId, p.PrefixMsisdn(), password, p.gateway.GetCurrency(), orderInfo),
 		MobileNumber:      p.PrefixMsisdn(),
-		CNIC:              345678,
+		CNIC:              247643,
 	})
 	req, err := http.NewRequest("POST", p.conf.JazzCash.Url, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")

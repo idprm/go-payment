@@ -58,7 +58,8 @@ var seederCmd = &cobra.Command{
 		var credentials = []entity.Credential{
 			{
 				GatewayID:   1,
-				Url:         "https://app.midtrans.com/snap/v1",
+				UrlPayment:  "https://app.midtrans.com/snap/v1",
+				UrlRefund:   "-",
 				MerchantId:  "G531825822",
 				Password:    "-",
 				MerchantKey: "Mid-client-V-7wPVYvklEsfAeZ",
@@ -66,7 +67,8 @@ var seederCmd = &cobra.Command{
 			},
 			{
 				GatewayID:   2,
-				Url:         "https://www.nicepay.co.id",
+				UrlPayment:  "https://www.nicepay.co.id",
+				UrlRefund:   "-",
 				MerchantId:  "CEPATSEH4T",
 				Password:    "-",
 				MerchantKey: "5n4l80sUZ9i43H02QlBqCK2ai3Yh9NZ+D+J1ZdS8azyfpyQyGokwmc1aFnbHDgGAHDmVKx77kQcr+VL7QmORfA==",
@@ -74,7 +76,8 @@ var seederCmd = &cobra.Command{
 			},
 			{
 				GatewayID:   3,
-				Url:         "https://gw.dragonpay.ph/api/collect/v2/",
+				UrlPayment:  "https://gw.dragonpay.ph/api/collect/v2/",
+				UrlRefund:   "-",
 				MerchantId:  "KBPI",
 				Password:    "5b7CDbEEqeyCaRu",
 				MerchantKey: "-",
@@ -82,7 +85,8 @@ var seederCmd = &cobra.Command{
 			},
 			{
 				GatewayID:   4,
-				Url:         "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/2.0/Purchase/DoMWalletTransaction",
+				UrlPayment:  "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/2.0/Purchase/DoMWalletTransaction",
+				UrlRefund:   "-",
 				MerchantId:  "MC54619",
 				Password:    "y4s81wb0y3",
 				MerchantKey: "vsb2vd08x9",
@@ -90,7 +94,8 @@ var seederCmd = &cobra.Command{
 			},
 			{
 				GatewayID:   5,
-				Url:         "https://test-payment.momo.vn",
+				UrlPayment:  "https://test-payment.momo.vn",
+				UrlRefund:   "-",
 				MerchantId:  "MOMO7QZS20210426",
 				Password:    "-",
 				MerchantKey: "D7D24rDGsR7WIRfz",
@@ -98,7 +103,8 @@ var seederCmd = &cobra.Command{
 			},
 			{
 				GatewayID:   6,
-				Url:         "https://pay.merchant.razer.com",
+				UrlPayment:  "https://pay.merchant.razer.com",
+				UrlRefund:   "-",
 				MerchantId:  "lInkit360_Dev",
 				Password:    "-",
 				MerchantKey: "b41cd1e0162fe2b65ae11afcc8348721",

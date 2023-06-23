@@ -109,7 +109,6 @@ func (p *Nicepay) Payment() ([]byte, error) {
  * Refund Method
  */
 func (p *Nicepay) Refund() ([]byte, error) {
-	
 	return nil, nil
 }
 
