@@ -29,7 +29,7 @@ type IApplicationRepository interface {
 
 func (r *ApplicationRepository) GetAll() (*[]entity.Application, error) {
 	var applications []entity.Application
-	err := r.db.Order("id desc").Preload("Country").Find(&applications).Error
+	err := r.db.Order("id desc").Find(&applications).Error
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (r *ApplicationRepository) GetAll() (*[]entity.Application, error) {
 
 func (r *ApplicationRepository) GetById(id int) (*entity.Application, error) {
 	var application entity.Application
-	err := r.db.Where("id = ?", id).Preload("Country").Take(&application).Error
+	err := r.db.Where("id = ?", id).Take(&application).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *ApplicationRepository) GetById(id int) (*entity.Application, error) {
 
 func (r *ApplicationRepository) GetByCode(code string) (*entity.Application, error) {
 	var application entity.Application
-	err := r.db.Where("code = ?", code).Preload("Country").Take(&application).Error
+	err := r.db.Where("code = ?", code).Take(&application).Error
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (r *ApplicationRepository) GetByCode(code string) (*entity.Application, err
 
 func (r *ApplicationRepository) GetByUrl(url string) (*entity.Application, error) {
 	var application entity.Application
-	err := r.db.Where("url = ?", url).Preload("Country").Take(&application).Error
+	err := r.db.Where("url = ?", url).Take(&application).Error
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (r *ApplicationRepository) GetByUrl(url string) (*entity.Application, error
 
 func (r *ApplicationRepository) GetByUrlCallback(urlCallback string) (*entity.Application, error) {
 	var application entity.Application
-	err := r.db.Where("url_callback = ?", urlCallback).Preload("Country").Take(&application).Error
+	err := r.db.Where("url_callback = ?", urlCallback).Take(&application).Error
 	if err != nil {
 		return nil, err
 	}
