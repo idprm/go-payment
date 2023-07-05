@@ -69,7 +69,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	request.ReqCustomer.Email = p.order.GetEmail()
 	request.ReqTransaction.OrderId = p.order.GetNumber()
 	request.ReqTransaction.GrossAmount = int(p.order.Amount)
-	request.ReqCallback.Finish = p.application.GetUrlReturn()
+	request.ReqCallback.Finish = p.order.GetUrlReturn()
 
 	payload, _ := json.Marshal(&request)
 

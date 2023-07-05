@@ -88,6 +88,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init callback
 	callbackRepo := repository.NewCallbackRepository(u.db)
 	callbackService := services.NewCallbackService(callbackRepo)
+	callbackHandler := handler.NewCallbackHandler(u.cfg, u.logger, u.zap, orderService, transactionService, callbackService)
 
 	// init payment
 	paymentRepo := repository.NewPaymentRepository(u.db)
@@ -98,6 +99,11 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	refundRepo := repository.NewRefundRepository(u.db)
 	refundService := services.NewRefundService(orderRepo, refundRepo)
 	refundHandler := handler.NewRefundHandler(u.cfg, u.logger, u.zap, applicationService, orderService, paymentService, refundService, transactionService)
+
+	// init return
+	returnRepo := repository.NewReturnRepository(u.db)
+	returnService := services.NewReturnService(orderRepo, returnRepo)
+	returnHandler := handler.NewReturnHandler(u.cfg, u.logger, u.zap, orderService, transactionService, returnService)
 
 	// init base
 	baseHandler := handler.NewBaseHandler(u.cfg)
@@ -161,6 +167,8 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	razer.Get("notification", paymentHandler.Razer)
 	razer.Post("notification", paymentHandler.Razer)
 	razer.Post("refund", refundHandler.Razer)
+	razer.Post("callback", callbackHandler.Razer)
+	razer.Post("return", returnHandler.Razer)
 
 	/**
 	 * AUTHENTICATED ROUTING

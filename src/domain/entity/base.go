@@ -2,51 +2,62 @@ package entity
 
 import "time"
 
-type OrderRequestBody struct {
-	Channel     string  `json:"channel"`
-	Msisdn      string  `json:"msisdn"`
-	Name        string  `json:"name"`
+type ErrorResponse struct {
+	Field string
+	Tag   string
+	Value string
+}
+
+type OrderBodyRequest struct {
+	UrlCallback string  `validate:"required" json:"url_callback"`
+	UrlReturn   string  `validate:"required" json:"url_return"`
+	Msisdn      string  `validate:"required" json:"msisdn"`
+	Name        string  `validate:"required" json:"name"`
+	Number      string  `validate:"required" json:"number"`
+	Channel     string  `validate:"required" json:"channel"`
+	Amount      float64 `validate:"required" json:"amount"`
 	Email       string  `json:"email"`
-	Number      string  `json:"number"`
-	Amount      float64 `json:"amount"`
 	Description string  `json:"description"`
-	UrlCallback string  `json:"url_callback"`
 	IpAddress   string  `json:"ip_address"`
 }
 
-func (r *OrderRequestBody) GetChannel() string {
-	return r.Channel
-}
-
-func (r *OrderRequestBody) GetMsisdn() string {
-	return r.Msisdn
-}
-
-func (r *OrderRequestBody) GetName() string {
-	return r.Name
-}
-
-func (r *OrderRequestBody) GetEmail() string {
-	return r.Email
-}
-
-func (r *OrderRequestBody) GetNumber() string {
-	return r.Number
-}
-
-func (r *OrderRequestBody) GetAmount() float64 {
-	return r.Amount
-}
-
-func (r *OrderRequestBody) GetDescription() string {
-	return r.Description
-}
-
-func (r *OrderRequestBody) GetUrlCallback() string {
+func (r *OrderBodyRequest) GetUrlCallback() string {
 	return r.UrlCallback
 }
 
-func (r *OrderRequestBody) GetIpAddress() string {
+func (r *OrderBodyRequest) GetUrlReturn() string {
+	return r.UrlReturn
+}
+
+func (r *OrderBodyRequest) GetChannel() string {
+	return r.Channel
+}
+
+func (r *OrderBodyRequest) GetMsisdn() string {
+	return r.Msisdn
+}
+
+func (r *OrderBodyRequest) GetName() string {
+	return r.Name
+}
+
+func (r *OrderBodyRequest) GetEmail() string {
+	return r.Email
+}
+
+func (r *OrderBodyRequest) GetNumber() string {
+	return r.Number
+}
+
+func (r *OrderBodyRequest) GetAmount() float64 {
+	return r.Amount
+}
+
+func (r *OrderBodyRequest) GetDescription() string {
+	return r.Description
+}
+
+func (r *OrderBodyRequest) GetIpAddress() string {
 	return r.IpAddress
 }
 

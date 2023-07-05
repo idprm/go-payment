@@ -114,44 +114,19 @@ var seederCmd = &cobra.Command{
 
 		var applications = []entity.Application{
 			{
-				CountryID:   1,
 				Code:        "sehatcepat",
 				Name:        "Sehat Cepat",
-				Url:         "https://www.sehatcepat.com",
-				UrlCallback: "https://www.sehatcepat.com/payment/callback",
-				UrlReturn:   "https://www.sehatcepat.com/order",
+				UrlCallback: "https://api.sehatcepat.com/payment/callback",
 			},
 			{
-				CountryID:   2,
-				Code:        "pagalingkaagad",
-				Name:        "Pagalingkaagad",
-				Url:         "https://www.pagalingkaagad.com",
-				UrlCallback: "https://www.pagalingkaagad.com/payment/callback",
-				UrlReturn:   "https://www.pagalingkaagad.com/order",
-			},
-			{
-				CountryID:   2,
-				Code:        "pagalingkaagad",
-				Name:        "Pagalingkaagad",
-				Url:         "https://www.pagalingkaagad.com",
-				UrlCallback: "https://www.pagalingkaagad.com/payment/callback",
-				UrlReturn:   "https://www.pagalingkaagad.com/order",
-			},
-			{
-				CountryID:   1,
-				Code:        "SURATSAKIT",
+				Code:        "suratsakit",
 				Name:        "Surat Sakit",
-				Url:         "https://www.suratsakit.com",
 				UrlCallback: "https://www.suratsakit.com/payment/callback",
-				UrlReturn:   "https://www.suratsakit.com/order",
 			},
 			{
-				CountryID:   2,
 				Code:        "GEMEZZVN",
 				Name:        "CP GEMEZZ",
-				Url:         "https://vngemezz.exmp.app",
 				UrlCallback: "https://vngemezz.exmp.app",
-				UrlReturn:   "https://vngemezz.exmp.app",
 			},
 		}
 

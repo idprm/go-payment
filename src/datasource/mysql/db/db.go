@@ -30,6 +30,7 @@ func InitMySQL(conf *config.Secret) (*gorm.DB, error) {
 		&entity.Callback{},
 		&entity.Refund{},
 		&entity.Transaction{},
+		&entity.Return{},
 	)
 	if err != nil {
 		return nil, err

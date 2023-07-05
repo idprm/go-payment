@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
@@ -47,16 +48,42 @@ func NewOrderHandler(
 	}
 }
 
+var validate = validator.New()
+
+func ValidateRequest(req interface{}) []*entity.ErrorResponse {
+	var errors []*entity.ErrorResponse
+	err := validate.Struct(req)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element entity.ErrorResponse
+			element.Field = err.Field()
+			element.Tag = err.Tag()
+			element.Value = err.Param()
+			errors = append(errors, &element)
+		}
+	}
+	return errors
+}
+
 /**
  * MIDTRANS
  */
 func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
-	req := new(entity.OrderRequestBody)
+	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
 	h.zap.Info(string(c.Body()))
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+	}
+
 	/**
 	 * checking application
 	 */
@@ -89,6 +116,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
 		Name:          req.GetName(),
@@ -134,13 +162,22 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
  * NICEPAY
  */
 func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
-	req := new(entity.OrderRequestBody)
+	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
 	h.zap.Info(string(c.Body()))
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+	}
+
 	/**
 	 * checking application
 	 */
@@ -174,6 +211,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
 		Name:          req.GetName(),
@@ -204,7 +242,11 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
 
-		redirectUrl := h.cfg.Nicepay.Url + "/nicepay/direct/v2/payment?timeStamp=" + provider.TimeStamp() + "&tXid=" + res.GetTransactionId() + "&merchantToken=" + provider.Token() + "&callBackUrl=" + application.GetUrlReturn()
+		redirectUrl := h.cfg.Nicepay.Url +
+			"/nicepay/direct/v2/payment?timeStamp=" + provider.TimeStamp() +
+			"&tXid=" + res.GetTransactionId() +
+			"&merchantToken=" + provider.Token() +
+			"&callBackUrl=" + req.GetUrlReturn()
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"error":        false,
@@ -220,13 +262,22 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
  * DRAGONPAY
  */
 func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
-	req := new(entity.OrderRequestBody)
+	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
 	h.zap.Info(string(c.Body()))
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+	}
+
 	/**
 	 * checking application
 	 */
@@ -262,6 +313,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
 		Name:          req.GetName(),
@@ -303,13 +355,22 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
  * JAZZCASH
  */
 func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
-	req := new(entity.OrderRequestBody)
+	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
 	h.zap.Info(string(c.Body()))
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+	}
+
 	/**
 	 * checking application
 	 */
@@ -343,6 +404,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
 		Name:          req.GetName(),
@@ -377,7 +439,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"error":        false,
 			"message":      res.GetResponseMessage(),
-			"redirect_url": application.GetUrlReturn(),
+			"redirect_url": req.GetUrlReturn(),
 		})
 	}
 
@@ -388,12 +450,21 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
  * MOMO
  */
 func (h *OrderHandler) Momo(c *fiber.Ctx) error {
-	req := new(entity.OrderRequestBody)
+	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
 	h.zap.Info(string(c.Body()))
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+	}
+
 	/**
 	 * checking application
 	 */
@@ -427,6 +498,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
 		Name:          req.GetName(),
@@ -470,12 +542,21 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
  * RAZER
  */
 func (h *OrderHandler) Razer(c *fiber.Ctx) error {
-	req := new(entity.OrderRequestBody)
+	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
 	}
 	h.zap.Info(string(c.Body()))
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+	}
+
 	/**
 	 * checking application
 	 */

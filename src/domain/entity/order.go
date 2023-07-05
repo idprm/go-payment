@@ -8,6 +8,7 @@ type Order struct {
 	Application   *Application `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"application,omitempty"`
 	ChannelID     int64        `json:"-"`
 	Channel       *Channel     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"channel,omitempty"`
+	UrlReturn     string       `gorm:"size:200" json:"url_return"`
 	Number        string       `gorm:"size:56" json:"number"`
 	Msisdn        string       `gorm:"size:25" json:"msisdn"`
 	Email         string       `gorm:"size:100" json:"email"`
@@ -20,6 +21,10 @@ type Order struct {
 
 func (e *Order) GetId() int64 {
 	return e.ID
+}
+
+func (e *Order) GetUrlReturn() string {
+	return e.UrlReturn
 }
 
 func (e *Order) GetNumber() string {

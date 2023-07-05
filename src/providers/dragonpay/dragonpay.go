@@ -49,8 +49,8 @@ func (p *DragonPay) Payment() ([]byte, error) {
 		Email:       p.order.GetEmail(),
 		MobileNo:    p.order.GetMsisdn(),
 		ProcId:      p.channel.GetParam(),
-		Param1:      p.application.GetUrlReturn(),
-		Param2:      p.application.GetUrlReturn(),
+		Param1:      p.order.GetUrlReturn(),
+		Param2:      p.order.GetUrlReturn(),
 		IpAddress:   p.order.GetIpAddress(),
 	}
 	payload, _ := json.Marshal(&request)

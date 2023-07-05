@@ -61,13 +61,13 @@ func (p *Momo) Payment() ([]byte, error) {
 		Amount:      int(p.order.GetAmount()),
 		OrderId:     p.order.GetNumber(),
 		OrderInfo:   p.order.GetDescription(),
-		RedirectUrl: p.application.GetUrlReturn(),
+		RedirectUrl: p.order.GetUrlReturn(),
 		IpnUrl:      p.conf.App.Url + "/v1/momo/notification",
 		RequestType: "captureWallet",
 		ExtraData:   "",
 		Lang:        "en",
 		AutoCapture: true,
-		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", p.conf.App.Url+"/v1/momo/notification", p.order.GetNumber(), p.order.GetDescription(), partnerCode, p.application.GetUrlReturn(), requestId, "captureWallet"),
+		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", p.conf.App.Url+"/v1/momo/notification", p.order.GetNumber(), p.order.GetDescription(), partnerCode, p.order.GetUrlReturn(), requestId, "captureWallet"),
 	}
 
 	payload, _ := json.Marshal(&request)
