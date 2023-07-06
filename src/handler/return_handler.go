@@ -6,6 +6,7 @@ import (
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/services"
+	"github.com/idprm/go-payment/src/utils/rest_errors"
 	"go.uber.org/zap"
 )
 
@@ -39,11 +40,12 @@ func NewReturnHandler(
 func (h *ReturnHandler) Razer(c *fiber.Ctx) error {
 	req := new(entity.NotifRazerRequestBody)
 	if err := c.BodyParser(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": err.Error(), "status": fiber.StatusBadGateway})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	order, err := h.orderService.GetByNumber(req.GetOrderId())
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).Redirect("/")
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).Redirect("/")
 	}
 	return c.Status(fiber.StatusOK).Redirect(order.GetUrlReturn())
 }
