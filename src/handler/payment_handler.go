@@ -85,7 +85,7 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 		})
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 	}
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "Failed"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
@@ -114,7 +114,6 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 		// hit callback
 		provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
 		cb, err := provider.Hit()
-		h.zap.Info(cb)
 		if err != nil {
 			h.zap.Error(err)
 			return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
@@ -132,7 +131,7 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 		})
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 	}
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "Failed"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
@@ -180,7 +179,7 @@ func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
 		})
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 	}
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "Failed"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
@@ -188,8 +187,8 @@ func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+	h.zap.Info(string(c.Body()))
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
@@ -218,7 +217,6 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 		// hit callback
 		provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
 		cb, err := provider.Hit()
-		h.zap.Info(cb)
 		if err != nil {
 			h.zap.Error(err)
 			return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
@@ -236,7 +234,7 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 		})
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 	}
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "Failed"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
@@ -265,7 +263,6 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 		// hit callback
 		provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
 		cb, err := provider.Hit()
-		h.zap.Info(cb)
 		if err != nil {
 			h.zap.Error(err)
 			return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
@@ -283,7 +280,7 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 		})
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 func (h *PaymentHandler) GetAll(c *fiber.Ctx) error {

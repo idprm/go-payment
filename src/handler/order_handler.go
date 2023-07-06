@@ -137,7 +137,6 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 
 	var res entity.MidtransResponsePayload
 	json.Unmarshal(mt, &res)
-	h.zap.Info(string(mt))
 
 	if res.IsValid() {
 		transaction := &entity.Transaction{
