@@ -11,7 +11,7 @@ import (
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
-	"github.com/idprm/go-payment/src/utils"
+	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
 type Nicepay struct {
@@ -114,9 +114,9 @@ func (p *Nicepay) Refund() ([]byte, error) {
 
 func (p *Nicepay) Token() string {
 	valueToken := []byte(p.TimeStamp() + p.conf.Nicepay.MerchantId + p.order.Number + strconv.Itoa(int(p.order.Amount)) + p.conf.Nicepay.MerchantKey)
-	return utils.EncryptSHA256(valueToken)
+	return hash_utils.EncryptSHA256(valueToken)
 }
 
 func (p *Nicepay) TimeStamp() string {
-	return utils.TimeStamp()
+	return hash_utils.TimeStamp()
 }

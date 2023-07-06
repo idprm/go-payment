@@ -14,7 +14,7 @@ import (
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
-	"github.com/idprm/go-payment/src/utils"
+	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
 type Momo struct {
@@ -51,7 +51,7 @@ func (p *Momo) Payment() ([]byte, error) {
 	url := p.conf.Momo.Url + "/v2/gateway/api/create"
 	accessKey := p.conf.Momo.AccessKey
 	partnerCode := p.conf.Momo.PartnerCode
-	requestId := utils.GenerateTransactionId()
+	requestId := hash_utils.GenerateTransactionId()
 
 	request := &entity.MomoRequestBody{
 		PartnerName: "Test",
@@ -108,7 +108,7 @@ func (p *Momo) Refund() ([]byte, error) {
 	url := p.conf.Momo.Url + "/v2/gateway/api/refund"
 	accessKey := p.conf.Momo.AccessKey
 	partnerCode := p.conf.Momo.PartnerCode
-	requestId := utils.GenerateTransactionId()
+	requestId := hash_utils.GenerateTransactionId()
 
 	request := &entity.MomoRefundRequestBody{
 		PartnerCode: partnerCode,

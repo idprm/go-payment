@@ -15,6 +15,7 @@ import (
 	"github.com/idprm/go-payment/src/providers/nicepay"
 	"github.com/idprm/go-payment/src/providers/razer"
 	"github.com/idprm/go-payment/src/services"
+	"github.com/idprm/go-payment/src/utils/rest_errors"
 	"go.uber.org/zap"
 )
 
@@ -72,7 +73,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.zap.Info(string(c.Body()))
 
@@ -81,36 +82,37 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
 
 	/**
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error application"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	/**
 	 * checking channel
 	 */
 	if !h.isValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
 	}
 	channel, err := h.channelService.GetBySlug(req.GetChannel())
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 
 	/**
 	 * checking order number
 	 */
 	if h.isValidOrderNumber(req.GetNumber()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
 
 	order := &entity.Order{
@@ -130,7 +132,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	mt, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error midtrans"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 
 	var res entity.MidtransResponsePayload
@@ -148,14 +150,10 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 		h.transactionService.Save(transaction)
 		res.SetRedirectUrl(channel.GetParam())
 
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error":        false,
-			"message":      "Success",
-			"redirect_url": res.GetRedirectUrl(),
-		})
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(res.GetRedirectUrl()))
 	}
 
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "Failed"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 /**
@@ -165,8 +163,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.zap.Info(string(c.Body()))
 
@@ -175,37 +172,37 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
 
 	/**
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error application"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	/**
 	 * checking channel
 	 */
 	if !h.isValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
 	}
 	channel, err := h.channelService.GetBySlug(req.GetChannel())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 
 	/**
 	 * checking order number
 	 */
 	if h.isValidOrderNumber(req.GetNumber()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
 
 	order := &entity.Order{
@@ -223,10 +220,9 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 
 	provider := nicepay.NewNicepay(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	np, err := provider.Payment()
-
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error nicepay"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	var res entity.NicepayResponsePayload
 	json.Unmarshal(np, &res)
@@ -248,14 +244,10 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 			"&merchantToken=" + provider.Token() +
 			"&callBackUrl=" + req.GetUrlReturn()
 
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error":        false,
-			"message":      "Success",
-			"redirect_url": redirectUrl,
-		})
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(redirectUrl))
 	}
 
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": "Failed"})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
 }
 
 /**
@@ -265,51 +257,44 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.zap.Info(string(c.Body()))
-
 	/**
 	 * validation request
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
-
 	/**
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error application"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
-
 	/**
 	 * checking channel
 	 */
 	if !h.isValidChannel(req.GetChannel()) {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
 	}
 	channel, err := h.channelService.GetBySlug(req.GetChannel())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
-
 	/**
 	 * checking order number
 	 */
 	if h.isValidOrderNumber(req.GetNumber()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
-
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
@@ -327,7 +312,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	dp, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error dragonpay"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	var res entity.DragonPayResponsePayload
 	json.Unmarshal(dp, &res)
@@ -341,14 +326,9 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 		}
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
-
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error":        false,
-			"message":      res.GetMessage(),
-			"redirect_url": res.GetUrl(),
-		})
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(res.GetUrl()))
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": true, "message": res.GetMessage()})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError(res.Message))
 }
 
 /**
@@ -358,47 +338,43 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.zap.Info(string(c.Body()))
-
 	/**
 	 * validation request
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
-
 	/**
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error application"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	/**
 	 * checking channel
 	 */
 	if !h.isValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
 	}
 	channel, err := h.channelService.GetBySlug(req.GetChannel())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
-
 	/**
 	 * checking order number
 	 */
 	if h.isValidOrderNumber(req.GetNumber()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
 
 	order := &entity.Order{
@@ -418,7 +394,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	jz, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error jazzcash"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 
 	var res entity.JazzCashResponsePayload
@@ -433,17 +409,9 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		}
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
-
-		h.zap.Info("")
-
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error":        false,
-			"message":      res.GetResponseMessage(),
-			"redirect_url": req.GetUrlReturn(),
-		})
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(req.GetUrlReturn()))
 	}
-
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": res.GetResponseMessage()})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError(res.GetResponseMessage()))
 }
 
 /**
@@ -453,46 +421,43 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.zap.Info(string(c.Body()))
-
 	/**
 	 * validation request
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
-
 	/**
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error application"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	/**
 	 * checking channel
 	 */
 	if !h.isValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
 	}
 	channel, err := h.channelService.GetBySlug(req.GetChannel())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
-
 	/**
 	 * checking order number
 	 */
 	if h.isValidOrderNumber(req.GetNumber()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
 
 	order := &entity.Order{
@@ -512,7 +477,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	mm, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error momopay"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	transaction := &entity.Transaction{
 		ApplicationID: application.GetId(),
@@ -527,15 +492,9 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	if res.IsValid() {
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
-
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error":        false,
-			"message":      res.GetMessage(),
-			"redirect_url": res.GetPayUrl(),
-		})
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(res.GetPayUrl()))
 	}
-
-	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": res.GetMessage()})
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError(res.GetMessage()))
 }
 
 /**
@@ -545,51 +504,49 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": true, "message": "Bad request"})
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.zap.Info(string(c.Body()))
-
 	/**
 	 * validation request
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": true, "message": errors})
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
-
 	/**
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Url Callback Not found, Please registered"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error application"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	/**
 	 * checking channel
 	 */
 	if !h.isValidChannel(req.GetChannel()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Channel Not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
 	}
 	channel, err := h.channelService.GetBySlug(req.GetChannel())
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
-
 	/**
 	 * checking order number
 	 */
 	if h.isValidOrderNumber(req.GetNumber()) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error number, already used"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
 	}
 
 	order := &entity.Order{
 		ApplicationID: application.GetId(),
 		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
 		Number:        req.GetNumber(),
 		Msisdn:        req.GetMsisdn(),
 		Name:          req.GetName(),
@@ -603,7 +560,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	rz, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Error razer"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	transaction := &entity.Transaction{
 		ApplicationID: application.GetId(),
@@ -614,12 +571,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	h.zap.Info(rz)
 	h.orderService.Save(order)
 	h.transactionService.Save(transaction)
-
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"error":        false,
-		"message":      "Success",
-		"redirect_url": rz,
-	})
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(rz))
 }
 
 func (h *OrderHandler) isValidApplication(urlCallback string) bool {

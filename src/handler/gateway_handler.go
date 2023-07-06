@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/services"
+	"github.com/idprm/go-payment/src/utils/rest_errors"
 )
 
 type GatewayHandler struct {
@@ -30,18 +31,18 @@ func NewGatewayHandler(
 func (h *GatewayHandler) Country(c *fiber.Ctx) error {
 	countries, err := h.countryService.GetAll()
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error countries"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(countries)
 }
 
 func (h *GatewayHandler) Locale(c *fiber.Ctx) error {
 	if !h.IsValidCountry(c.Params("locale")) {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": true, "message": "Country not found"})
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("country_not_found"))
 	}
 	locales, err := h.countryService.GetByLocale(c.Params("locale"))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error country"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(locales)
 }
@@ -49,11 +50,11 @@ func (h *GatewayHandler) Locale(c *fiber.Ctx) error {
 func (h *GatewayHandler) Midtrans(c *fiber.Ctx) error {
 	gateway, err := h.gatewayService.GetByCode(MIDTRANS)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error gateway"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
 }
@@ -61,11 +62,11 @@ func (h *GatewayHandler) Midtrans(c *fiber.Ctx) error {
 func (h *GatewayHandler) Nicepay(c *fiber.Ctx) error {
 	gateway, err := h.gatewayService.GetByCode(NICEPAY)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error gateway"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
 }
@@ -73,11 +74,11 @@ func (h *GatewayHandler) Nicepay(c *fiber.Ctx) error {
 func (h *GatewayHandler) Dragonpay(c *fiber.Ctx) error {
 	gateway, err := h.gatewayService.GetByCode(DRAGONPAY)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error gateway"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
 }
@@ -85,11 +86,11 @@ func (h *GatewayHandler) Dragonpay(c *fiber.Ctx) error {
 func (h *GatewayHandler) Jazzcash(c *fiber.Ctx) error {
 	gateway, err := h.gatewayService.GetByCode(JAZZCASH)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error gateway"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
 }
@@ -97,11 +98,11 @@ func (h *GatewayHandler) Jazzcash(c *fiber.Ctx) error {
 func (h *GatewayHandler) Momo(c *fiber.Ctx) error {
 	gateway, err := h.gatewayService.GetByCode(MOMO)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error gateway"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
 }
@@ -109,11 +110,11 @@ func (h *GatewayHandler) Momo(c *fiber.Ctx) error {
 func (h *GatewayHandler) Razer(c *fiber.Ctx) error {
 	gateway, err := h.gatewayService.GetByCode(RAZER)
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error gateway"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
 	if err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error channel"})
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
 	return c.Status(fiber.StatusOK).JSON(channels)
 }

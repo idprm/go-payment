@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"net/http"
+	"time"
+)
 
 type ErrorResponse struct {
 	Field string
@@ -8,17 +11,48 @@ type ErrorResponse struct {
 	Value string
 }
 
-type OrderBodyRequest struct {
-	UrlCallback string  `validate:"required" json:"url_callback"`
-	UrlReturn   string  `validate:"required" json:"url_return"`
-	Msisdn      string  `validate:"required" json:"msisdn"`
-	Name        string  `validate:"required" json:"name"`
-	Number      string  `validate:"required" json:"number"`
-	Channel     string  `validate:"required" json:"channel"`
-	Amount      float64 `validate:"required" json:"amount"`
-	Email       string  `json:"email"`
-	Description string  `json:"description"`
-	IpAddress   string  `json:"ip_address"`
+type (
+	OrderBodyRequest struct {
+		UrlCallback string  `validate:"required" json:"url_callback"`
+		UrlReturn   string  `validate:"required" json:"url_return"`
+		Msisdn      string  `validate:"required" json:"msisdn"`
+		Name        string  `validate:"required" json:"name"`
+		Number      string  `validate:"required" json:"number"`
+		Channel     string  `validate:"required" json:"channel"`
+		Amount      float64 `validate:"required" json:"amount"`
+		Email       string  `json:"email"`
+		Description string  `json:"description"`
+		IpAddress   string  `json:"ip_address"`
+	}
+	OrderBodyResponse struct {
+		Error       bool   `json:"error"`
+		StatusCode  int    `json:"status_code"`
+		Message     string `json:"message"`
+		RedirectUrl string `json:"redirect_url"`
+	}
+)
+
+type PaymentBodyResponse struct {
+	Error      bool   `json:"error"`
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"message"`
+}
+
+func NewStatusCreatedPaymentBodyResponse() *PaymentBodyResponse {
+	return &PaymentBodyResponse{
+		Error:      false,
+		StatusCode: http.StatusCreated,
+		Message:    "success",
+	}
+}
+
+func NewStatusCreatedOrderBodyResponse(url string) *OrderBodyResponse {
+	return &OrderBodyResponse{
+		Error:       false,
+		StatusCode:  http.StatusCreated,
+		Message:     "success",
+		RedirectUrl: url,
+	}
 }
 
 func (r *OrderBodyRequest) GetUrlCallback() string {

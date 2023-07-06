@@ -11,7 +11,7 @@ import (
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
-	"github.com/idprm/go-payment/src/utils"
+	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
 type Razer struct {
@@ -64,7 +64,7 @@ func (p *Razer) Payment() (string, error) {
 	q.Add("bill_mobile", "+"+p.order.GetMsisdn())
 	q.Add("bill_desc", p.order.GetDescription())
 	q.Add("cur", p.gateway.GetCurrency())
-	q.Add("vcode", utils.GetMD5Hash(str))
+	q.Add("vcode", hash_utils.GetMD5Hash(str))
 	p.logger.Writer(req)
 	req.URL.RawQuery = q.Encode()
 	returnUrl := url + "?" + q.Encode()
@@ -82,7 +82,7 @@ func (p *Razer) Refund() ([]byte, error) {
 		MerchantID:    p.conf.Razer.MerchantId,
 	}
 	var str = p.payment.GetTransactionId() + p.conf.Razer.MerchantId + p.conf.Razer.VerifyKey
-	request.SetSignature(utils.GetMD5Hash(str))
+	request.SetSignature(hash_utils.GetMD5Hash(str))
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
