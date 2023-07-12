@@ -517,7 +517,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	 * checking application
 	 */
 	if !h.isValidApplication(req.GetUrlCallback()) {
-		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
 	}
 	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
 	if err != nil {
