@@ -16,6 +16,7 @@ import (
 	"github.com/idprm/go-payment/src/providers/razer"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
+	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
 )
 
@@ -70,12 +71,18 @@ func ValidateRequest(req interface{}) []*entity.ErrorResponse {
  * MIDTRANS
  */
 func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_MIDTRANS")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MIDTRANS")
 
 	/**
 	 * validation request
@@ -159,12 +166,18 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
  * NICEPAY
  */
 func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_NICEPAY")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_NICEPAY")
 
 	/**
 	 * validation request
@@ -253,12 +266,19 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
  * DRAGONPAY
  */
 func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_DRAGONPAY")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_DRAGONPAY")
+
 	/**
 	 * validation request
 	 */
@@ -334,12 +354,19 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
  * JAZZCASH
  */
 func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_JAZZCASH")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_JAZZCASH")
+
 	/**
 	 * validation request
 	 */
@@ -417,12 +444,18 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
  * MOMO
  */
 func (h *OrderHandler) Momo(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_MOMO")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MOMO")
 	/**
 	 * validation request
 	 */
@@ -500,12 +533,19 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
  * RAZER
  */
 func (h *OrderHandler) Razer(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
 	req := new(entity.OrderBodyRequest)
 	err := c.BodyParser(req)
 	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_RAZER")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_RAZER")
+
 	/**
 	 * validation request
 	 */

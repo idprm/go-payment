@@ -8,6 +8,7 @@ import (
 	"github.com/idprm/go-payment/src/providers/callback"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
+	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
 )
 
@@ -42,11 +43,16 @@ func NewPaymentHandler(
 }
 
 func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("payment", true)
+
 	req := new(entity.NotifMidtransRequestBody)
 	if err := c.BodyParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Info("REQUEST_MIDTRANS")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MIDTRANS")
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
@@ -89,11 +95,16 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 }
 
 func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("payment", true)
+
 	req := new(entity.NotifNicepayRequestBody)
 	if err := c.BodyParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_NICEPAY")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_NICEPAY")
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetReferenceNo()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
@@ -135,11 +146,16 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 }
 
 func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("payment", true)
+
 	req := new(entity.NotifDragonPayRequestBody)
 	if err := c.BodyParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_JAZZCASH")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_JAZZCASH")
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetTransactionId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
@@ -183,20 +199,30 @@ func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
 }
 
 func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("payment", true)
+
 	req := new(entity.NotifJazzCashRequestBody)
 	if err := c.BodyParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_JAZZCASH")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_JAZZCASH")
 	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
+	l := h.logger.Init("payment", true)
+
 	req := new(entity.NotifMomoRequestBody)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
+	h.logger.Writer(req)
 	h.zap.Info(string(c.Body()))
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MOMO")
+
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
@@ -238,11 +264,17 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 }
 
 func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("payment", true)
+
 	req := new(entity.NotifRazerRequestBody)
 	if err := c.BodyParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_RAZER")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
-	h.zap.Info(string(c.Body()))
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_RAZER")
+
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
