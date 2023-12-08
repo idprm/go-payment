@@ -215,16 +215,19 @@ func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
 func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 	l := h.logger.Init("payment", true)
 
+	h.zap.Info(string(c.Body()))
+
 	req := new(entity.NotifMomoRequestBody)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MOMO")
 	if err := c.BodyParser(req); err != nil {
+		l.WithFields(logrus.Fields{"request": req}).Error("REQUEST_MOMO")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.logger.Writer(req)
-	h.zap.Info(string(c.Body()))
-	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MOMO")
 
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
+		l.WithFields(logrus.Fields{"request": req}).Error("MOMO_NOT_FOUND")
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
 	}
 	// get order
