@@ -702,7 +702,7 @@ func (r *NotifMomoRequestBody) GetRequestId() string {
 	return r.RequestId
 }
 
-func (r *NotifMomoRequestBody) GetAmount() string {
+func (r *NotifMomoRequestBody) GetAmount() int {
 	return r.Amount
 }
 
@@ -714,7 +714,7 @@ func (r *NotifMomoRequestBody) GetOrderType() string {
 	return r.OrderType
 }
 
-func (r *NotifMomoRequestBody) GetTransId() string {
+func (r *NotifMomoRequestBody) GetTransId() int {
 	return r.TransId
 }
 
@@ -730,7 +730,7 @@ func (r *NotifMomoRequestBody) GetPayType() string {
 	return r.PayType
 }
 
-func (r *NotifMomoRequestBody) GetResponseTime() string {
+func (r *NotifMomoRequestBody) GetResponseTime() int {
 	return r.ResponseTime
 }
 
