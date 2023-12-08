@@ -54,7 +54,7 @@ func (r *PaymentRepository) GetByOrderId(id int) (*entity.Payment, error) {
 
 func (r *PaymentRepository) CountByOrderId(id int) (int64, error) {
 	var count int64
-	err := r.db.Model(&entity.Order{}).Where("order_id = ?", id).Count(&count).Error
+	err := r.db.Model(&entity.Payment{}).Where("order_id = ?", id).Count(&count).Error
 	if err != nil {
 		return count, err
 	}
