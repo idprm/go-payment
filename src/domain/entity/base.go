@@ -672,6 +672,24 @@ type NotifMomoRequestBody struct {
 	Signature    string `json:"signature" query:"signature"`
 }
 
+/**
+{
+    "partnerCode": "MOMO7QZS20210426",
+    "orderId": "ORD-20231208132745",
+    "requestId": "a5ef072b-8c9d-4278-b18d-38036de46b56",
+    "amount": "",
+    "orderInfo": "khoingay.com",
+    "orderType": "momo_wallet",
+    "transId": "",
+    "resultCode": 0,
+    "message": "Successful.",
+    "payType": "webApp",
+    "responseTime": "",
+    "extraData": "",
+    "signature": "130c6d1f8b1d89772fa16c1df581416f3206341bda5e93d4a9f96ce8f06fe766"
+}
+**/
+
 func (r *NotifMomoRequestBody) GetPartnerCode() string {
 	return r.PartnerCode
 }

@@ -148,7 +148,6 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	momo.Get("/", gatewayHandler.Momo)
 	momo.Get("channel/:slug", channelHandler.Momo)
 	momo.Post("order", orderHandler.Momo)
-	momo.Get("notification", paymentHandler.Momo)
 	momo.Post("notification", paymentHandler.Momo)
 	momo.Post("refund", refundHandler.Momo)
 
@@ -164,7 +163,6 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	razer.Get("/", gatewayHandler.Razer)
 	razer.Get("channel/:slug", channelHandler.Razer)
 	razer.Post("order", orderHandler.Razer)
-	razer.Get("notification", paymentHandler.Razer)
 	razer.Post("notification", paymentHandler.Razer)
 	razer.Post("refund", refundHandler.Razer)
 	razer.Post("callback", callbackHandler.Razer)
