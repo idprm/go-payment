@@ -660,14 +660,14 @@ type NotifMomoRequestBody struct {
 	PartnerCode  string `json:"partnerCode" query:"partnerCode"`
 	OrderId      string `json:"orderId" query:"orderId"`
 	RequestId    string `json:"requestId" query:"requestId"`
-	Amount       string `json:"amount" query:"amount"`
+	Amount       int    `json:"amount" query:"amount"`
 	OrderInfo    string `json:"orderInfo" query:"orderInfo"`
 	OrderType    string `json:"orderType" query:"orderType"`
-	TransId      string `json:"transId" query:"transId"`
+	TransId      int    `json:"transId" query:"transId"`
 	ResultCode   int    `json:"resultCode" query:"resultCode"`
 	Message      string `json:"message" query:"message"`
 	PayType      string `json:"payType" query:"payType"`
-	ResponseTime string `json:"responseTime" query:"responseTime"`
+	ResponseTime int    `json:"responseTime" query:"responseTime"`
 	ExtraData    string `json:"extraData" query:"extraData"`
 	Signature    string `json:"signature" query:"signature"`
 }
