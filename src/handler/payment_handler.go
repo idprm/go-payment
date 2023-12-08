@@ -221,10 +221,10 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 	h.logger.Writer(req)
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MOMO")
 
-	if err := c.BodyParser(req); err != nil {
-		l.WithFields(logrus.Fields{"request": req}).Error("REQUEST_MOMO")
-		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
-	}
+	// if err := c.BodyParser(req); err != nil {
+	// 	l.WithFields(logrus.Fields{"request": req}).Error("REQUEST_MOMO")
+	// 	return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
+	// }
 
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
