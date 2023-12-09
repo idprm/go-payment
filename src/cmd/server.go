@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 
 	"github.com/idprm/go-payment/src/app"
@@ -40,7 +41,7 @@ var serverCmd = &cobra.Command{
 		}
 
 		// Init redis
-		rds, err := redis.InitRedis("")
+		rds, err := redis.InitRedis(cfg)
 		if err != nil {
 			panic(err)
 		}
@@ -51,7 +52,9 @@ var serverCmd = &cobra.Command{
 		lg := logger.NewLogger(cfg)
 		zap := logger.InitLogger(cfg)
 
-		application := app.NewApplication(cfg, db, rds, lg, zap)
+		ctx := context.Background()
+
+		application := app.NewApplication(cfg, db, rds, lg, zap, ctx)
 		router := application.Start()
 		log.Fatal(router.Listen(":" + cfg.App.Port))
 	},

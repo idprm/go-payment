@@ -2,6 +2,7 @@ package entity
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -1055,4 +1056,46 @@ func (r *CallbackRequestBody) GetIsPaid() bool {
 
 func (r *CallbackRequestBody) GetTime() time.Time {
 	return r.Time
+}
+
+type NotifRequestBody struct {
+	NotifMidtransRequestBody  *NotifMidtransRequestBody
+	NotifNicepayRequestBody   *NotifNicepayRequestBody
+	NotifDragonPayRequestBody *NotifDragonPayRequestBody
+	NotifJazzCashRequestBody  *NotifJazzCashRequestBody
+	NotifMomoRequestBody      *NotifMomoRequestBody
+	NotifRazerRequestBody     *NotifRazerRequestBody
+	Channel                   string `json:"channel"`
+}
+
+func (r *NotifRequestBody) GetChannel() string {
+	return strings.ToUpper(r.Channel)
+}
+
+func (r *NotifRequestBody) SetChannel(data string) {
+	r.Channel = strings.ToUpper(data)
+}
+
+func (r *NotifRequestBody) IsMidtrans() bool {
+	return r.GetChannel() == "MIDTRANS"
+}
+
+func (r *NotifRequestBody) IsNicePay() bool {
+	return r.GetChannel() == "NICEPAY"
+}
+
+func (r *NotifRequestBody) IsDragonPay() bool {
+	return r.GetChannel() == "DRAGONPAY"
+}
+
+func (r *NotifRequestBody) IsJazzCash() bool {
+	return r.GetChannel() == "JAZZCASH"
+}
+
+func (r *NotifRequestBody) IsMomo() bool {
+	return r.GetChannel() == "MOMO"
+}
+
+func (r *NotifRequestBody) IsRazer() bool {
+	return r.GetChannel() == "RAZER"
 }

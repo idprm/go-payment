@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/datasource/mysql/db"
 	"github.com/idprm/go-payment/src/datasource/redis"
+	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/domain/repository"
 	"github.com/idprm/go-payment/src/handler"
 	"github.com/idprm/go-payment/src/logger"
@@ -40,7 +42,7 @@ var workerCmd = &cobra.Command{
 		/**
 		 * Init redis
 		 */
-		rds, err := redis.InitRedis("")
+		rds, err := redis.InitRedis(cfg)
 		if err != nil {
 			panic(err)
 		}
@@ -57,6 +59,10 @@ var workerCmd = &cobra.Command{
 		orderRepo := repository.NewOrderRepository(db)
 		orderService := services.NewOrderService(orderRepo)
 
+		// init payment
+		paymentRepo := repository.NewPaymentRepository(db)
+		paymentService := services.NewPaymentService(orderRepo, paymentRepo)
+
 		// init transaction
 		transactionRepo := repository.NewTransactionRepository(db)
 		transactionService := services.NewTransactionService(transactionRepo)
@@ -64,7 +70,17 @@ var workerCmd = &cobra.Command{
 		// init callback
 		callbackRepo := repository.NewCallbackRepository(db)
 		callbackService := services.NewCallbackService(callbackRepo)
-		handler.NewCallbackHandler(cfg, rds, lg, zap, orderService, transactionService, callbackService)
+
+		h := handler.NewCallbackHandler(
+			cfg,
+			rds,
+			lg,
+			zap,
+			orderService,
+			paymentService,
+			transactionService,
+			callbackService,
+		)
 
 		fmt.Println("Ready message")
 
@@ -75,16 +91,38 @@ var workerCmd = &cobra.Command{
 				continue
 			}
 
-			// var req *entity.HandlerRequest
-			// json.Unmarshal([]byte(result[1]), &req)
+			var req *entity.NotifRequestBody
+			json.Unmarshal([]byte(result[1]), &req)
 
 			// print
 			fmt.Println(result[1])
 
-			// h.Send(req)
+			if req.IsMidtrans() {
+				h.Midtrans(req.NotifMidtransRequestBody)
+			}
+
+			if req.IsNicePay() {
+				h.Nicepay(req.NotifNicepayRequestBody)
+			}
+
+			if req.IsDragonPay() {
+				h.DragonPay(req.NotifDragonPayRequestBody)
+			}
+
+			if req.IsJazzCash() {
+				h.JazzCash(req.NotifJazzCashRequestBody)
+			}
+
+			if req.IsMomo() {
+				h.Momo(req.NotifMomoRequestBody)
+			}
+
+			if req.IsRazer() {
+				h.Razer(req.NotifRazerRequestBody)
+			}
 
 			// Wait a random amount of time before popping the next item
-			time.Sleep(time.Duration(rand.Intn(8)) * time.Second)
+			time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
 		}
 	},
 }

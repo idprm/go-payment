@@ -3,13 +3,14 @@ package callback
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/sirupsen/logrus"
 )
 
 type Callback struct {
@@ -34,6 +35,10 @@ func NewCallback(
 }
 
 func (p *Callback) Hit() ([]byte, error) {
+	l := p.logger.Init("callback", true)
+
+	start := time.Now()
+
 	request := &entity.CallbackRequestBody{
 		Number: p.order.GetNumber(),
 		IsPaid: true,
@@ -65,10 +70,14 @@ func (p *Callback) Hit() ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
+
+	duration := time.Since(start).Milliseconds()
 	p.logger.Writer(string(body))
+	l.WithFields(logrus.Fields{"response": string(body), "duration": duration}).Info("POSTBACK_SAM_MO")
+
 	return body, nil
 }

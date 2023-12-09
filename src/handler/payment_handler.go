@@ -2,12 +2,12 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
-	"github.com/idprm/go-payment/src/providers/callback"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
 	"github.com/redis/go-redis/v9"
@@ -28,6 +28,7 @@ type PaymentHandler struct {
 	paymentService     services.IPaymentService
 	transactionService services.ITransactionService
 	callbackService    services.ICallbackService
+	ctx                context.Context
 }
 
 func NewPaymentHandler(
@@ -39,6 +40,7 @@ func NewPaymentHandler(
 	paymentService services.IPaymentService,
 	transactionService services.ITransactionService,
 	callbackService services.ICallbackService,
+	ctx context.Context,
 ) *PaymentHandler {
 	return &PaymentHandler{
 		cfg:                cfg,
@@ -49,6 +51,7 @@ func NewPaymentHandler(
 		paymentService:     paymentService,
 		transactionService: transactionService,
 		callbackService:    callbackService,
+		ctx:                ctx,
 	}
 }
 
@@ -63,56 +66,21 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 	}
 	h.logger.Writer(req)
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MIDTRANS")
-	// checking order number
-	if !h.orderService.CountByNumber(req.GetOrderId()) {
-		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
-	}
-	// get order
-	order, err := h.orderService.GetByNumber(req.GetOrderId())
-	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-	}
 
-	if req.IsValid() {
-		if !h.paymentService.CountByOrderId(int(order.GetId())) {
-			// insert payment
-			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
-			cb, err := provider.Hit()
-			h.zap.Info(cb)
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// insert transaction
-			h.transactionService.Save(&entity.Transaction{
-				ApplicationID: order.Application.GetId(),
-				Action:        PAYMENT + MIDTRANS,
-				Payload:       string(c.Body()),
-			})
-			// insert callback
-			h.callbackService.Save(&entity.Callback{
-				PaymentID: payment.GetId(),
-				Payload:   string(cb),
-			})
-			return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
-		} else {
-			return c.Status(fiber.StatusOK).JSON(
-				&entity.PaymentBodyResponse{
-					Error:      false,
-					StatusCode: fiber.StatusOK,
-					Message:    "success",
-				})
-		}
+	// // checking order number
+	// if !h.orderService.CountByNumber(req.GetOrderId()) {
+	// 	return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
+	// }
 
+	notifRequest := &entity.NotifRequestBody{
+		NotifMidtransRequestBody: req,
 	}
-	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
+	notifRequest.SetChannel("MIDTRANS")
+	dataJson, _ := json.Marshal(notifRequest)
+
+	go producer(h.rds, h.logger, h.ctx, dataJson)
+
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
@@ -130,52 +98,16 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 	if !h.orderService.CountByNumber(req.GetReferenceNo()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
 	}
-	// get order
-	order, err := h.orderService.GetByNumber(req.GetReferenceNo())
-	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+
+	notifRequest := &entity.NotifRequestBody{
+		NotifNicepayRequestBody: req,
 	}
+	notifRequest.SetChannel("NICEPAY")
+	dataJson, _ := json.Marshal(notifRequest)
 
-	if req.IsValid() {
+	go producer(h.rds, h.logger, h.ctx, dataJson)
 
-		if !h.paymentService.CountByOrderId(int(order.GetId())) {
-			// insert payment
-			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
-			cb, err := provider.Hit()
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// insert transaction
-			h.transactionService.Save(&entity.Transaction{
-				ApplicationID: order.Application.GetId(),
-				Action:        PAYMENT + NICEPAY,
-				Payload:       string(c.Body()),
-			})
-			// insert callback
-			h.callbackService.Save(&entity.Callback{
-				PaymentID: payment.GetId(),
-				Payload:   string(cb),
-			})
-			return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
-		} else {
-			return c.Status(fiber.StatusOK).JSON(
-				&entity.PaymentBodyResponse{
-					Error:      false,
-					StatusCode: fiber.StatusOK,
-					Message:    "success",
-				})
-		}
-
-	}
-	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
@@ -193,52 +125,16 @@ func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
 	if !h.orderService.CountByNumber(req.GetTransactionId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
 	}
-	// get order
-	order, err := h.orderService.GetByNumber(req.GetTransactionId())
-	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-	}
 
-	if req.IsValid() {
-		// hit callback
-		if !h.paymentService.CountByOrderId(int(order.GetId())) {
-			// insert payment
-			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
-			cb, err := provider.Hit()
-			h.zap.Info(cb)
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// insert transaction
-			h.transactionService.Save(&entity.Transaction{
-				ApplicationID: order.Application.GetId(),
-				Action:        PAYMENT + DRAGONPAY,
-				Payload:       string(c.Body()),
-			})
-			// insert callback
-			h.callbackService.Save(&entity.Callback{
-				PaymentID: payment.GetId(),
-				Payload:   string(cb),
-			})
-			return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
-		} else {
-			return c.Status(fiber.StatusOK).JSON(
-				&entity.PaymentBodyResponse{
-					Error:      false,
-					StatusCode: fiber.StatusOK,
-					Message:    "success",
-				})
-		}
-
+	notifRequest := &entity.NotifRequestBody{
+		NotifDragonPayRequestBody: req,
 	}
-	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
+	notifRequest.SetChannel("DRAGONPAY")
+	dataJson, _ := json.Marshal(notifRequest)
+
+	go producer(h.rds, h.logger, h.ctx, dataJson)
+
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
@@ -252,12 +148,19 @@ func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
 	}
 	h.logger.Writer(req)
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_JAZZCASH")
+
+	notifRequest := &entity.NotifRequestBody{
+		NotifJazzCashRequestBody: req,
+	}
+	notifRequest.SetChannel("JAZZCASH")
+	dataJson, _ := json.Marshal(notifRequest)
+
+	go producer(h.rds, h.logger, h.ctx, dataJson)
+
 	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
-	c.Accepts("text/plain", "application/json")
-
 	l := h.logger.Init("payment", true)
 
 	h.zap.Info(string(c.Body()))
@@ -276,56 +179,21 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 		l.WithFields(logrus.Fields{"request": req}).Error("MOMO_NOT_FOUND")
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
 	}
-	// get order
-	order, err := h.orderService.GetByNumber(req.GetOrderId())
-	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-	}
 
-	if req.IsValid() {
-		if !h.paymentService.CountByOrderId(int(order.GetId())) {
-			// insert payment
-			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
-			cb, err := provider.Hit()
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// insert transaction
-			h.transactionService.Save(&entity.Transaction{
-				ApplicationID: order.Application.GetId(),
-				Action:        PAYMENT + MOMO,
-				Payload:       string(c.Body()),
-			})
-			// insert callback
-			h.callbackService.Save(&entity.Callback{
-				PaymentID: payment.GetId(),
-				Payload:   string(cb),
-			})
-			return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
-		} else {
-			return c.Status(fiber.StatusOK).JSON(
-				&entity.PaymentBodyResponse{
-					Error:      false,
-					StatusCode: fiber.StatusOK,
-					Message:    "success",
-				})
-		}
-
+	notifRequest := &entity.NotifRequestBody{
+		NotifMomoRequestBody: req,
 	}
-	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
+	notifRequest.SetChannel("MOMO")
+	dataJson, _ := json.Marshal(notifRequest)
+
+	go producer(h.rds, h.logger, h.ctx, dataJson)
+
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
-	h.zap.Info(string(c.Body()))
 	l := h.logger.Init("payment", true)
+	h.zap.Info(string(c.Body()))
 
 	req := new(entity.NotifRazerRequestBody)
 	if err := c.BodyParser(req); err != nil {
@@ -339,52 +207,16 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 	if !h.orderService.CountByNumber(req.GetOrderId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
 	}
-	// get order
-	order, err := h.orderService.GetByNumber(req.GetOrderId())
-	if err != nil {
-		h.zap.Error(err)
-		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+
+	notifRequest := &entity.NotifRequestBody{
+		NotifRazerRequestBody: req,
 	}
+	notifRequest.SetChannel("RAZER")
+	dataJson, _ := json.Marshal(notifRequest)
 
-	if req.IsValid() {
-		if !h.paymentService.CountByOrderId(int(order.GetId())) {
-			// insert payment
-			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
+	go producer(h.rds, h.logger, h.ctx, dataJson)
 
-			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
-			cb, err := provider.Hit()
-			if err != nil {
-				h.zap.Error(err)
-				return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
-			}
-			// insert transaction
-			h.transactionService.Save(&entity.Transaction{
-				ApplicationID: order.Application.GetId(),
-				Action:        PAYMENT + RAZER,
-				Payload:       string(c.Body()),
-			})
-			// insert callback
-			h.callbackService.Save(&entity.Callback{
-				PaymentID: payment.GetId(),
-				Payload:   string(cb),
-			})
-			return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
-		} else {
-			return c.Status(fiber.StatusOK).JSON(
-				&entity.PaymentBodyResponse{
-					Error:      false,
-					StatusCode: fiber.StatusOK,
-					Message:    "success",
-				})
-		}
-
-	}
-	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("forbidden"))
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) GetAll(c *fiber.Ctx) error {
@@ -403,9 +235,9 @@ func (h *PaymentHandler) Delete(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }
 
-func (h *PaymentHandler) producer(rds *redis.Client, ctx context.Context, dataJson []byte) {
+func producer(rds *redis.Client, logger *logger.Logger, ctx context.Context, dataJson []byte) {
 	_, err := rds.LPush(ctx, Q_PAY, dataJson).Result()
 	if err != nil {
-		h.logger.Writer(err.Error())
+		logger.Writer(err.Error())
 	}
 }
