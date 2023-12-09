@@ -39,6 +39,14 @@ type PaymentBodyResponse struct {
 	Message    string `json:"message"`
 }
 
+func NewStatusOKPaymentBodyResponse() *PaymentBodyResponse {
+	return &PaymentBodyResponse{
+		Error:      false,
+		StatusCode: http.StatusOK,
+		Message:    "success",
+	}
+}
+
 func NewStatusCreatedPaymentBodyResponse() *PaymentBodyResponse {
 	return &PaymentBodyResponse{
 		Error:      false,

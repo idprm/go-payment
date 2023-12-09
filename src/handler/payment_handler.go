@@ -80,7 +80,7 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
 
-	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
+	return c.Status(fiber.StatusOK).JSON(entity.NewStatusOKPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
@@ -107,7 +107,7 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
 
-	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
+	return c.Status(fiber.StatusOK).JSON(entity.NewStatusOKPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
