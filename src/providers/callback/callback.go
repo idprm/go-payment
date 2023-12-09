@@ -77,7 +77,7 @@ func (p *Callback) Hit() ([]byte, error) {
 
 	duration := time.Since(start).Milliseconds()
 	p.logger.Writer(string(body))
-	l.WithFields(logrus.Fields{"response": string(body), "duration": duration}).Info("POSTBACK_SAM_MO")
+	l.WithFields(logrus.Fields{"response": string(body), "duration": duration}).Info("CALLBACK")
 
 	return body, nil
 }

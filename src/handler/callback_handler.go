@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
+
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
@@ -64,11 +66,13 @@ func (h *CallbackHandler) Midtrans(req *entity.NotifMidtransRequestBody) {
 			if err != nil {
 				h.zap.Error(err)
 			}
+
+			dataJson, _ := json.Marshal(req)
 			// insert transaction
 			h.transactionService.Save(&entity.Transaction{
 				ApplicationID: order.Application.GetId(),
 				Action:        PAYMENT + MIDTRANS,
-				Payload:       string(""),
+				Payload:       string(dataJson),
 			})
 			// insert callback
 			h.callbackService.Save(&entity.Callback{
@@ -105,11 +109,13 @@ func (h *CallbackHandler) Nicepay(req *entity.NotifNicepayRequestBody) {
 				h.zap.Error(err)
 
 			}
+
+			dataJson, _ := json.Marshal(req)
 			// insert transaction
 			h.transactionService.Save(&entity.Transaction{
 				ApplicationID: order.Application.GetId(),
 				Action:        PAYMENT + NICEPAY,
-				Payload:       string(""),
+				Payload:       string(dataJson),
 			})
 			// insert callback
 			h.callbackService.Save(&entity.Callback{
@@ -141,11 +147,13 @@ func (h *CallbackHandler) DragonPay(req *entity.NotifDragonPayRequestBody) {
 			if err != nil {
 				h.zap.Error(err)
 			}
+
+			dataJson, _ := json.Marshal(req)
 			// insert transaction
 			h.transactionService.Save(&entity.Transaction{
 				ApplicationID: order.Application.GetId(),
 				Action:        PAYMENT + DRAGONPAY,
-				Payload:       string(""),
+				Payload:       string(dataJson),
 			})
 			// insert callback
 			h.callbackService.Save(&entity.Callback{
@@ -180,13 +188,14 @@ func (h *CallbackHandler) Momo(req *entity.NotifMomoRequestBody) {
 			cb, err := provider.Hit()
 			if err != nil {
 				h.zap.Error(err)
-
 			}
+
+			dataJson, _ := json.Marshal(req)
 			// insert transaction
 			h.transactionService.Save(&entity.Transaction{
 				ApplicationID: order.Application.GetId(),
 				Action:        PAYMENT + MOMO,
-				Payload:       string(""),
+				Payload:       string(dataJson),
 			})
 			// insert callback
 			h.callbackService.Save(&entity.Callback{
@@ -218,11 +227,13 @@ func (h *CallbackHandler) Razer(req *entity.NotifRazerRequestBody) {
 			if err != nil {
 				h.zap.Error(err)
 			}
+
+			dataJson, _ := json.Marshal(req)
 			// insert transaction
 			h.transactionService.Save(&entity.Transaction{
 				ApplicationID: order.Application.GetId(),
 				Action:        PAYMENT + RAZER,
-				Payload:       string(""),
+				Payload:       string(dataJson),
 			})
 			// insert callback
 			h.callbackService.Save(&entity.Callback{
