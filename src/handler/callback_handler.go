@@ -1,15 +1,16 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/services"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
 type CallbackHandler struct {
 	cfg                *config.Secret
+	rds                *redis.Client
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
 	orderService       services.IOrderService
@@ -19,6 +20,7 @@ type CallbackHandler struct {
 
 func NewCallbackHandler(
 	cfg *config.Secret,
+	rds *redis.Client,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
 	orderService services.IOrderService,
@@ -27,6 +29,7 @@ func NewCallbackHandler(
 ) *CallbackHandler {
 	return &CallbackHandler{
 		cfg:                cfg,
+		rds:                rds,
 		logger:             logger,
 		zap:                zap,
 		orderService:       orderService,
@@ -35,6 +38,20 @@ func NewCallbackHandler(
 	}
 }
 
-func (h *CallbackHandler) Razer(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
+func (h *CallbackHandler) Midtrans() {
+}
+
+func (h *CallbackHandler) Nicepay() {
+}
+
+func (h *CallbackHandler) DragonPay() {
+}
+
+func (h *CallbackHandler) JazzCash() {
+}
+
+func (h *CallbackHandler) Momo() {
+}
+
+func (h *CallbackHandler) Razer() {
 }

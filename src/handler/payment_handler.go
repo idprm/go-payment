@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
@@ -8,12 +10,18 @@ import (
 	"github.com/idprm/go-payment/src/providers/callback"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
 )
 
+const (
+	Q_PAY = "q_payment"
+)
+
 type PaymentHandler struct {
 	cfg                *config.Secret
+	rds                *redis.Client
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
 	orderService       services.IOrderService
@@ -24,6 +32,7 @@ type PaymentHandler struct {
 
 func NewPaymentHandler(
 	cfg *config.Secret,
+	rds *redis.Client,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
 	orderService services.IOrderService,
@@ -33,6 +42,7 @@ func NewPaymentHandler(
 ) *PaymentHandler {
 	return &PaymentHandler{
 		cfg:                cfg,
+		rds:                rds,
 		logger:             logger,
 		zap:                zap,
 		orderService:       orderService,
@@ -391,4 +401,11 @@ func (h *PaymentHandler) Update(c *fiber.Ctx) error {
 
 func (h *PaymentHandler) Delete(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
+
+func (h *PaymentHandler) producer(rds *redis.Client, ctx context.Context, dataJson []byte) {
+	_, err := rds.LPush(ctx, Q_PAY, dataJson).Result()
+	if err != nil {
+		h.logger.Writer(err.Error())
+	}
 }

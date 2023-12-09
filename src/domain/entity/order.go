@@ -9,7 +9,7 @@ type Order struct {
 	ChannelID     int64        `json:"-"`
 	Channel       *Channel     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"channel,omitempty"`
 	UrlReturn     string       `gorm:"size:200" json:"url_return"`
-	Number        string       `gorm:"size:56" json:"number"`
+	Number        string       `gorm:"size:60;uniqueIndex:uidx_number" json:"number"`
 	Msisdn        string       `gorm:"size:25" json:"msisdn"`
 	Email         string       `gorm:"size:100" json:"email"`
 	Name          string       `gorm:"size:150" json:"name"`

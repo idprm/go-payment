@@ -21,6 +21,9 @@ type Secret struct {
 		SourcePgSql string `yaml:"sourcepgsql"`
 		SourceMySql string `yaml:"sourcemysql"`
 	} `yaml:"db"`
+	Redis struct {
+		Url string `yaml:"url"`
+	} `yaml:"redis"`
 	DragonPay struct {
 		Url        string `yaml:"url"`
 		MerchantId string `yaml:"merchantid"`

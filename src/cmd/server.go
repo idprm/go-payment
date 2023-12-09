@@ -6,8 +6,13 @@ import (
 	"github.com/idprm/go-payment/src/app"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/datasource/mysql/db"
+	"github.com/idprm/go-payment/src/datasource/redis"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/spf13/cobra"
+)
+
+const (
+	Q_PAY = "q_payment"
 )
 
 var serverCmd = &cobra.Command{
@@ -34,13 +39,19 @@ var serverCmd = &cobra.Command{
 			return
 		}
 
+		// Init redis
+		rds, err := redis.InitRedis("")
+		if err != nil {
+			panic(err)
+		}
+
 		/**
 		 * Init Log
 		 */
 		lg := logger.NewLogger(cfg)
 		zap := logger.InitLogger(cfg)
 
-		application := app.NewApplication(cfg, db, lg, zap)
+		application := app.NewApplication(cfg, db, rds, lg, zap)
 		router := application.Start()
 		log.Fatal(router.Listen(":" + cfg.App.Port))
 	},
