@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"fmt"
-
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
@@ -46,8 +44,6 @@ func NewCallbackHandler(
 }
 
 func (h *CallbackHandler) Midtrans(req *entity.NotifMidtransRequestBody) {
-
-	fmt.Println("YES MIDTRANS")
 	// get order
 	order, err := h.orderService.GetByNumber(req.GetOrderId())
 	if err != nil {
@@ -86,7 +82,6 @@ func (h *CallbackHandler) Midtrans(req *entity.NotifMidtransRequestBody) {
 }
 
 func (h *CallbackHandler) Nicepay(req *entity.NotifNicepayRequestBody) {
-	fmt.Println("YES NICEPAY")
 	// get order
 	order, err := h.orderService.GetByNumber(req.GetReferenceNo())
 	if err != nil {

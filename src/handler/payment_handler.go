@@ -67,10 +67,10 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 	h.logger.Writer(req)
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_MIDTRANS")
 
-	// // checking order number
-	// if !h.orderService.CountByNumber(req.GetOrderId()) {
-	// 	return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
-	// }
+	// checking order number
+	if !h.orderService.CountByNumber(req.GetOrderId()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
+	}
 
 	notifRequest := &entity.NotifRequestBody{
 		NotifMidtransRequestBody: req,
