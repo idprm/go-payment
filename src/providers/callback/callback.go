@@ -54,12 +54,12 @@ func (p *Callback) Hit() ([]byte, error) {
 	tr := &http.Transport{
 		Proxy:              http.ProxyFromEnvironment,
 		MaxIdleConns:       10,
-		IdleConnTimeout:    30 * time.Second,
+		IdleConnTimeout:    60 * time.Second,
 		DisableCompression: true,
 	}
 
 	client := &http.Client{
-		Timeout:   30 * time.Second,
+		Timeout:   60 * time.Second,
 		Transport: tr,
 	}
 
