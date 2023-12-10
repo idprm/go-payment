@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
@@ -39,12 +40,16 @@ func (p *Callback) Hit() ([]byte, error) {
 
 	start := time.Now()
 
+	// set transaction_id
+	id := uuid.New()
+	trxId := id.String()
+
 	request := &entity.CallbackRequestBody{
 		Number: p.order.GetNumber(),
 		IsPaid: true,
 		Time:   time.Now(),
 	}
-	payload, _ := json.Marshal(&request)
+	payload, _ := json.Marshal(request)
 	req, err := http.NewRequest("POST", p.app.GetUrlCallback(), bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
@@ -64,6 +69,8 @@ func (p *Callback) Hit() ([]byte, error) {
 	}
 
 	p.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": string(payload), "trx_id": trxId}).Info("CALLBACK_REQUEST")
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -77,7 +84,7 @@ func (p *Callback) Hit() ([]byte, error) {
 
 	duration := time.Since(start).Milliseconds()
 	p.logger.Writer(string(body))
-	l.WithFields(logrus.Fields{"response": string(body), "duration": duration}).Info("CALLBACK")
+	l.WithFields(logrus.Fields{"response": string(body), "trx_id": trxId, "duration": duration}).Info("CALLBACK_RESPONSE")
 
 	return body, nil
 }
