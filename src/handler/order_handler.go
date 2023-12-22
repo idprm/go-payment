@@ -14,6 +14,7 @@ import (
 	"github.com/idprm/go-payment/src/providers/momo"
 	"github.com/idprm/go-payment/src/providers/nicepay"
 	"github.com/idprm/go-payment/src/providers/razer"
+	"github.com/idprm/go-payment/src/providers/ximpay"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
 	"github.com/sirupsen/logrus"
@@ -611,6 +612,90 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	h.orderService.Save(order)
 	h.transactionService.Save(transaction)
 	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(rz))
+}
+
+/**
+ * XIMPAY
+ */
+func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
+	req := new(entity.OrderBodyRequest)
+	err := c.BodyParser(req)
+	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XIMPAY")
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
+	}
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_XIMPAY")
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
+	}
+	/**
+	 * checking application
+	 */
+	if !h.isValidApplication(req.GetUrlCallback()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
+	}
+	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
+	if err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	/**
+	 * checking channel
+	 */
+	if !h.isValidChannel(req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
+	}
+	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	if err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	/**
+	 * checking order number
+	 */
+	if h.isValidOrderNumber(req.GetNumber()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_already_used"))
+	}
+
+	order := &entity.Order{
+		ApplicationID: application.GetId(),
+		ChannelID:     channel.GetId(),
+		UrlReturn:     req.GetUrlReturn(),
+		Number:        req.GetNumber(),
+		Msisdn:        req.GetMsisdn(),
+		Name:          req.GetName(),
+		Email:         req.GetEmail(),
+		Amount:        req.GetAmount(),
+		Description:   req.GetDescription(),
+		IpAddress:     req.GetIpAddress(),
+	}
+
+	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
+	xim, err := provider.Payment()
+	if err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	transaction := &entity.Transaction{
+		ApplicationID: application.GetId(),
+		Action:        ORDER + XIMPAY,
+		Payload:       string(xim),
+	}
+
+	h.zap.Info(xim)
+	h.orderService.Save(order)
+	h.transactionService.Save(transaction)
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(""))
 }
 
 func (h *OrderHandler) isValidApplication(urlCallback string) bool {

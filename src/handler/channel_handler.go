@@ -73,6 +73,14 @@ func (h *ChannelHandler) Razer(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(channel)
 }
 
+func (h *ChannelHandler) Ximpay(c *fiber.Ctx) error {
+	channel, err := h.channelService.GetBySlug(c.Params("slug"))
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	return c.Status(fiber.StatusOK).JSON(channel)
+}
+
 func (h *ChannelHandler) IsValidChannel(slug string) bool {
 	return h.channelService.CountBySlug(slug)
 }

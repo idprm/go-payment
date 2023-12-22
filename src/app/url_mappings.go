@@ -155,7 +155,6 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	nicepay.Get("channel/:slug", channelHandler.Nicepay)
 	nicepay.Post("order", orderHandler.Nicepay)
 	nicepay.Post("notification", paymentHandler.Nicepay)
-	nicepay.Post("notification", paymentHandler.Nicepay)
 	nicepay.Post("refund", refundHandler.Nicepay)
 
 	razer := v1.Group("razer")
@@ -165,6 +164,12 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	razer.Post("notification", paymentHandler.Razer)
 	razer.Post("refund", refundHandler.Razer)
 	razer.Post("return", returnHandler.Razer)
+
+	ximpay := v1.Group("ximpay")
+	ximpay.Get("/", gatewayHandler.Ximpay)
+	ximpay.Get("channel/:slug", channelHandler.Ximpay)
+	ximpay.Post("order", orderHandler.Ximpay)
+	ximpay.Get("notification", paymentHandler.Ximpay)
 
 	/**
 	 * AUTHENTICATED ROUTING

@@ -20,11 +20,9 @@ func init() {
 	 * WORKER SERVICE
 	 */
 	rootCmd.AddCommand(workerCmd)
-
-	/**
-	 * SEEDER SERVICE
-	 */
 	rootCmd.AddCommand(seederCmd)
+
+	rootCmd.AddCommand(testCmd)
 
 }
 

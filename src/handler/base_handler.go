@@ -15,6 +15,7 @@ const (
 	MOMO      = "MOMO"
 	NICEPAY   = "NICEPAY"
 	RAZER     = "RAZER"
+	XIMPAY    = "XIMPAY"
 )
 
 type BaseHandler struct {

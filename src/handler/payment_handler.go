@@ -219,6 +219,33 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedPaymentBodyResponse())
 }
 
+func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
+	l := h.logger.Init("payment", true)
+
+	req := new(entity.NotifXimpayRequestBody)
+	if err := c.QueryParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XIMPAY")
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
+	}
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_XIMPAY")
+
+	// checking order number
+	if !h.orderService.CountByNumber(req.GetCbParam()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
+	}
+
+	notifRequest := &entity.NotifRequestBody{
+		NotifXimpayRequestBody: req,
+	}
+	notifRequest.SetChannel("XIMPAY")
+	dataJson, _ := json.Marshal(notifRequest)
+
+	go producer(h.rds, h.logger, h.ctx, dataJson)
+
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusOKPaymentBodyResponse())
+}
+
 func (h *PaymentHandler) GetAll(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
 }

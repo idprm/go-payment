@@ -1048,6 +1048,88 @@ func (r *RefundRazerRequestBody) SetSignature(data string) {
 	r.Signature = data
 }
 
+type XimpayTselRequestBody struct {
+	PartnerId string `json:"partnerid"`
+	ItemId    string `json:"itemid"`
+	CbParam   string `json:"cbparam"`
+	Token     string `json:"token"`
+	Op        string `json:"op"`
+	Msisdn    string `json:"msisdn"`
+}
+
+type XimpayHtiRequestBody struct {
+	PartnerId string `json:"partnerid"`
+	ItemId    string `json:"itemid"`
+	CbParam   string `json:"cbparam"`
+	Token     string `json:"token"`
+	Op        string `json:"op"`
+	Msisdn    string `json:"msisdn"`
+}
+
+type XimpayXlRequestBody struct {
+	PartnerId string `json:"partnerid"`
+	ItemName  string `json:"item_name"`
+	ItemDesc  string `json:"item_desc"`
+	Amount    int    `json:"amount"`
+	CbParam   string `json:"cbparam"`
+	Token     string `json:"token"`
+	Op        string `json:"op"`
+	Msisdn    string `json:"msisdn"`
+}
+
+type XimpayIsatRequestBody struct {
+	PartnerId  string `json:"partnerid"`
+	ItemName   string `json:"item_name"`
+	ItemDesc   string `json:"item_desc"`
+	Amount     int    `json:"amount"`
+	ChargeType string `json:"charge_type"`
+	CbParam    string `json:"cbparam"`
+	Token      string `json:"token"`
+	Op         string `json:"op"`
+	Msisdn     string `json:"msisdn"`
+}
+
+type XimpaySfRequestBody struct {
+	PartnerId string `json:"partnerid"`
+	ItemName  string `json:"item_name"`
+	ItemDesc  string `json:"item_desc"`
+	AmountExc int    `json:"amount_exc"`
+	CbParam   string `json:"cbparam"`
+	Token     string `json:"token"`
+	Op        string `json:"op"`
+	Msisdn    string `json:"msisdn"`
+}
+
+type XimpayPinRequestBody struct {
+	XimpayId    string `json:"ximpayid"`
+	CodePin     string `json:"codepin"`
+	XimpayToken string `json:"ximpaytoken"`
+}
+
+type XimpayResponse struct {
+	ResponseCode int `json:"responsecode"`
+}
+
+type NotifXimpayRequestBody struct {
+	XimpayId     string `query:"ximpayid"`
+	XimpayStatus string `query:"ximpaystatus"`
+	CbParam      string `query:"cbparam"`
+	XimpayToken  string `query:"ximpaytoken"`
+	FailCode     string `query:"failcode"`
+}
+
+func (e *NotifXimpayRequestBody) GetCbParam() string {
+	return e.CbParam
+}
+
+func (e *NotifXimpayRequestBody) GetXimpayStatus() string {
+	return e.XimpayStatus
+}
+
+func (e *NotifXimpayRequestBody) IsValid() bool {
+	return e.FailCode == "0"
+}
+
 type CallbackRequestBody struct {
 	Number string    `json:"number"`
 	IsPaid bool      `json:"is_paid"`
@@ -1073,6 +1155,7 @@ type NotifRequestBody struct {
 	NotifJazzCashRequestBody  *NotifJazzCashRequestBody
 	NotifMomoRequestBody      *NotifMomoRequestBody
 	NotifRazerRequestBody     *NotifRazerRequestBody
+	NotifXimpayRequestBody    *NotifXimpayRequestBody
 	Channel                   string `json:"channel"`
 }
 
@@ -1106,4 +1189,8 @@ func (r *NotifRequestBody) IsMomo() bool {
 
 func (r *NotifRequestBody) IsRazer() bool {
 	return r.GetChannel() == "RAZER"
+}
+
+func (r *NotifRequestBody) IsXimpay() bool {
+	return r.GetChannel() == "XIMPAY"
 }

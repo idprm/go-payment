@@ -1,5 +1,7 @@
 package entity
 
+import "strings"
+
 type Channel struct {
 	ID        int64    `gorm:"primaryKey" json:"id"`
 	GatewayID int64    `json:"-"`
@@ -42,4 +44,24 @@ func (e *Channel) GetParam() string {
 
 func (e *Channel) GetIsActive() bool {
 	return e.IsActive
+}
+
+func (e *Channel) IsTsel() bool {
+	return strings.ToUpper(e.GetSlug()) == "TSEL"
+}
+
+func (e *Channel) IsHti() bool {
+	return strings.ToUpper(e.GetSlug()) == "HTI"
+}
+
+func (e *Channel) IsIsat() bool {
+	return strings.ToUpper(e.GetSlug()) == "ISAT"
+}
+
+func (e *Channel) IsXl() bool {
+	return strings.ToUpper(e.GetSlug()) == "XL"
+}
+
+func (e *Channel) IsSf() bool {
+	return strings.ToUpper(e.GetSlug()) == "SF"
 }

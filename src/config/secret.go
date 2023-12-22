@@ -2,8 +2,8 @@ package config
 
 import (
 	"bytes"
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -55,18 +55,28 @@ type Secret struct {
 	} `yaml:"nicepay"`
 	Razer struct {
 		Url        string `yaml:"url"`
-		UrlApi     string `yaml:"url_api"`
+		UrlApi     string `yaml:"urlApi"`
 		MerchantId string `yaml:"merchantid"`
 		VerifyKey  string `yaml:"verifykey"`
 		SecretKey  string `yaml:"secretkey"`
 	} `yaml:"razer"`
+	Ximpay struct {
+		UrlTsel   string `yaml:"urlTsel"`
+		UrlHti    string `yaml:"urlHti"`
+		UrlXl     string `yaml:"urlXl"`
+		UrlIsat   string `yaml:"urlIsat"`
+		UrlSf     string `yaml:"urlSf"`
+		PartnerId string `yaml:"partnerId"`
+		SecretKey string `yaml:"secretKey"`
+		Username  string `yaml:"username"`
+	} `yaml:"ximpay"`
 	Log struct {
 		Path string `yaml:"path"`
 	}
 }
 
 func LoadSecret(path string) (*Secret, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
