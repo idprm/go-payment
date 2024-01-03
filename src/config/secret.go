@@ -66,6 +66,8 @@ type Secret struct {
 		UrlXl     string `yaml:"urlXl"`
 		UrlIsat   string `yaml:"urlIsat"`
 		UrlSf     string `yaml:"urlSf"`
+		UrlXlPin  string `yaml:"urlXlPin"`
+		UrlSfPin  string `yaml:"urlSfPin"`
 		PartnerId string `yaml:"partnerId"`
 		SecretKey string `yaml:"secretKey"`
 		Username  string `yaml:"username"`

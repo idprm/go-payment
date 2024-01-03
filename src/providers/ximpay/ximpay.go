@@ -3,6 +3,7 @@ package ximpay
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -45,12 +46,12 @@ func NewXimpay(
 }
 
 func (p *Ximpay) token() string {
-	str := p.conf.Ximpay.PartnerId + "SHT00001" + "123" + time.Now().Format("01/02/2006") + p.conf.Ximpay.SecretKey
+	str := p.conf.Ximpay.PartnerId + "SHT00001" + p.order.GetNumber() + time.Now().Format("01/02/2006") + p.conf.Ximpay.SecretKey
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
 func (p *Ximpay) tokenSecond() string {
-	str := p.conf.Ximpay.PartnerId + "2220" + "12345" + time.Now().Format("01/02/2006") + p.conf.Ximpay.SecretKey
+	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("01/02/2006") + p.conf.Ximpay.SecretKey
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
@@ -67,7 +68,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 			&entity.XimpayTselRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemId:    "SHT00001",
-				CbParam:   "",
+				CbParam:   p.order.GetNumber(),
 				Token:     p.token(),
 				Op:        "TSEL",
 				Msisdn:    p.order.GetMsisdn(),
@@ -81,7 +82,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 			&entity.XimpayHtiRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemId:    "SHT00001",
-				CbParam:   "",
+				CbParam:   p.order.GetNumber(),
 				Token:     p.token(),
 				Op:        "HTI",
 				Msisdn:    p.order.GetMsisdn(),
@@ -96,9 +97,9 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				PartnerId:  p.conf.Ximpay.PartnerId,
 				ItemName:   "Item 2K",
 				ItemDesc:   "Item 2K",
-				Amount:     2220,
+				Amount:     int(p.order.GetAmount()),
 				ChargeType: "ISAT_GENERAL",
-				CbParam:    "",
+				CbParam:    p.order.GetNumber(),
 				Token:      p.token(),
 				Op:         "ISAT",
 				Msisdn:     p.order.GetMsisdn(),
@@ -113,8 +114,8 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemName:  "Item 2K",
 				ItemDesc:  "Item 2K",
-				Amount:    2220,
-				CbParam:   "",
+				Amount:    int(p.order.GetAmount()),
+				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
 				Op:        "xl",
 				Msisdn:    p.order.GetMsisdn(),
@@ -129,8 +130,8 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemName:  "Item 2K",
 				ItemDesc:  "Item 2K",
-				Amount:    2220,
-				CbParam:   "",
+				Amount:    int(p.order.GetAmount()),
+				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
 				Op:        "SF",
 				Msisdn:    p.order.GetMsisdn(),
@@ -169,19 +170,31 @@ func (p *Ximpay) Payment() ([]byte, error) {
 }
 
 func (p *Ximpay) Pin() ([]byte, error) {
-	url := p.conf.Ximpay.UrlSf
-	payload, _ := json.Marshal(
-		&entity.XimpayXlRequestBody{
-			PartnerId: p.conf.Ximpay.PartnerId,
-			ItemName:  "Item 2K",
-			ItemDesc:  "Item 2K",
-			Amount:    2220,
-			CbParam:   "",
-			Token:     p.tokenSecond(),
-			Op:        "SF",
-			Msisdn:    p.order.GetMsisdn(),
-		},
-	)
+	var url string
+	var payload []byte
+
+	if p.channel.IsXl() {
+		url = p.conf.Ximpay.UrlXlPin
+		payload, _ = json.Marshal(
+			&entity.XimpayPinRequestBody{
+				XimpayId:    "",
+				CodePin:     "",
+				XimpayToken: "",
+			},
+		)
+	}
+
+	if p.channel.IsSf() {
+		url = p.conf.Ximpay.UrlSfPin
+		payload, _ = json.Marshal(
+			&entity.XimpayPinRequestBody{
+				XimpayId:    "",
+				CodePin:     "",
+				XimpayToken: "",
+			},
+		)
+	}
+
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
