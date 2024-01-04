@@ -1,6 +1,10 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"strings"
+
+	"gorm.io/gorm"
+)
 
 type Order struct {
 	ID            int64        `gorm:"primaryKey" json:"id"`
@@ -33,6 +37,12 @@ func (e *Order) GetNumber() string {
 
 func (e *Order) GetMsisdn() string {
 	return e.Msisdn
+}
+
+func (e *Order) SetMsisdn() {
+	// remove (+) character
+	r := strings.NewReplacer("+", "")
+	e.Msisdn = r.Replace(e.Msisdn)
 }
 
 func (e *Order) GetEmail() string {

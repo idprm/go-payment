@@ -135,6 +135,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := midtrans.NewMidtrans(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	mt, err := provider.Payment()
@@ -230,6 +231,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := nicepay.NewNicepay(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	np, err := provider.Payment()
@@ -327,6 +329,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := dragonpay.NewDragonPay(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	dp, err := provider.Payment()
@@ -416,6 +419,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := jazzcash.NewJazzCash(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	jz, err := provider.Payment()
@@ -505,6 +509,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := momo.NewMomo(h.cfg, h.logger, application, channel.Gateway, channel, order)
 	mm, err := provider.Payment()
@@ -595,6 +600,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := razer.NewRazer(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
 	rz, err := provider.Payment()
@@ -679,6 +685,7 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 		Description:   req.GetDescription(),
 		IpAddress:     req.GetIpAddress(),
 	}
+	order.SetMsisdn()
 
 	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
 	xim, err := provider.Payment()
