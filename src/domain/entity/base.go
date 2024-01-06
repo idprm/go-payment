@@ -1130,12 +1130,16 @@ func (e *NotifXimpayRequestBody) GetCbParam() string {
 	return e.CbParam
 }
 
+func (e *NotifXimpayRequestBody) GetFailCode() string {
+	return e.FailCode
+}
+
 func (e *NotifXimpayRequestBody) GetXimpayStatus() string {
 	return e.XimpayStatus
 }
 
 func (e *NotifXimpayRequestBody) IsValid() bool {
-	return e.FailCode == "0"
+	return e.GetFailCode() == "0" && e.GetXimpayStatus() == "1"
 }
 
 type CallbackRequestBody struct {
