@@ -247,6 +247,7 @@ func (h *CallbackHandler) Razer(req *entity.NotifRazerRequestBody) {
 }
 
 func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
+	log.Println(req)
 	// get order
 	order, err := h.orderService.GetByNumber(req.GetCbParam())
 	if err != nil {
@@ -256,7 +257,6 @@ func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
 	log.Println(order)
 
 	if req.IsValid() {
-		log.Println(req)
 
 		if !h.paymentService.CountByOrderId(int(order.GetId())) {
 			// insert payment
