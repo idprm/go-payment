@@ -1119,11 +1119,11 @@ func (e *XimpayTransactionResponse) IsValid() bool {
 }
 
 type NotifXimpayRequestBody struct {
-	XimpayId     string `query:"ximpayid"`
-	XimpayStatus string `query:"ximpaystatus"`
-	CbParam      string `query:"cbparam"`
-	XimpayToken  string `query:"ximpaytoken"`
-	FailCode     string `query:"failcode"`
+	XimpayId     string `query:"XimpayId"`
+	XimpayStatus string `query:"XimpayStatus"`
+	CbParam      string `query:"CbParam"`
+	XimpayToken  string `query:"XimpayToken"`
+	FailCode     string `query:"FailCode"`
 }
 
 func (e *NotifXimpayRequestBody) GetCbParam() string {
