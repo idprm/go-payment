@@ -47,14 +47,14 @@ func NewXimpay(
 }
 
 func (p *Ximpay) token() string {
-	str := p.conf.Ximpay.PartnerId + "SHT00001" + p.order.GetNumber() + time.Now().Format("1/02/2006") + p.conf.Ximpay.SecretKey
+	str := p.conf.Ximpay.PartnerId + "SHT00001" + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
 	l := p.logger.Init("order", true)
 	l.WithFields(logrus.Fields{"plain_text": str}).Info("TOKEN")
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
 func (p *Ximpay) tokenSecond() string {
-	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/02/2006") + p.conf.Ximpay.SecretKey
+	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
