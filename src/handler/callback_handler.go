@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
@@ -252,7 +253,11 @@ func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
 		h.zap.Error(err)
 	}
 
+	log.Println(order)
+
 	if req.IsValid() {
+		log.Println(req)
+
 		if !h.paymentService.CountByOrderId(int(order.GetId())) {
 			// insert payment
 			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
