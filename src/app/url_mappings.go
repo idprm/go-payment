@@ -45,8 +45,8 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 
 	router.Use(requestid.New())
 	router.Use(log_access.New(log_access.Config{
-		Format:     "${pid} ${status} - ${method} ${path}\n",
-		TimeFormat: "02-Jan-2006",
+		Format:     "${time} - ${method} | ${url}\n",
+		TimeFormat: "2006-01-02 15:04:05",
 		TimeZone:   u.cfg.App.TimeZone,
 		Output:     file,
 	}))
