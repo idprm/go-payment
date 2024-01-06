@@ -1118,7 +1118,7 @@ func (e *XimpayTransactionResponse) IsValid() bool {
 	return e.Transaction[0].ResponseCode == 1
 }
 
-type NotifXimpayRequestBody struct {
+type NotifXimpayRequestParam struct {
 	XimpayId     string `query:"XimpayId"`
 	XimpayStatus string `query:"XimpayStatus"`
 	CbParam      string `query:"CbParam"`
@@ -1126,19 +1126,19 @@ type NotifXimpayRequestBody struct {
 	FailCode     string `query:"FailCode"`
 }
 
-func (e *NotifXimpayRequestBody) GetCbParam() string {
+func (e *NotifXimpayRequestParam) GetCbParam() string {
 	return e.CbParam
 }
 
-func (e *NotifXimpayRequestBody) GetFailCode() string {
+func (e *NotifXimpayRequestParam) GetFailCode() string {
 	return e.FailCode
 }
 
-func (e *NotifXimpayRequestBody) GetXimpayStatus() string {
+func (e *NotifXimpayRequestParam) GetXimpayStatus() string {
 	return e.XimpayStatus
 }
 
-func (e *NotifXimpayRequestBody) IsValid() bool {
+func (e *NotifXimpayRequestParam) IsValid() bool {
 	return e.GetFailCode() == "0" && e.GetXimpayStatus() == "1"
 }
 
@@ -1167,7 +1167,7 @@ type NotifRequestBody struct {
 	NotifJazzCashRequestBody  *NotifJazzCashRequestBody
 	NotifMomoRequestBody      *NotifMomoRequestBody
 	NotifRazerRequestBody     *NotifRazerRequestBody
-	NotifXimpayRequestBody    *NotifXimpayRequestBody
+	NotifXimpayRequestBody    *NotifXimpayRequestParam
 	Channel                   string `json:"channel"`
 }
 

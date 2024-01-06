@@ -245,7 +245,7 @@ func (h *CallbackHandler) Razer(req *entity.NotifRazerRequestBody) {
 	}
 }
 
-func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestBody) {
+func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
 	// get order
 	order, err := h.orderService.GetByNumber(req.GetCbParam())
 	if err != nil {

@@ -222,7 +222,7 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 	l := h.logger.Init("payment", true)
 
-	req := new(entity.NotifXimpayRequestBody)
+	req := new(entity.NotifXimpayRequestParam)
 	if err := c.QueryParser(req); err != nil {
 		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XIMPAY")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
