@@ -699,7 +699,7 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 		Payload:       string(xim),
 	}
 
-	h.zap.Info(xim)
+	h.zap.Info(string(xim))
 	h.orderService.Save(order)
 	h.transactionService.Save(transaction)
 	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(""))

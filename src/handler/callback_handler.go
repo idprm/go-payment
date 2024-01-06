@@ -62,7 +62,7 @@ func (h *CallbackHandler) Midtrans(req *entity.NotifMidtransRequestBody) {
 			// hit callback
 			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
 			cb, err := provider.Hit()
-			h.zap.Info(cb)
+			h.zap.Info(string(cb))
 			if err != nil {
 				h.zap.Error(err)
 			}

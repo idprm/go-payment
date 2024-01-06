@@ -24,3 +24,7 @@ func (e *Refund) GetAmount() float64 {
 func (e *Refund) GetStatus() string {
 	return e.Status
 }
+
+func (e *Refund) GetIpAddress() string {
+	return e.IpAddress
+}

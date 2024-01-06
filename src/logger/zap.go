@@ -26,8 +26,8 @@ func getLogWriter(cfg *config.Secret) zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
 		Filename:   cfg.Log.Path + "/logging" + ".log",
 		MaxSize:    10,
-		MaxBackups: 5,
-		MaxAge:     30,
+		MaxBackups: 2,
+		MaxAge:     5,
 		Compress:   true,
 	}
 	return zapcore.AddSync(lumberJackLogger)
