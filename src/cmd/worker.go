@@ -121,6 +121,10 @@ var workerCmd = &cobra.Command{
 				h.Razer(req.NotifRazerRequestBody)
 			}
 
+			if req.IsXimpay() {
+				h.Ximpay(req.NotifXimpayRequestBody)
+			}
+
 			// Wait a random amount of time before popping the next item
 			time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
 		}

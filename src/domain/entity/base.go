@@ -1139,7 +1139,7 @@ func (e *NotifXimpayRequestParam) GetXimpayStatus() string {
 }
 
 func (e *NotifXimpayRequestParam) IsValid() bool {
-	return e.GetXimpayStatus() == "1"
+	return e.GetXimpayStatus() == "1" && e.GetFailCode() == "0"
 }
 
 type CallbackRequestBody struct {

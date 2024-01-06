@@ -239,7 +239,7 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 		NotifXimpayRequestBody: req,
 	}
 	notifRequest.SetChannel("XIMPAY")
-	dataJson, _ := json.Marshal(notifRequest.NotifXimpayRequestBody)
+	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
 
