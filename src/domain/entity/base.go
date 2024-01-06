@@ -1106,8 +1106,16 @@ type XimpayPinRequestBody struct {
 	XimpayToken string `json:"ximpaytoken"`
 }
 
+type XimpayTransactionResponse struct {
+	Transaction []XimpayResponse `json:"ximpaytransaction"`
+}
+
 type XimpayResponse struct {
 	ResponseCode int `json:"responsecode"`
+}
+
+func (e *XimpayTransactionResponse) IsValid() bool {
+	return e.Transaction[0].ResponseCode == 1
 }
 
 type NotifXimpayRequestBody struct {

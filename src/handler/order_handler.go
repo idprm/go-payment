@@ -699,10 +699,15 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 		Payload:       string(xim),
 	}
 
-	h.zap.Info(string(xim))
-	h.orderService.Save(order)
-	h.transactionService.Save(transaction)
-	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(""))
+	var res entity.XimpayTransactionResponse
+	json.Unmarshal(xim, &res)
+
+	if res.IsValid() {
+		h.orderService.Save(order)
+		h.transactionService.Save(transaction)
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(order.GetUrlReturn()))
+	}
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("Error"))
 }
 
 func (h *OrderHandler) isValidApplication(urlCallback string) bool {

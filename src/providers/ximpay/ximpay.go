@@ -13,7 +13,6 @@ import (
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/utils/hash_utils"
-	"github.com/sirupsen/logrus"
 )
 
 type Ximpay struct {
@@ -48,8 +47,6 @@ func NewXimpay(
 
 func (p *Ximpay) token() string {
 	str := p.conf.Ximpay.PartnerId + "SHT00001" + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
-	l := p.logger.Init("order", true)
-	l.WithFields(logrus.Fields{"plain_text": str}).Info("TOKEN")
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
