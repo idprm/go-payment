@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	log_access "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gofiber/template/html"
+	"github.com/gofiber/template/html/v2"
 	"github.com/idprm/go-payment/src/domain/repository"
 	"github.com/idprm/go-payment/src/handler"
 	"github.com/idprm/go-payment/src/services"

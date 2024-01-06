@@ -14,6 +14,8 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gofiber/fiber/v2 v2.46.0 // indirect
 	github.com/gofiber/template v1.8.2 // indirect
+	github.com/gofiber/template/html/v2 v2.0.5 // indirect
+	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
