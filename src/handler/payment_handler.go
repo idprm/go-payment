@@ -243,7 +243,7 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
 
-	return c.Status(fiber.StatusOK).JSON(entity.NewStatusOKPaymentBodyResponse())
+	return c.Status(fiber.StatusOK).JSON(entity.NewStatusOKXimpayPaymentBodyResponse())
 }
 
 func (h *PaymentHandler) GetAll(c *fiber.Ctx) error {

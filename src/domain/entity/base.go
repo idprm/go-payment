@@ -39,6 +39,13 @@ type PaymentBodyResponse struct {
 	Message    string `json:"message"`
 }
 
+type XimpayPaymentBodyResponse struct {
+	Error      bool   `json:"error"`
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"Message"`
+	Retry      string `json:"Retry"`
+}
+
 func NewStatusOKPaymentBodyResponse() *PaymentBodyResponse {
 	return &PaymentBodyResponse{
 		Error:      false,
@@ -61,6 +68,15 @@ func NewStatusCreatedOrderBodyResponse(url string) *OrderBodyResponse {
 		StatusCode:  http.StatusCreated,
 		Message:     "success",
 		RedirectUrl: url,
+	}
+}
+
+func NewStatusOKXimpayPaymentBodyResponse() *XimpayPaymentBodyResponse {
+	return &XimpayPaymentBodyResponse{
+		Error:      false,
+		StatusCode: http.StatusOK,
+		Message:    "Success",
+		Retry:      "No",
 	}
 }
 
