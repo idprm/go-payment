@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
@@ -247,14 +246,11 @@ func (h *CallbackHandler) Razer(req *entity.NotifRazerRequestBody) {
 }
 
 func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
-	log.Println(req)
 	// get order
 	order, err := h.orderService.GetByNumber(req.GetCbParam())
 	if err != nil {
 		h.zap.Error(err)
 	}
-
-	log.Println(order)
 
 	if req.IsValid() {
 
