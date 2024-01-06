@@ -11,16 +11,21 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	log_access "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/template/html"
 	"github.com/idprm/go-payment/src/domain/repository"
 	"github.com/idprm/go-payment/src/handler"
 	"github.com/idprm/go-payment/src/services"
 )
 
 func (u *UrlMappings) mapUrls() *fiber.App {
+	engine := html.New("./src/presenter/views", ".html")
+
 	/**
 	 * Init Fiber
 	 */
-	router := fiber.New()
+	router := fiber.New(fiber.Config{
+		Views: engine,
+	})
 
 	// set cors
 	router.Use(cors.New())
