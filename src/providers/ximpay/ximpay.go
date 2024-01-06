@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -47,6 +48,7 @@ func NewXimpay(
 
 func (p *Ximpay) token() string {
 	str := p.conf.Ximpay.PartnerId + "SHT00001" + p.order.GetNumber() + time.Now().Format("01/02/2006") + p.conf.Ximpay.SecretKey
+	log.Println(str)
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
