@@ -1118,6 +1118,10 @@ func (e *XimpayTransactionResponse) IsValid() bool {
 	return e.Transaction[0].ResponseCode == 1
 }
 
+func (e *XimpayTransactionResponse) IsWrongPhoneNumber() bool {
+	return e.Transaction[0].ResponseCode == -9 || e.Transaction[0].ResponseCode == -10
+}
+
 type NotifXimpayRequestParam struct {
 	XimpayId     string `query:"ximpayid" json:"ximpayid"`
 	XimpayStatus string `query:"ximpaystatus" json:"ximpaystatus"`

@@ -707,6 +707,11 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 		h.transactionService.Save(transaction)
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(order.GetUrlReturn()))
 	}
+
+	if res.IsWrongPhoneNumber() {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": true, "message": "wrong_number"})
+	}
+
 	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("Error"))
 }
 
