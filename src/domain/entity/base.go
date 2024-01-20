@@ -1066,17 +1066,6 @@ type XimpayHtiRequestBody struct {
 	Msisdn    string `json:"msisdn"`
 }
 
-type XimpayXlRequestBody struct {
-	PartnerId string `json:"partnerid"`
-	ItemName  string `json:"item_name"`
-	ItemDesc  string `json:"item_desc"`
-	Amount    int    `json:"amount"`
-	CbParam   string `json:"cbparam"`
-	Token     string `json:"token"`
-	Op        string `json:"op"`
-	Msisdn    string `json:"msisdn"`
-}
-
 type XimpayIsatRequestBody struct {
 	PartnerId  string `json:"partnerid"`
 	ItemName   string `json:"item_name"`
@@ -1087,6 +1076,17 @@ type XimpayIsatRequestBody struct {
 	Token      string `json:"token"`
 	Op         string `json:"op"`
 	Msisdn     string `json:"msisdn"`
+}
+
+type XimpayXlRequestBody struct {
+	PartnerId string `json:"partnerid"`
+	ItemName  string `json:"item_name"`
+	ItemDesc  string `json:"item_desc"`
+	Amount    int    `json:"amount"`
+	CbParam   string `json:"cbparam"`
+	Token     string `json:"token"`
+	Op        string `json:"op"`
+	Msisdn    string `json:"msisdn"`
 }
 
 type XimpaySfRequestBody struct {
