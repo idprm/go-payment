@@ -3,7 +3,6 @@ package ximpay
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -59,7 +58,7 @@ func (p *Ximpay) tokenIsat() string {
 }
 
 func (p *Ximpay) tokenSecond() string {
-	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	str := p.conf.Ximpay.PartnerId + strconv.Itoa(int(p.order.GetAmount())) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
