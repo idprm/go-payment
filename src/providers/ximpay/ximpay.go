@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -50,9 +51,19 @@ func (p *Ximpay) token() string {
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
+func (p *Ximpay) tokenIsat() string {
+	str := p.conf.Ximpay.PartnerId + floatToString(p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	return hash_utils.GetMD5Hash(strings.ToLower(str))
+}
+
 func (p *Ximpay) tokenSecond() string {
 	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
+}
+
+func floatToString(input_num float64) string {
+	// to convert a float number to a string
+	return strconv.FormatFloat(input_num, 'f', 6, 64)
 }
 
 /**
@@ -100,7 +111,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Amount:     int(p.order.GetAmount()),
 				ChargeType: "ISAT_GENERAL",
 				CbParam:    p.order.GetNumber(),
-				Token:      p.tokenSecond(),
+				Token:      p.tokenIsat(),
 				Op:         "ISAT",
 				Msisdn:     p.order.GetMsisdn(),
 			},
