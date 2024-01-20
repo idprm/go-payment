@@ -126,11 +126,11 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	if p.channel.IsSf() {
 		url = p.conf.Ximpay.UrlSf
 		payload, _ = json.Marshal(
-			&entity.XimpayXlRequestBody{
+			&entity.XimpaySfRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemName:  "Item 2K",
 				ItemDesc:  "Item 2K",
-				Amount:    int(p.order.GetAmount()),
+				AmountExc: int(p.order.GetAmount()),
 				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
 				Op:        "SF",

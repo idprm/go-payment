@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -690,6 +691,7 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
 	xim, err := provider.Payment()
 	if err != nil {
+		log.Println(err)
 		h.zap.Error(err)
 		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
 	}
