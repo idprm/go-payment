@@ -55,7 +55,7 @@ func (e *Channel) IsHti() bool {
 }
 
 func (e *Channel) IsIsat() bool {
-	return strings.ToUpper(e.GetSlug()) == "ISAT"
+	return strings.ToUpper(e.GetSlug()) == "INDOSAT"
 }
 
 func (e *Channel) IsXl() bool {
@@ -63,5 +63,5 @@ func (e *Channel) IsXl() bool {
 }
 
 func (e *Channel) IsSf() bool {
-	return strings.ToUpper(e.GetSlug()) == "SF"
+	return strings.ToUpper(e.GetSlug()) == "SMARTFREN"
 }
