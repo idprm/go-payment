@@ -110,7 +110,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 			&entity.XimpayIsatRequestBody{
 				PartnerId:  p.conf.Ximpay.PartnerId,
 				ItemName:   "Item 2K",
-				ItemDesc:   "Item 2K",
+				ItemDesc:   "Item 2K CEHAT",
 				Amount:     int(p.order.GetAmount()),
 				ChargeType: "ISAT_GENERAL",
 				CbParam:    p.order.GetNumber(),
