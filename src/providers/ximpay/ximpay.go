@@ -111,7 +111,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Amount:     int(p.order.GetAmount()),
 				ChargeType: "ISAT_GENERAL",
 				CbParam:    p.order.GetNumber(),
-				Token:      p.tokenIsat(),
+				Token:      p.tokenSecond(),
 				Op:         "ISAT",
 				Msisdn:     p.order.GetMsisdn(),
 			},
