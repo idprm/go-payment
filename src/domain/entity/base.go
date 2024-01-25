@@ -31,6 +31,20 @@ type (
 		Message     string `json:"message"`
 		RedirectUrl string `json:"redirect_url"`
 	}
+
+	OrderBodyWithoutRedirectResponse struct {
+		Error      bool   `json:"error"`
+		StatusCode int    `json:"status_code"`
+		Message    string `json:"message"`
+	}
+
+	OrderPINBodyRequest struct {
+		UrlCallback string `validate:"required" json:"url_callback"`
+		UrlReturn   string `validate:"required" json:"url_return"`
+		Channel     string `validate:"required" json:"channel"`
+		Msisdn      string `validate:"required" json:"msisdn"`
+		PIN         string `validate:"required" json:"pin"`
+	}
 )
 
 type PaymentBodyResponse struct {
@@ -64,12 +78,11 @@ func NewStatusCreatedOrderBodyResponse(url string) *OrderBodyResponse {
 	}
 }
 
-func NewStatusCreatedOrderBodyWithCodeResponse(url string) *OrderBodyResponse {
-	return &OrderBodyResponse{
-		Error:       false,
-		StatusCode:  http.StatusCreated,
-		Message:     "success",
-		RedirectUrl: url,
+func NewStatusCreatedOrderBodyMessageResponse(message string) *OrderBodyWithoutRedirectResponse {
+	return &OrderBodyWithoutRedirectResponse{
+		Error:      false,
+		StatusCode: http.StatusCreated,
+		Message:    message,
 	}
 }
 
@@ -111,6 +124,26 @@ func (r *OrderBodyRequest) GetDescription() string {
 
 func (r *OrderBodyRequest) GetIpAddress() string {
 	return r.IpAddress
+}
+
+func (r *OrderPINBodyRequest) GetUrlCallback() string {
+	return r.UrlCallback
+}
+
+func (r *OrderPINBodyRequest) GetUrlReturn() string {
+	return r.UrlReturn
+}
+
+func (r *OrderPINBodyRequest) GetChannel() string {
+	return r.Channel
+}
+
+func (r *OrderPINBodyRequest) GetMsisdn() string {
+	return r.Msisdn
+}
+
+func (r *OrderPINBodyRequest) GetPIN() string {
+	return r.PIN
 }
 
 type RefundRequestBody struct {
@@ -1120,7 +1153,8 @@ type XimpayTransactionResponse struct {
 }
 
 type XimpayResponse struct {
-	ResponseCode int `json:"responsecode"`
+	ResponseCode int    `json:"responsecode"`
+	XimpayId     string `json:"ximpayid"`
 }
 
 func (e *XimpayTransactionResponse) IsValid() bool {
@@ -1129,6 +1163,14 @@ func (e *XimpayTransactionResponse) IsValid() bool {
 
 func (e *XimpayTransactionResponse) IsWrongPhoneNumber() bool {
 	return e.Transaction[0].ResponseCode == -9 || e.Transaction[0].ResponseCode == -10
+}
+
+func (e *XimpayTransactionResponse) IsWrongPIN() bool {
+	return e.Transaction[0].ResponseCode == -2
+}
+
+func (e *XimpayTransactionResponse) GetXimpayId() string {
+	return e.Transaction[0].XimpayId
 }
 
 type NotifXimpayRequestParam struct {

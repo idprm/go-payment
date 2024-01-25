@@ -183,7 +183,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	return body, nil
 }
 
-func (p *Ximpay) Pin() ([]byte, error) {
+func (p *Ximpay) Pin(ximpayId, pin string) ([]byte, error) {
 	var url string
 	var payload []byte
 
@@ -191,9 +191,9 @@ func (p *Ximpay) Pin() ([]byte, error) {
 		url = p.conf.Ximpay.UrlXlPin
 		payload, _ = json.Marshal(
 			&entity.XimpayPinRequestBody{
-				XimpayId:    "",
-				CodePin:     "",
-				XimpayToken: "",
+				XimpayId:    ximpayId,
+				CodePin:     pin,
+				XimpayToken: p.tokenSecond(),
 			},
 		)
 	}
@@ -202,9 +202,9 @@ func (p *Ximpay) Pin() ([]byte, error) {
 		url = p.conf.Ximpay.UrlSfPin
 		payload, _ = json.Marshal(
 			&entity.XimpayPinRequestBody{
-				XimpayId:    "",
-				CodePin:     "",
-				XimpayToken: "",
+				XimpayId:    ximpayId,
+				CodePin:     pin,
+				XimpayToken: p.tokenSecond(),
 			},
 		)
 	}

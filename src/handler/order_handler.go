@@ -563,6 +563,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	if errors != nil {
 		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
 	}
+
 	/**
 	 * checking application
 	 */
@@ -710,10 +711,15 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 	if res.IsValid() {
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
-		h.verifyService.Set(&entity.Verify{
-			Key:  req.GetMsisdn(),
-			Data: string(xim),
-		})
+		h.verifyService.Set(
+			&entity.Verify{
+				Key:  req.GetMsisdn(),
+				Data: res.GetXimpayId(),
+			},
+		)
+		if channel.IsXl() || channel.IsSf() {
+			c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyMessageResponse("please_input_pin"))
+		}
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(order.GetUrlReturn()))
 	}
 
@@ -721,6 +727,76 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": true, "message": "wrong_number"})
 	}
 
+	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("Error"))
+}
+
+func (h *OrderHandler) XimpayPIN(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
+	l := h.logger.Init("order", true)
+
+	req := new(entity.OrderPINBodyRequest)
+	err := c.BodyParser(req)
+	if err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XIMPAY_PIN")
+		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
+	}
+
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_XIMPAY_PIN")
+
+	/**
+	 * validation request
+	 */
+	errors := ValidateRequest(*req)
+	if errors != nil {
+		return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewValidateError(errors))
+	}
+
+	/**
+	 * checking application
+	 */
+	if !h.isValidApplication(req.GetUrlCallback()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("url_callback_not_found"))
+	}
+	application, err := h.applicationService.GetByUrlCallback(req.GetUrlCallback())
+	if err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+
+	/**
+	 * checking channel
+	 */
+	if !h.isValidChannel(req.GetChannel()) {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("channel_not_found"))
+	}
+	channel, err := h.channelService.GetBySlug(req.GetChannel())
+	if err != nil {
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	verify, err := h.verifyService.Get(req.GetMsisdn())
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("ximpayid_not_found"))
+	}
+	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, &entity.Order{}, &entity.Payment{})
+	xim, err := provider.Pin(verify.GetData(), req.GetPIN())
+	if err != nil {
+		log.Println(err)
+		h.zap.Error(err)
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+
+	var res entity.XimpayTransactionResponse
+	json.Unmarshal(xim, &res)
+
+	if res.IsValid() {
+		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(req.GetUrlReturn()))
+	}
+
+	if res.IsWrongPIN() {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": true, "message": "wrong_pin"})
+	}
 	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("Error"))
 }
 
