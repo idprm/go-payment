@@ -4,6 +4,7 @@ type Verify struct {
 	Key    string `json:"key"`
 	Data   string `json:"data"`
 	Value1 string `json:"value_1"`
+	Value2 string `json:"value_2"`
 }
 
 func (e *Verify) GetKey() string {
