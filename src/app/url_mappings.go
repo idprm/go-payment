@@ -179,6 +179,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	ximpay.Get("/", gatewayHandler.Ximpay)
 	ximpay.Get("channel/:slug", channelHandler.Ximpay)
 	ximpay.Post("order", orderHandler.Ximpay)
+	ximpay.Post("pin", orderHandler.XimpayPIN)
 	ximpay.Get("notification", paymentHandler.Ximpay)
 
 	/**
