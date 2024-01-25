@@ -30,6 +30,7 @@ type OrderHandler struct {
 	channelService     services.IChannelService
 	orderService       services.IOrderService
 	transactionService services.ITransactionService
+	verifyService      services.IVerifyService
 }
 
 func NewOrderHandler(
@@ -40,6 +41,7 @@ func NewOrderHandler(
 	channelService services.IChannelService,
 	orderService services.IOrderService,
 	transactionService services.ITransactionService,
+	verifyService services.IVerifyService,
 ) *OrderHandler {
 	return &OrderHandler{
 		cfg:                cfg,
@@ -49,6 +51,7 @@ func NewOrderHandler(
 		channelService:     channelService,
 		orderService:       orderService,
 		transactionService: transactionService,
+		verifyService:      verifyService,
 	}
 }
 
@@ -707,6 +710,10 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 	if res.IsValid() {
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
+		h.verifyService.Set(&entity.Verify{
+			Key:  req.GetMsisdn(),
+			Data: string(xim),
+		})
 		return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(order.GetUrlReturn()))
 	}
 

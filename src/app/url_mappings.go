@@ -86,10 +86,14 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	transactionRepo := repository.NewTransactionRepository(u.db)
 	transactionService := services.NewTransactionService(transactionRepo)
 
+	// init verify
+	verifyRepo := repository.NewVerfifyRepository(u.rds)
+	verifyService := services.NewVerifyService(verifyRepo)
+
 	// init order
 	orderRepo := repository.NewOrderRepository(u.db)
 	orderService := services.NewOrderService(orderRepo)
-	orderHandler := handler.NewOrderHandler(u.cfg, u.logger, u.zap, applicationService, channelService, orderService, transactionService)
+	orderHandler := handler.NewOrderHandler(u.cfg, u.logger, u.zap, applicationService, channelService, orderService, transactionService, verifyService)
 
 	// init callback
 	callbackRepo := repository.NewCallbackRepository(u.db)

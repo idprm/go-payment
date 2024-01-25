@@ -64,6 +64,15 @@ func NewStatusCreatedOrderBodyResponse(url string) *OrderBodyResponse {
 	}
 }
 
+func NewStatusCreatedOrderBodyWithCodeResponse(url string) *OrderBodyResponse {
+	return &OrderBodyResponse{
+		Error:       false,
+		StatusCode:  http.StatusCreated,
+		Message:     "success",
+		RedirectUrl: url,
+	}
+}
+
 func (r *OrderBodyRequest) GetUrlCallback() string {
 	return r.UrlCallback
 }
