@@ -693,7 +693,7 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 	order.SetMsisdn()
 
 	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
-	xim, token, err := provider.Payment()
+	xim, err := provider.Payment()
 	if err != nil {
 		log.Println(err)
 		h.zap.Error(err)
@@ -713,9 +713,8 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 		h.transactionService.Save(transaction)
 		h.verifyService.Set(
 			&entity.Verify{
-				Key:    req.GetMsisdn(),
-				Data:   res.GetXimpayId(),
-				Value1: token,
+				Key:  req.GetMsisdn(),
+				Data: res.GetXimpayId(),
 			},
 		)
 		if channel.IsXl() || channel.IsSf() {
@@ -781,7 +780,7 @@ func (h *OrderHandler) XimpayPIN(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("ximpayid_not_found"))
 	}
 	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, &entity.Order{}, &entity.Payment{})
-	xim, err := provider.Pin(verify.GetData(), verify.GetValue1(), req.GetPIN())
+	xim, err := provider.Pin(verify.GetData(), req.GetPIN())
 	if err != nil {
 		log.Println(err)
 		h.zap.Error(err)
