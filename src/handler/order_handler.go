@@ -797,6 +797,11 @@ func (h *OrderHandler) XimpayPIN(c *fiber.Ctx) error {
 	if res.IsWrongPIN() {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": true, "message": "wrong_pin"})
 	}
+
+	if res.IsInvalidPIN() {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": true, "message": "invalid_pin"})
+	}
+
 	return c.Status(fiber.StatusForbidden).JSON(rest_errors.NewForbiddenError("Error"))
 }
 

@@ -1169,6 +1169,10 @@ func (e *XimpayTransactionResponse) IsWrongPIN() bool {
 	return e.Transaction[0].ResponseCode == -2
 }
 
+func (e *XimpayTransactionResponse) IsInvalidPIN() bool {
+	return e.Transaction[0].ResponseCode == -13
+}
+
 func (e *XimpayTransactionResponse) GetXimpayId() string {
 	return e.Transaction[0].XimpayId
 }

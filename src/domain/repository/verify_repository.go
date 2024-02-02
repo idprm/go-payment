@@ -9,12 +9,12 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type VerfifyRepository struct {
+type VerifyRepository struct {
 	rds *redis.Client
 }
 
-func NewVerfifyRepository(rds *redis.Client) *VerfifyRepository {
-	return &VerfifyRepository{
+func NewVerfifyRepository(rds *redis.Client) *VerifyRepository {
+	return &VerifyRepository{
 		rds: rds,
 	}
 }
@@ -25,7 +25,7 @@ type IVerifyRepository interface {
 	Del(*entity.Verify) error
 }
 
-func (r *VerfifyRepository) Get(key string) (*entity.Verify, error) {
+func (r *VerifyRepository) Get(key string) (*entity.Verify, error) {
 	val, err := r.rds.Get(context.TODO(), key).Result()
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (r *VerfifyRepository) Get(key string) (*entity.Verify, error) {
 	return v, nil
 }
 
-func (r *VerfifyRepository) Set(v *entity.Verify) error {
+func (r *VerifyRepository) Set(v *entity.Verify) error {
 	verify, _ := json.Marshal(v)
 	err := r.rds.Set(context.TODO(), v.GetKey(), string(verify), 30*time.Minute).Err()
 	if err != nil {
@@ -44,7 +44,7 @@ func (r *VerfifyRepository) Set(v *entity.Verify) error {
 	return nil
 }
 
-func (r *VerfifyRepository) Del(v *entity.Verify) error {
+func (r *VerifyRepository) Del(v *entity.Verify) error {
 	err := r.rds.Del(context.TODO(), v.GetKey()).Err()
 	if err != nil {
 		return err
