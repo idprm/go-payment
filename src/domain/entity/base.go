@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
 type ErrorResponse struct {
@@ -1155,7 +1157,6 @@ type XimpayTransactionResponse struct {
 type XimpayResponse struct {
 	ResponseCode int    `json:"responsecode"`
 	XimpayId     string `json:"ximpayid"`
-	XimpayToken  string `json:"ximpaytoken"`
 }
 
 func (e *XimpayTransactionResponse) IsValid() bool {
@@ -1178,20 +1179,21 @@ func (e *XimpayTransactionResponse) GetXimpayId() string {
 	return e.Transaction[0].XimpayId
 }
 
-func (e *XimpayTransactionResponse) SetXimpayToken(data string) {
-	e.Transaction[0].XimpayToken = data
-}
-
-func (e *XimpayTransactionResponse) GetXimpayToken() string {
-	return e.Transaction[0].XimpayToken
-}
-
 type NotifXimpayRequestParam struct {
 	XimpayId     string `query:"ximpayid" json:"ximpayid"`
 	XimpayStatus string `query:"ximpaystatus" json:"ximpaystatus"`
 	CbParam      string `query:"cbparam" json:"cbparam"`
 	XimpayToken  string `query:"ximpaytoken" json:"ximpaytoken"`
 	FailCode     string `query:"failcode" json:"failcode"`
+}
+
+func (e *NotifXimpayRequestParam) IsValidXimpayToken(secretKey string) bool {
+	str := e.GetXimpayId() + e.GetXimpayStatus() + e.GetCbParam() + secretKey
+	return e.GetXimpayToken() == hash_utils.GetMD5Hash(strings.ToLower(str))
+}
+
+func (e *NotifXimpayRequestParam) GetXimpayId() string {
+	return e.XimpayId
 }
 
 func (e *NotifXimpayRequestParam) GetCbParam() string {
