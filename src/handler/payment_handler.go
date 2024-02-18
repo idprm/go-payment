@@ -238,8 +238,11 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
 
-	verify, _ := h.verifyService.Get(req.GetCbParam())
 	// check order valid token
+	verify, err := h.verifyService.Get(req.GetCbParam())
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
+	}
 	if req.GetXimpayToken() != verify.GetData() {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
