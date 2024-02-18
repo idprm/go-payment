@@ -717,6 +717,12 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 				Data: res.GetXimpayId(),
 			},
 		)
+		h.verifyService.Set(
+			&entity.Verify{
+				Key:  req.GetNumber(),
+				Data: res.GetXimpayToken(),
+			},
+		)
 		if channel.IsXl() || channel.IsSf() {
 			return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyMessageResponse("please_input_pin"))
 		}

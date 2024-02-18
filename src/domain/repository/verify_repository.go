@@ -37,7 +37,7 @@ func (r *VerifyRepository) Get(key string) (*entity.Verify, error) {
 
 func (r *VerifyRepository) Set(v *entity.Verify) error {
 	verify, _ := json.Marshal(v)
-	err := r.rds.Set(context.TODO(), v.GetKey(), string(verify), 30*time.Minute).Err()
+	err := r.rds.Set(context.TODO(), v.GetKey(), string(verify), 12*time.Hour).Err()
 	if err != nil {
 		return err
 	}

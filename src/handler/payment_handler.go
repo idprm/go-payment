@@ -28,6 +28,7 @@ type PaymentHandler struct {
 	paymentService     services.IPaymentService
 	transactionService services.ITransactionService
 	callbackService    services.ICallbackService
+	verifyService      services.IVerifyService
 	ctx                context.Context
 }
 
@@ -40,6 +41,7 @@ func NewPaymentHandler(
 	paymentService services.IPaymentService,
 	transactionService services.ITransactionService,
 	callbackService services.ICallbackService,
+	verifyService services.IVerifyService,
 	ctx context.Context,
 ) *PaymentHandler {
 	return &PaymentHandler{
@@ -51,6 +53,7 @@ func NewPaymentHandler(
 		paymentService:     paymentService,
 		transactionService: transactionService,
 		callbackService:    callbackService,
+		verifyService:      verifyService,
 		ctx:                ctx,
 	}
 }
@@ -225,14 +228,26 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 	req := new(entity.NotifXimpayRequestParam)
 	if err := c.QueryParser(req); err != nil {
 		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XIMPAY")
-		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
 	h.logger.Writer(req)
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_XIMPAY")
 
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetCbParam()) {
-		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
+	}
+
+	verify, _ := h.verifyService.Get(req.GetCbParam())
+	// check order valid token
+	if req.GetXimpayToken() != verify.GetData() {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
+	}
+
+	order, _ := h.orderService.GetByNumber(req.GetCbParam())
+	// checking already success
+	if h.paymentService.CountByOrderId(int(order.GetId())) {
+		return c.Status(fiber.StatusOK).SendString("Processed")
 	}
 
 	notifRequest := &entity.NotifRequestBody{
@@ -243,7 +258,7 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
 
-	return c.Status(fiber.StatusOK).Render("success", fiber.Map{})
+	return c.Status(fiber.StatusOK).SendString("Success")
 }
 
 func (h *PaymentHandler) GetAll(c *fiber.Ctx) error {

@@ -102,7 +102,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init payment
 	paymentRepo := repository.NewPaymentRepository(u.db)
 	paymentService := services.NewPaymentService(orderRepo, paymentRepo)
-	paymentHandler := handler.NewPaymentHandler(u.cfg, u.rds, u.logger, u.zap, orderService, paymentService, transactionService, callbackService, u.ctx)
+	paymentHandler := handler.NewPaymentHandler(u.cfg, u.rds, u.logger, u.zap, orderService, paymentService, transactionService, callbackService, verifyService, u.ctx)
 
 	// init refund
 	refundRepo := repository.NewRefundRepository(u.db)

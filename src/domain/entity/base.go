@@ -1155,6 +1155,7 @@ type XimpayTransactionResponse struct {
 type XimpayResponse struct {
 	ResponseCode int    `json:"responsecode"`
 	XimpayId     string `json:"ximpayid"`
+	XimpayToken  string `json:"ximpaytoken"`
 }
 
 func (e *XimpayTransactionResponse) IsValid() bool {
@@ -1177,6 +1178,14 @@ func (e *XimpayTransactionResponse) GetXimpayId() string {
 	return e.Transaction[0].XimpayId
 }
 
+func (e *XimpayTransactionResponse) SetXimpayToken(data string) {
+	e.Transaction[0].XimpayToken = data
+}
+
+func (e *XimpayTransactionResponse) GetXimpayToken() string {
+	return e.Transaction[0].XimpayToken
+}
+
 type NotifXimpayRequestParam struct {
 	XimpayId     string `query:"ximpayid" json:"ximpayid"`
 	XimpayStatus string `query:"ximpaystatus" json:"ximpaystatus"`
@@ -1195,6 +1204,10 @@ func (e *NotifXimpayRequestParam) GetFailCode() string {
 
 func (e *NotifXimpayRequestParam) GetXimpayStatus() string {
 	return e.XimpayStatus
+}
+
+func (e *NotifXimpayRequestParam) GetXimpayToken() string {
+	return e.XimpayToken
 }
 
 func (e *NotifXimpayRequestParam) IsValid() bool {
