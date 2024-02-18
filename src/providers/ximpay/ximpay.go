@@ -12,17 +12,19 @@ import (
 	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
 type Ximpay struct {
-	conf        *config.Secret
-	logger      *logger.Logger
-	application *entity.Application
-	gateway     *entity.Gateway
-	channel     *entity.Channel
-	order       *entity.Order
-	payment     *entity.Payment
+	conf          *config.Secret
+	logger        *logger.Logger
+	application   *entity.Application
+	gateway       *entity.Gateway
+	channel       *entity.Channel
+	order         *entity.Order
+	payment       *entity.Payment
+	verifyService services.IVerifyService
 }
 
 func NewXimpay(
@@ -33,15 +35,17 @@ func NewXimpay(
 	channel *entity.Channel,
 	order *entity.Order,
 	payment *entity.Payment,
+	verifyService services.IVerifyService,
 ) *Ximpay {
 	return &Ximpay{
-		conf:        conf,
-		logger:      logger,
-		application: application,
-		gateway:     gateway,
-		channel:     channel,
-		order:       order,
-		payment:     payment,
+		conf:          conf,
+		logger:        logger,
+		application:   application,
+		gateway:       gateway,
+		channel:       channel,
+		order:         order,
+		payment:       payment,
+		verifyService: verifyService,
 	}
 }
 
@@ -82,6 +86,10 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Msisdn:    p.order.GetMsisdn(),
 			},
 		)
+		p.verifyService.Set(&entity.Verify{
+			Key:  p.order.GetNumber(),
+			Data: p.token(),
+		})
 	}
 
 	if p.channel.IsHti() {
@@ -96,6 +104,10 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Msisdn:    p.order.GetMsisdn(),
 			},
 		)
+		p.verifyService.Set(&entity.Verify{
+			Key:  p.order.GetNumber(),
+			Data: p.token(),
+		})
 	}
 
 	if p.channel.IsIsat() {
@@ -113,6 +125,10 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Msisdn:     p.order.GetMsisdn(),
 			},
 		)
+		p.verifyService.Set(&entity.Verify{
+			Key:  p.order.GetNumber(),
+			Data: p.token(),
+		})
 	}
 
 	if p.channel.IsXl() {
@@ -129,6 +145,10 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Msisdn:    p.order.GetMsisdn(),
 			},
 		)
+		p.verifyService.Set(&entity.Verify{
+			Key:  p.order.GetNumber(),
+			Data: p.token(),
+		})
 	}
 
 	if p.channel.IsSf() {
@@ -145,6 +165,10 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				Msisdn:    p.order.GetMsisdn(),
 			},
 		)
+		p.verifyService.Set(&entity.Verify{
+			Key:  p.order.GetNumber(),
+			Data: p.token(),
+		})
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
