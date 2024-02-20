@@ -6,14 +6,12 @@ import (
 
 	"github.com/idprm/go-payment/src/app"
 	"github.com/idprm/go-payment/src/config"
-	"github.com/idprm/go-payment/src/datasource/mysql/db"
-	"github.com/idprm/go-payment/src/datasource/redis"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/spf13/cobra"
 )
 
-var serverCmd = &cobra.Command{
-	Use:   "server",
+var listenerCmd = &cobra.Command{
+	Use:   "listener",
 	Short: "Webserver CLI",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -25,19 +23,16 @@ var serverCmd = &cobra.Command{
 			panic(err)
 		}
 
-		log.Println(cfg)
-
 		/**
 		 * Init DB
 		 */
-		db, err := db.InitMySQL(cfg)
+		db, err := connectDB()
 		if err != nil {
-			log.Fatal(err)
-			return
+			panic(err)
 		}
 
 		// Init redis
-		rds, err := redis.InitRedis(cfg)
+		rds, err := connectRedis()
 		if err != nil {
 			panic(err)
 		}
@@ -52,6 +47,6 @@ var serverCmd = &cobra.Command{
 
 		application := app.NewApplication(cfg, db, rds, lg, zap, ctx)
 		router := application.Start()
-		log.Fatal(router.Listen(":" + cfg.App.Port))
+		log.Fatal(router.Listen(":" + getEnv(APP_PORT)))
 	},
 }

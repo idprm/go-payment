@@ -77,6 +77,10 @@ type Secret struct {
 	}
 }
 
+func (s *Secret) SetAppName(data string) {
+	s.App.Name = data
+}
+
 func LoadSecret(path string) (*Secret, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {

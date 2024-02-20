@@ -2,3 +2,4 @@ secret.yaml
 logs
 go-payment
 ./go-payment
+.env
