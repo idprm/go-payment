@@ -45,8 +45,8 @@ func NewXimpay(
 	}
 }
 
-func (p *Ximpay) token() string {
-	str := p.conf.Ximpay.PartnerId + "SHT00001" + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+func (p *Ximpay) token(itemcode string) string {
+	str := p.conf.Ximpay.PartnerId + itemcode + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
@@ -77,7 +77,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemId:    "SHT00001",
 				CbParam:   p.order.GetNumber(),
-				Token:     p.token(),
+				Token:     p.token("SHT00001"),
 				Op:        "TSEL",
 				Msisdn:    p.order.GetMsisdn(),
 			},
@@ -89,17 +89,18 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		req := &entity.XimpayHtiRequestBody{
 			PartnerId: p.conf.Ximpay.PartnerId,
 			CbParam:   p.order.GetNumber(),
-			Token:     p.token(),
 			Op:        "HTI",
 			Msisdn:    p.order.GetMsisdn(),
 		}
 
 		if p.application.IsSuratSakit() || p.application.IsSurkit() {
 			req.SetItemId(p.medicalCertificateHtiAmountToItemCode(p.order.GetAmount()))
+			req.SetToken(p.token(p.medicalCertificateHtiAmountToItemCode(p.order.GetAmount())))
 		}
 
 		if p.application.IsSehatCepat() {
 			req.SetItemId(p.consultationHtiAmountToItemCode(p.order.GetAmount()))
+			req.SetToken(p.token(p.consultationHtiAmountToItemCode(p.order.GetAmount())))
 		}
 
 		payload, _ = json.Marshal(req)

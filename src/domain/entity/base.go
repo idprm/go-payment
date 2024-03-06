@@ -1105,6 +1105,10 @@ func (e *XimpayTselRequestBody) SetItemId(data string) {
 	e.ItemId = data
 }
 
+func (e *XimpayTselRequestBody) SetToken(data string) {
+	e.Token = data
+}
+
 type XimpayHtiRequestBody struct {
 	PartnerId string `json:"partnerid"`
 	ItemId    string `json:"itemid"`
@@ -1116,6 +1120,10 @@ type XimpayHtiRequestBody struct {
 
 func (e *XimpayHtiRequestBody) SetItemId(data string) {
 	e.ItemId = data
+}
+
+func (e *XimpayHtiRequestBody) SetToken(data string) {
+	e.Token = data
 }
 
 type XimpayIsatRequestBody struct {
