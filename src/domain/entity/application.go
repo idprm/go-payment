@@ -24,3 +24,15 @@ func (e *Application) GetCode() string {
 func (e *Application) GetName() string {
 	return e.Name
 }
+
+func (e *Application) IsSehatCepat() bool {
+	return e.Code == "sehatcepat"
+}
+
+func (e *Application) IsSuratSakit() bool {
+	return e.Code == "suratsakit"
+}
+
+func (e *Application) IsSurkit() bool {
+	return e.Code == "suratsakit_new"
+}

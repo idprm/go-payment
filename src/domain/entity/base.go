@@ -1101,6 +1101,10 @@ type XimpayTselRequestBody struct {
 	Msisdn    string `json:"msisdn"`
 }
 
+func (e *XimpayTselRequestBody) SetItemId(data string) {
+	e.ItemId = data
+}
+
 type XimpayHtiRequestBody struct {
 	PartnerId string `json:"partnerid"`
 	ItemId    string `json:"itemid"`
@@ -1108,6 +1112,10 @@ type XimpayHtiRequestBody struct {
 	Token     string `json:"token"`
 	Op        string `json:"op"`
 	Msisdn    string `json:"msisdn"`
+}
+
+func (e *XimpayHtiRequestBody) SetItemId(data string) {
+	e.ItemId = data
 }
 
 type XimpayIsatRequestBody struct {

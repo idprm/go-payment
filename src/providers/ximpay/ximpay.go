@@ -86,16 +86,23 @@ func (p *Ximpay) Payment() ([]byte, error) {
 
 	if p.channel.IsHti() {
 		url = p.conf.Ximpay.UrlHti
-		payload, _ = json.Marshal(
-			&entity.XimpayHtiRequestBody{
-				PartnerId: p.conf.Ximpay.PartnerId,
-				ItemId:    "SHT00001",
-				CbParam:   p.order.GetNumber(),
-				Token:     p.token(),
-				Op:        "HTI",
-				Msisdn:    p.order.GetMsisdn(),
-			},
-		)
+		req := &entity.XimpayHtiRequestBody{
+			PartnerId: p.conf.Ximpay.PartnerId,
+			CbParam:   p.order.GetNumber(),
+			Token:     p.token(),
+			Op:        "HTI",
+			Msisdn:    p.order.GetMsisdn(),
+		}
+
+		if p.application.IsSuratSakit() || p.application.IsSurkit() {
+			req.SetItemId(p.medicalCertificateHtiAmountToItemCode(p.order.GetAmount()))
+		}
+
+		if p.application.IsSehatCepat() {
+			req.SetItemId(p.consultationHtiAmountToItemCode(p.order.GetAmount()))
+		}
+
+		payload, _ = json.Marshal(req)
 	}
 
 	if p.channel.IsIsat() {
@@ -103,8 +110,8 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		payload, _ = json.Marshal(
 			&entity.XimpayIsatRequestBody{
 				PartnerId:  p.conf.Ximpay.PartnerId,
-				ItemName:   "Item 2K",
-				ItemDesc:   "Item 2K CEHAT",
+				ItemName:   "Item",
+				ItemDesc:   "Item CEHAT",
 				Amount:     int(p.order.GetAmount()),
 				ChargeType: "ISAT_GENERAL",
 				CbParam:    p.order.GetNumber(),
@@ -120,8 +127,8 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		payload, _ = json.Marshal(
 			&entity.XimpayXlRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
-				ItemName:  "Item 2K",
-				ItemDesc:  "Item 2K",
+				ItemName:  "Item",
+				ItemDesc:  "Item",
 				Amount:    int(p.order.GetAmount()),
 				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
@@ -136,8 +143,8 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		payload, _ = json.Marshal(
 			&entity.XimpaySfRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
-				ItemName:  "Item 2K",
-				ItemDesc:  "Item 2K",
+				ItemName:  "Item",
+				ItemDesc:  "Item",
 				AmountExc: int(p.order.GetAmount()),
 				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
@@ -231,4 +238,96 @@ func (p *Ximpay) Pin(ximpayId, pin string) ([]byte, error) {
 
 	p.logger.Writer(string(body))
 	return body, nil
+}
+
+func (p *Ximpay) medicalCertificateHtiAmountToItemCode(amount float64) string {
+	switch amount {
+	case 5000:
+		return "SHT01001"
+	case 10000:
+		return "SHT01002"
+	case 15000:
+		return "SHT01003"
+	case 20000:
+		return "SHT01004"
+	case 25000:
+		return "SHT01005"
+	case 30000:
+		return "SHT01006"
+	case 35000:
+		return "SHT01007"
+	case 40000:
+		return "SHT01008"
+	case 45000:
+		return "SHT01009"
+	case 50000:
+		return "SHT01010"
+	case 55000:
+		return "SHT01011"
+	case 60000:
+		return "SHT01012"
+	case 65000:
+		return "SHT01013"
+	case 70000:
+		return "SHT01014"
+	case 75000:
+		return "SHT01015"
+	case 80000:
+		return "SHT01016"
+	case 85000:
+		return "SHT01017"
+	case 90000:
+		return "SHT01018"
+	case 95000:
+		return "SHT01019"
+	case 100000:
+		return "SHT01020"
+	}
+	return "SHT01020"
+}
+
+func (p *Ximpay) consultationHtiAmountToItemCode(amount float64) string {
+	switch amount {
+	case 5000:
+		return "SHT02001"
+	case 10000:
+		return "SHT02002"
+	case 15000:
+		return "SHT02003"
+	case 20000:
+		return "SHT02004"
+	case 25000:
+		return "SHT02005"
+	case 30000:
+		return "SHT02006"
+	case 35000:
+		return "SHT02007"
+	case 40000:
+		return "SHT02008"
+	case 45000:
+		return "SHT02009"
+	case 50000:
+		return "SHT02010"
+	case 55000:
+		return "SHT02011"
+	case 60000:
+		return "SHT02012"
+	case 65000:
+		return "SHT02013"
+	case 70000:
+		return "SHT02014"
+	case 75000:
+		return "SHT02015"
+	case 80000:
+		return "SHT02016"
+	case 85000:
+		return "SHT02017"
+	case 90000:
+		return "SHT02018"
+	case 95000:
+		return "SHT02019"
+	case 100000:
+		return "SHT02020"
+	}
+	return "SHT02020"
 }
