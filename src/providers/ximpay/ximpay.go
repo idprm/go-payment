@@ -52,7 +52,8 @@ func (p *Ximpay) token(itemcode string) string {
 }
 
 func (p *Ximpay) tokenSecond() string {
-	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%.0f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	tax := p.order.GetAmount() * 0.11
+	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%.0f", p.order.GetAmount()+tax) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
@@ -110,7 +111,6 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		url = p.conf.Ximpay.UrlIsat
 		// added tax 11%
 		vat := int(p.order.GetAmount() * 0.11)
-		//
 		payload, _ = json.Marshal(
 			&entity.XimpayIsatRequestBody{
 				PartnerId:  p.conf.Ximpay.PartnerId,
@@ -147,12 +147,13 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	if p.channel.IsSf() {
 		url = p.conf.Ximpay.UrlSf
 		// added tax 11%
+		vat := int(p.order.GetAmount() * 0.11)
 		payload, _ = json.Marshal(
 			&entity.XimpaySfRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemName:  "Item",
 				ItemDesc:  "Item CEHAT",
-				AmountExc: int(p.order.GetAmount()),
+				AmountExc: int(p.order.GetAmount()) + vat,
 				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
 				Op:        "SF",
