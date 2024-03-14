@@ -110,6 +110,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		url = p.conf.Ximpay.UrlIsat
 		// added tax 11%
 		vat := int(p.order.GetAmount() * 0.11)
+		//
 		payload, _ = json.Marshal(
 			&entity.XimpayIsatRequestBody{
 				PartnerId:  p.conf.Ximpay.PartnerId,
