@@ -58,6 +58,12 @@ func (p *Ximpay) tokenSecond() string {
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
+func (p *Ximpay) tokenWithoutTax() string {
+	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%.0f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	p.logger.Writer(strings.ToLower(str))
+	return hash_utils.GetMD5Hash(strings.ToLower(str))
+}
+
 func (p *Ximpay) tokenPin(ximpayId, pin string) string {
 	str := ximpayId + pin + p.conf.Ximpay.SecretKey
 	p.logger.Writer(strings.ToLower(str))
@@ -153,7 +159,7 @@ func (p *Ximpay) Payment() ([]byte, error) {
 				ItemDesc:  "Item CEHAT",
 				AmountExc: int(p.order.GetAmount()),
 				CbParam:   p.order.GetNumber(),
-				Token:     p.tokenSecond(),
+				Token:     p.tokenWithoutTax(),
 				Op:        "SF",
 				Msisdn:    p.order.GetMsisdn(),
 			},
