@@ -110,13 +110,13 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	if p.channel.IsIsat() {
 		url = p.conf.Ximpay.UrlIsat
 		// added tax 11%
-		vat := int(p.order.GetAmount() * 0.11)
+		vat := int(p.order.GetAmount()) + int(p.order.GetAmount()*0.11)
 		payload, _ = json.Marshal(
 			&entity.XimpayIsatRequestBody{
 				PartnerId:  p.conf.Ximpay.PartnerId,
 				ItemName:   "Item",
 				ItemDesc:   "Item CEHAT",
-				Amount:     int(p.order.GetAmount()) + vat,
+				Amount:     vat,
 				ChargeType: "ISAT_GENERAL",
 				CbParam:    p.order.GetNumber(),
 				Token:      p.tokenSecond(),
@@ -129,13 +129,13 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	if p.channel.IsXl() {
 		url = p.conf.Ximpay.UrlXl
 		// added tax 11%
-		vat := int(p.order.GetAmount() * 0.11)
+		vat := int(p.order.GetAmount()) + int(p.order.GetAmount()*0.11)
 		payload, _ = json.Marshal(
 			&entity.XimpayXlRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemName:  "Item",
 				ItemDesc:  "Item CEHAT",
-				Amount:    int(p.order.GetAmount()) + vat,
+				Amount:    vat,
 				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
 				Op:        "xl",
@@ -146,14 +146,12 @@ func (p *Ximpay) Payment() ([]byte, error) {
 
 	if p.channel.IsSf() {
 		url = p.conf.Ximpay.UrlSf
-		// added tax 11%
-		vat := int(p.order.GetAmount() * 0.11)
 		payload, _ = json.Marshal(
 			&entity.XimpaySfRequestBody{
 				PartnerId: p.conf.Ximpay.PartnerId,
 				ItemName:  "Item",
 				ItemDesc:  "Item CEHAT",
-				AmountExc: int(p.order.GetAmount()) + vat,
+				AmountExc: int(p.order.GetAmount()),
 				CbParam:   p.order.GetNumber(),
 				Token:     p.tokenSecond(),
 				Op:        "SF",
