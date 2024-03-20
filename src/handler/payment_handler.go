@@ -119,11 +119,11 @@ func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
 
 	req := new(entity.NotifDragonPayRequestBody)
 	if err := c.BodyParser(req); err != nil {
-		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_JAZZCASH")
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_DRAGONPAY")
 		return c.Status(fiber.StatusBadRequest).JSON(rest_errors.NewBadRequestError())
 	}
 	h.logger.Writer(req)
-	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_JAZZCASH")
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_DRAGONPAY")
 	// checking order number
 	if !h.orderService.CountByNumber(req.GetTransactionId()) {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("number_not_found"))
