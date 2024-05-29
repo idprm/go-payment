@@ -24,4 +24,4 @@ COPY --from=golang /bin/sh /bin/sh
 
 COPY --from=golang /payment .
 
-CMD ["/payment", "consumer"]
+CMD ["/payment", "callback"]

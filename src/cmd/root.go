@@ -46,7 +46,7 @@ func init() {
 	/**
 	 * WORKER SERVICE
 	 */
-	rootCmd.AddCommand(consumerCmd)
+	rootCmd.AddCommand(callbackCmd)
 	rootCmd.AddCommand(seederCmd)
 
 	rootCmd.AddCommand(testCmd)

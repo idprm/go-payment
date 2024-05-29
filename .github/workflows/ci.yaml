@@ -14,8 +14,8 @@ jobs:
         include:
           - dockerfile: ./Dockerfile.listener
             image: idprm/cehatpay-listener-service
-          - dockerfile: ./Dockerfile.consumer
-            image: idprm/cehatpay-consumer-service
+          - dockerfile: ./Dockerfile.callback
+            image: idprm/cehatpay-callback-service
 
     permissions:
       contents: read
