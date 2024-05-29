@@ -73,10 +73,10 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 
 	// init channel
 	channelRepo := repository.NewChannelRepository(u.db)
-	channelService := services.NewChannelService(u.cfg, gatewayRepo, channelRepo)
+	channelService := services.NewChannelService(gatewayRepo, channelRepo)
 
-	gatewayHandler := handler.NewGatewayHandler(u.cfg, countryService, gatewayService, channelService)
-	channelHandler := handler.NewChannelHandler(u.cfg, gatewayService, channelService)
+	gatewayHandler := handler.NewGatewayHandler(countryService, gatewayService, channelService)
+	channelHandler := handler.NewChannelHandler(gatewayService, channelService)
 
 	// init application
 	applicationRepo := repository.NewApplicationRepository(u.db)
@@ -93,7 +93,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init order
 	orderRepo := repository.NewOrderRepository(u.db)
 	orderService := services.NewOrderService(orderRepo)
-	orderHandler := handler.NewOrderHandler(u.cfg, u.logger, u.zap, applicationService, channelService, orderService, transactionService, verifyService)
+	orderHandler := handler.NewOrderHandler(u.logger, u.zap, applicationService, channelService, orderService, transactionService, verifyService)
 
 	// init callback
 	callbackRepo := repository.NewCallbackRepository(u.db)
@@ -102,20 +102,20 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	// init payment
 	paymentRepo := repository.NewPaymentRepository(u.db)
 	paymentService := services.NewPaymentService(orderRepo, paymentRepo)
-	paymentHandler := handler.NewPaymentHandler(u.cfg, u.rds, u.logger, u.zap, orderService, paymentService, transactionService, callbackService, verifyService, u.ctx)
+	paymentHandler := handler.NewPaymentHandler(u.rds, u.logger, u.zap, orderService, paymentService, transactionService, callbackService, verifyService, u.ctx)
 
 	// init refund
 	refundRepo := repository.NewRefundRepository(u.db)
 	refundService := services.NewRefundService(orderRepo, refundRepo)
-	refundHandler := handler.NewRefundHandler(u.cfg, u.logger, u.zap, applicationService, orderService, paymentService, refundService, transactionService)
+	refundHandler := handler.NewRefundHandler(u.logger, u.zap, applicationService, orderService, paymentService, refundService, transactionService)
 
 	// init return
 	returnRepo := repository.NewReturnRepository(u.db)
 	returnService := services.NewReturnService(orderRepo, returnRepo)
-	returnHandler := handler.NewReturnHandler(u.cfg, u.logger, u.zap, orderService, transactionService, returnService)
+	returnHandler := handler.NewReturnHandler(u.logger, u.zap, orderService, transactionService, returnService)
 
 	// init base
-	baseHandler := handler.NewBaseHandler(u.cfg)
+	baseHandler := handler.NewBaseHandler()
 
 	/**
 	 * Routes Base
