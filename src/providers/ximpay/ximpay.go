@@ -79,16 +79,24 @@ func (p *Ximpay) Payment() ([]byte, error) {
 
 	if p.channel.IsTsel() {
 		url = p.conf.Ximpay.UrlTsel
-		payload, _ = json.Marshal(
-			&entity.XimpayTselRequestBody{
-				PartnerId: p.conf.Ximpay.PartnerId,
-				ItemId:    "SHT00001",
-				CbParam:   p.order.GetNumber(),
-				Token:     p.token("SHT00001"),
-				Op:        "TSEL",
-				Msisdn:    p.order.GetMsisdn(),
-			},
-		)
+		req := &entity.XimpayTselRequestBody{
+			PartnerId: p.conf.Ximpay.PartnerId,
+			CbParam:   p.order.GetNumber(),
+			Op:        "TSEL",
+			Msisdn:    p.order.GetMsisdn(),
+		}
+
+		if p.application.IsSuratSakit() || p.application.IsSurkit() {
+			req.SetItemId(p.medicalCertificateHtiAndTselAmountToItemCode(p.order.GetAmount()))
+			req.SetToken(p.token(p.medicalCertificateHtiAndTselAmountToItemCode(p.order.GetAmount())))
+		}
+
+		if p.application.IsSehatCepat() {
+			req.SetItemId(p.consultationHtiAndTselAmountToItemCode(p.order.GetAmount()))
+			req.SetToken(p.token(p.consultationHtiAndTselAmountToItemCode(p.order.GetAmount())))
+		}
+
+		payload, _ = json.Marshal(req)
 	}
 
 	if p.channel.IsHti() {
@@ -101,13 +109,13 @@ func (p *Ximpay) Payment() ([]byte, error) {
 		}
 
 		if p.application.IsSuratSakit() || p.application.IsSurkit() {
-			req.SetItemId(p.medicalCertificateHtiAmountToItemCode(p.order.GetAmount()))
-			req.SetToken(p.token(p.medicalCertificateHtiAmountToItemCode(p.order.GetAmount())))
+			req.SetItemId(p.medicalCertificateHtiAndTselAmountToItemCode(p.order.GetAmount()))
+			req.SetToken(p.token(p.medicalCertificateHtiAndTselAmountToItemCode(p.order.GetAmount())))
 		}
 
 		if p.application.IsSehatCepat() {
-			req.SetItemId(p.consultationHtiAmountToItemCode(p.order.GetAmount()))
-			req.SetToken(p.token(p.consultationHtiAmountToItemCode(p.order.GetAmount())))
+			req.SetItemId(p.consultationHtiAndTselAmountToItemCode(p.order.GetAmount()))
+			req.SetToken(p.token(p.consultationHtiAndTselAmountToItemCode(p.order.GetAmount())))
 		}
 
 		payload, _ = json.Marshal(req)
@@ -252,7 +260,7 @@ func (p *Ximpay) Pin(ximpayId, pin string) ([]byte, error) {
 	return body, nil
 }
 
-func (p *Ximpay) medicalCertificateHtiAmountToItemCode(amount float64) string {
+func (p *Ximpay) medicalCertificateHtiAndTselAmountToItemCode(amount float64) string {
 	switch amount {
 	case 5000:
 		return "SHT01001"
@@ -298,7 +306,7 @@ func (p *Ximpay) medicalCertificateHtiAmountToItemCode(amount float64) string {
 	return "SHT01020"
 }
 
-func (p *Ximpay) consultationHtiAmountToItemCode(amount float64) string {
+func (p *Ximpay) consultationHtiAndTselAmountToItemCode(amount float64) string {
 	switch amount {
 	case 5000:
 		return "SHT02001"
