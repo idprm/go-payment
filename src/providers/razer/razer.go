@@ -8,14 +8,20 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
+var (
+	RAZER_URL        string = utils.GetEnv("RAZER_URL")
+	RAZER_MERCHANTID string = utils.GetEnv("RAZER_MERCHANTID")
+	RAZER_VERIFYKEY  string = utils.GetEnv("RAZER_VERIFYKEY")
+	RAZER_SECRETKEY  string = utils.GetEnv("RAZER_SECRETKEY")
+)
+
 type Razer struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -25,7 +31,6 @@ type Razer struct {
 }
 
 func NewRazer(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -34,7 +39,6 @@ func NewRazer(
 	payment *entity.Payment,
 ) *Razer {
 	return &Razer{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -48,14 +52,14 @@ func NewRazer(
  * Payment Method
  */
 func (p *Razer) Payment() (string, error) {
-	url := p.conf.Razer.Url + "/RMS/pay/" + p.conf.Razer.MerchantId + "/" + p.channel.GetParam()
+	url := RAZER_URL + "/RMS/pay/" + RAZER_MERCHANTID + "/" + p.channel.GetParam()
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		p.logger.Writer(err)
 		return "", err
 	}
 	req.Header.Add("Accept-Charset", "utf-8")
-	var str = strconv.Itoa(int(p.order.Amount)) + p.conf.Razer.MerchantId + p.order.Number + p.conf.Razer.VerifyKey
+	var str = strconv.Itoa(int(p.order.Amount)) + RAZER_MERCHANTID + p.order.Number + RAZER_VERIFYKEY
 	q := req.URL.Query()
 	q.Add("amount", strconv.Itoa(int(p.order.Amount)))
 	q.Add("orderid", p.order.GetNumber())
@@ -76,12 +80,12 @@ func (p *Razer) Payment() (string, error) {
  * Refund Method
  */
 func (p *Razer) Refund() ([]byte, error) {
-	url := p.conf.Razer.UrlApi + "/RMS/API/refundAPI/refund.php"
+	url := RAZER_URL + "/RMS/API/refundAPI/refund.php"
 	request := &entity.RefundRazerRequestBody{
 		TransactionId: p.payment.GetTransactionId(),
-		MerchantID:    p.conf.Razer.MerchantId,
+		MerchantID:    RAZER_MERCHANTID,
 	}
-	var str = p.payment.GetTransactionId() + p.conf.Razer.MerchantId + p.conf.Razer.VerifyKey
+	var str = p.payment.GetTransactionId() + RAZER_MERCHANTID + RAZER_VERIFYKEY
 	request.SetSignature(hash_utils.GetMD5Hash(str))
 	payload, _ := json.Marshal(&request)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))

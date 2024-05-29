@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/services"
@@ -11,7 +10,6 @@ import (
 )
 
 type ReturnHandler struct {
-	cfg                *config.Secret
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
 	orderService       services.IOrderService
@@ -20,7 +18,6 @@ type ReturnHandler struct {
 }
 
 func NewReturnHandler(
-	cfg *config.Secret,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
 	orderService services.IOrderService,
@@ -28,7 +25,6 @@ func NewReturnHandler(
 	returnService services.IReturnService,
 ) *ReturnHandler {
 	return &ReturnHandler{
-		cfg:                cfg,
 		logger:             logger,
 		zap:                zap,
 		orderService:       orderService,

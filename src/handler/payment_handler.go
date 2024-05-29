@@ -5,14 +5,19 @@ import (
 	"encoding/json"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/services"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
+)
+
+var (
+	XIMPAY_SECRETKEY string = utils.GetEnv("XIMPAY_SECRETKEY")
+	XIMPAY_USERNAME  string = utils.GetEnv("XIMPAY_USERNAME")
 )
 
 const (
@@ -20,7 +25,6 @@ const (
 )
 
 type PaymentHandler struct {
-	cfg                *config.Secret
 	rds                *redis.Client
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
@@ -33,7 +37,6 @@ type PaymentHandler struct {
 }
 
 func NewPaymentHandler(
-	cfg *config.Secret,
 	rds *redis.Client,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
@@ -45,7 +48,6 @@ func NewPaymentHandler(
 	ctx context.Context,
 ) *PaymentHandler {
 	return &PaymentHandler{
-		cfg:                cfg,
 		rds:                rds,
 		logger:             logger,
 		zap:                zap,
@@ -238,7 +240,7 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
 
-	if !req.IsValidXimpayToken(h.cfg.Ximpay.SecretKey) {
+	if !req.IsValidXimpayToken(XIMPAY_SECRETKEY) {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
 

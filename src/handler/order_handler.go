@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/providers/dragonpay"
@@ -17,13 +16,17 @@ import (
 	"github.com/idprm/go-payment/src/providers/razer"
 	"github.com/idprm/go-payment/src/providers/ximpay"
 	"github.com/idprm/go-payment/src/services"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
 )
 
+var (
+	NICEPAY_URL string = utils.GetEnv("NICEPAY_URL")
+)
+
 type OrderHandler struct {
-	cfg                *config.Secret
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
 	applicationService services.IApplicationService
@@ -34,7 +37,6 @@ type OrderHandler struct {
 }
 
 func NewOrderHandler(
-	cfg *config.Secret,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
 	applicationService services.IApplicationService,
@@ -44,7 +46,6 @@ func NewOrderHandler(
 	verifyService services.IVerifyService,
 ) *OrderHandler {
 	return &OrderHandler{
-		cfg:                cfg,
 		logger:             logger,
 		zap:                zap,
 		applicationService: applicationService,
@@ -141,7 +142,7 @@ func (h *OrderHandler) Midtrans(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := midtrans.NewMidtrans(h.cfg, h.logger, application, channel.Gateway, channel, order)
+	provider := midtrans.NewMidtrans(h.logger, application, channel.Gateway, channel, order)
 	mt, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
@@ -186,7 +187,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_NICEPAY")
 
 	/**
-	 * validation request
+	 * validation requestAPP_URL
 	 */
 	errors := ValidateRequest(*req)
 	if errors != nil {
@@ -237,7 +238,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := nicepay.NewNicepay(h.cfg, h.logger, application, channel.Gateway, channel, order)
+	provider := nicepay.NewNicepay(h.logger, application, channel.Gateway, channel, order)
 	np, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
@@ -257,7 +258,7 @@ func (h *OrderHandler) Nicepay(c *fiber.Ctx) error {
 		h.orderService.Save(order)
 		h.transactionService.Save(transaction)
 
-		redirectUrl := h.cfg.Nicepay.Url +
+		redirectUrl := NICEPAY_URL +
 			"/nicepay/direct/v2/payment?timeStamp=" + provider.TimeStamp() +
 			"&tXid=" + res.GetTransactionId() +
 			"&merchantToken=" + provider.Token() +
@@ -335,7 +336,7 @@ func (h *OrderHandler) DragonPay(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := dragonpay.NewDragonPay(h.cfg, h.logger, application, channel.Gateway, channel, order)
+	provider := dragonpay.NewDragonPay(h.logger, application, channel.Gateway, channel, order)
 	dp, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
@@ -425,7 +426,7 @@ func (h *OrderHandler) JazzCash(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := jazzcash.NewJazzCash(h.cfg, h.logger, application, channel.Gateway, channel, order)
+	provider := jazzcash.NewJazzCash(h.logger, application, channel.Gateway, channel, order)
 	jz, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
@@ -515,7 +516,7 @@ func (h *OrderHandler) Momo(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := momo.NewMomo(h.cfg, h.logger, application, channel.Gateway, channel, order)
+	provider := momo.NewMomo(h.logger, application, channel.Gateway, channel, order)
 	mm, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
@@ -607,7 +608,7 @@ func (h *OrderHandler) Razer(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := razer.NewRazer(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
+	provider := razer.NewRazer(h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
 	rz, err := provider.Payment()
 	if err != nil {
 		h.zap.Error(err)
@@ -692,7 +693,7 @@ func (h *OrderHandler) Ximpay(c *fiber.Ctx) error {
 	}
 	order.SetMsisdn()
 
-	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
+	provider := ximpay.NewXimpay(h.logger, application, channel.Gateway, channel, order, &entity.Payment{})
 	xim, err := provider.Payment()
 	if err != nil {
 		log.Println(err)
@@ -779,7 +780,7 @@ func (h *OrderHandler) XimpayPIN(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(rest_errors.NewNotFoundError("ximpayid_not_found"))
 	}
-	provider := ximpay.NewXimpay(h.cfg, h.logger, application, channel.Gateway, channel, &entity.Order{}, &entity.Payment{})
+	provider := ximpay.NewXimpay(h.logger, application, channel.Gateway, channel, &entity.Order{}, &entity.Payment{})
 	xim, err := provider.Pin(verify.GetData(), req.GetPIN())
 	if err != nil {
 		log.Println(err)

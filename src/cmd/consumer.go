@@ -7,9 +7,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
-	"github.com/idprm/go-payment/src/datasource/mysql/db"
-	"github.com/idprm/go-payment/src/datasource/redis"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/domain/repository"
 	"github.com/idprm/go-payment/src/handler"
@@ -18,23 +15,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var workerCmd = &cobra.Command{
-	Use:   "worker",
-	Short: "Worker CLI",
+var consumerCmd = &cobra.Command{
+	Use:   "consumer",
+	Short: "Consumer CLI",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		/**
-		 * Load config
-		 */
-		cfg, err := config.LoadSecret("secret.yaml")
-		if err != nil {
-			panic(err)
-		}
 
 		/**
 		 * Init DB
 		 */
-		db, err := db.InitMySQL(cfg)
+		db, err := connectDB()
 		if err != nil {
 			panic(err)
 		}
@@ -42,7 +32,7 @@ var workerCmd = &cobra.Command{
 		/**
 		 * Init redis
 		 */
-		rds, err := redis.InitRedis(cfg)
+		rds, err := connectRedis()
 		if err != nil {
 			panic(err)
 		}
@@ -50,8 +40,8 @@ var workerCmd = &cobra.Command{
 		/**
 		 * Init log
 		 */
-		lg := logger.NewLogger(cfg)
-		zap := logger.InitLogger(cfg)
+		lg := logger.NewLogger()
+		zap := logger.InitLogger()
 
 		ctx := context.Background()
 
@@ -72,7 +62,6 @@ var workerCmd = &cobra.Command{
 		callbackService := services.NewCallbackService(callbackRepo)
 
 		h := handler.NewCallbackHandler(
-			cfg,
 			rds,
 			lg,
 			zap,

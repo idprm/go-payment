@@ -6,23 +6,24 @@ import (
 	"os"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	LOG_PATH string = utils.GetEnv("LOG_PATH")
+)
+
 type Logger struct {
-	cfg *config.Secret
 }
 
-func NewLogger(cfg *config.Secret) *Logger {
-	return &Logger{
-		cfg: cfg,
-	}
+func NewLogger() *Logger {
+	return &Logger{}
 }
 
 func (l *Logger) Writer(data interface{}) {
 	//create your file with desired read/write permissions
-	f, err := os.OpenFile(l.cfg.Log.Path+"/http_log/http-"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	f, err := os.OpenFile(LOG_PATH+"/http_log/http-"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,7 +38,7 @@ func (l *Logger) Writer(data interface{}) {
 }
 
 func (l *Logger) Init(path string, display bool) *logrus.Logger {
-	f, err := os.OpenFile(l.cfg.Log.Path+"/"+path+"/"+path+"-"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	f, err := os.OpenFile(LOG_PATH+"/"+path+"/"+path+"-"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err.Error())
 	}

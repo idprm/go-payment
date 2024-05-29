@@ -1,24 +1,25 @@
 package services
 
 import (
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/domain/repository"
+	"github.com/idprm/go-payment/src/utils"
+)
+
+var (
+	APP_URL string = utils.GetEnv("APP_URL")
 )
 
 type ChannelService struct {
-	cfg         *config.Secret
 	gatewayRepo repository.IGatewayRepository
 	channelRepo repository.IChannelRepository
 }
 
 func NewChannelService(
-	cfg *config.Secret,
 	gatewayRepo repository.IGatewayRepository,
 	channelRepo repository.IChannelRepository,
 ) *ChannelService {
 	return &ChannelService{
-		cfg:         cfg,
 		gatewayRepo: gatewayRepo,
 		channelRepo: channelRepo,
 	}
@@ -47,7 +48,7 @@ func (s *ChannelService) GetAllByGateway(gateId int) (*[]entity.Channel, error) 
 				Gateway:  a.Gateway,
 				IsActive: a.GetIsActive(),
 			}
-			channel.SetLogo(s.cfg.App.Url, a.GetLogo())
+			channel.SetLogo(APP_URL, a.GetLogo())
 			channels = append(channels, channel)
 		}
 	}
@@ -76,7 +77,7 @@ func (s *ChannelService) GetBySlug(slug string) (*entity.Channel, error) {
 			IsActive: result.GetIsActive(),
 		}
 
-		channel.SetLogo(s.cfg.App.Url, result.GetLogo())
+		channel.SetLogo(APP_URL, result.GetLogo())
 	}
 	return &channel, nil
 }

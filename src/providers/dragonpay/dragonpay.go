@@ -4,17 +4,22 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
+)
+
+var (
+	DRAGONPAY_URL        string = utils.GetEnv("DRAGONPAY_URL")
+	DRAGONPAY_MERCHANTID string = utils.GetEnv("DRAGONPAY_MERCHANTID")
+	DRAGONPAY_PASSWORD   string = utils.GetEnv("DRAGONPAY_PASSWORD")
 )
 
 type DragonPay struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -23,7 +28,6 @@ type DragonPay struct {
 }
 
 func NewDragonPay(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -31,7 +35,6 @@ func NewDragonPay(
 	order *entity.Order,
 ) *DragonPay {
 	return &DragonPay{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -41,7 +44,7 @@ func NewDragonPay(
 }
 
 func (p *DragonPay) Payment() ([]byte, error) {
-	url := p.conf.DragonPay.Url + p.order.GetNumber() + "/post"
+	url := DRAGONPAY_URL + p.order.GetNumber() + "/post"
 	request := &entity.DragonPayRequestBody{
 		Amount:      int(p.order.GetAmount()),
 		Currency:    p.gateway.GetCurrency(),
@@ -59,7 +62,7 @@ func (p *DragonPay) Payment() ([]byte, error) {
 		return nil, err
 	}
 
-	var basic = "Basic " + base64.StdEncoding.EncodeToString([]byte(p.conf.DragonPay.MerchantId+":"+p.conf.DragonPay.Password))
+	var basic = "Basic " + base64.StdEncoding.EncodeToString([]byte(DRAGONPAY_MERCHANTID+":"+DRAGONPAY_PASSWORD))
 	req.Header.Add("Authorization", basic)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -82,7 +85,7 @@ func (p *DragonPay) Payment() ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/providers/callback"
@@ -13,7 +12,6 @@ import (
 )
 
 type CallbackHandler struct {
-	cfg                *config.Secret
 	rds                *redis.Client
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
@@ -24,7 +22,6 @@ type CallbackHandler struct {
 }
 
 func NewCallbackHandler(
-	cfg *config.Secret,
 	rds *redis.Client,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
@@ -34,7 +31,6 @@ func NewCallbackHandler(
 	callbackService services.ICallbackService,
 ) *CallbackHandler {
 	return &CallbackHandler{
-		cfg:                cfg,
 		rds:                rds,
 		logger:             logger,
 		zap:                zap,
@@ -60,7 +56,7 @@ func (h *CallbackHandler) Midtrans(req *entity.NotifMidtransRequestBody) {
 				h.zap.Error(err)
 			}
 			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
+			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
 			h.zap.Info(string(cb))
 			if err != nil {
@@ -103,7 +99,7 @@ func (h *CallbackHandler) Nicepay(req *entity.NotifNicepayRequestBody) {
 
 			}
 			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
+			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
 			if err != nil {
 				h.zap.Error(err)
@@ -141,7 +137,7 @@ func (h *CallbackHandler) DragonPay(req *entity.NotifDragonPayRequestBody) {
 			if err != nil {
 				h.zap.Error(err)
 			}
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
+			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
 			h.zap.Info(cb)
 			if err != nil {
@@ -184,7 +180,7 @@ func (h *CallbackHandler) Momo(req *entity.NotifMomoRequestBody) {
 
 			}
 			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
+			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
 			if err != nil {
 				h.zap.Error(err)
@@ -222,7 +218,7 @@ func (h *CallbackHandler) Razer(req *entity.NotifRazerRequestBody) {
 			}
 
 			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
+			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
 			if err != nil {
 				h.zap.Error(err)
@@ -262,7 +258,7 @@ func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
 			}
 
 			// hit callback
-			provider := callback.NewCallback(h.cfg, h.logger, order.Application, order)
+			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
 			if err != nil {
 				h.zap.Error(err)

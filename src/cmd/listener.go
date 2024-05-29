@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/idprm/go-payment/src/app"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/spf13/cobra"
 )
@@ -15,14 +14,6 @@ var listenerCmd = &cobra.Command{
 	Short: "Webserver CLI",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		/**
-		 * LOAD CONFIG
-		 */
-		cfg, err := config.LoadSecret("secret.yaml")
-		if err != nil {
-			panic(err)
-		}
-
 		/**
 		 * Init DB
 		 */
@@ -40,13 +31,13 @@ var listenerCmd = &cobra.Command{
 		/**
 		 * Init Log
 		 */
-		lg := logger.NewLogger(cfg)
-		zap := logger.InitLogger(cfg)
+		lg := logger.NewLogger()
+		zap := logger.InitLogger()
 
 		ctx := context.Background()
 
-		application := app.NewApplication(cfg, db, rds, lg, zap, ctx)
+		application := app.NewApplication(db, rds, lg, zap, ctx)
 		router := application.Start()
-		log.Fatal(router.Listen(":" + getEnv(APP_PORT)))
+		log.Fatal(router.Listen(":" + APP_PORT))
 	},
 }

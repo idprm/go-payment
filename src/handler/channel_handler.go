@@ -2,24 +2,20 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
 )
 
 type ChannelHandler struct {
-	cfg            *config.Secret
 	gatewayService services.IGatewayService
 	channelService services.IChannelService
 }
 
 func NewChannelHandler(
-	cfg *config.Secret,
 	gatewayService services.IGatewayService,
 	channelService services.IChannelService,
 ) *ChannelHandler {
 	return &ChannelHandler{
-		cfg:            cfg,
 		gatewayService: gatewayService,
 		channelService: channelService,
 	}

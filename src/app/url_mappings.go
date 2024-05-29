@@ -34,7 +34,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	 * Access log on browser
 	 */
 	router.Use("/logs", filesystem.New(filesystem.Config{
-		Root:         http.Dir(u.cfg.Log.Path),
+		Root:         http.Dir(LOG_PATH),
 		Browse:       true,
 		Index:        "index.html",
 		NotFoundFile: "404.html",
@@ -44,7 +44,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	/**
 	 * Write access logger
 	 */
-	file, err := os.OpenFile(u.cfg.Log.Path+"/access_log/log-"+time.Now().Format("2006-01-02")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(LOG_PATH+"/access_log/log-"+time.Now().Format("2006-01-02")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
@@ -53,7 +53,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	router.Use(log_access.New(log_access.Config{
 		Format:     "${time} - ${method} | ${url}\n",
 		TimeFormat: "2006-01-02 15:04:05",
-		TimeZone:   u.cfg.App.TimeZone,
+		TimeZone:   APP_TZ,
 		Output:     file,
 	}))
 

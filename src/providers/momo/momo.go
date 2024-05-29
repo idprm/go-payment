@@ -6,19 +6,26 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
+var (
+	APP_URL          string = utils.GetEnv("APP_URL")
+	MOMO_URL         string = utils.GetEnv("MOMO_URL")
+	MOMO_PARTNERCODE string = utils.GetEnv("MOMO_PARTNERCODE")
+	MOMO_ACCESSKEY   string = utils.GetEnv("MOMO_ACCESSKEY")
+	MOMO_SECRETKEY   string = utils.GetEnv("MOMO_SECRETKEY")
+)
+
 type Momo struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -27,7 +34,6 @@ type Momo struct {
 }
 
 func NewMomo(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -35,7 +41,6 @@ func NewMomo(
 	order *entity.Order,
 ) *Momo {
 	return &Momo{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -48,9 +53,9 @@ func NewMomo(
  * Payment Method
  */
 func (p *Momo) Payment() ([]byte, error) {
-	url := p.conf.Momo.Url + "/v2/gateway/api/create"
-	accessKey := p.conf.Momo.AccessKey
-	partnerCode := p.conf.Momo.PartnerCode
+	url := MOMO_URL + "/v2/gateway/api/create"
+	accessKey := MOMO_ACCESSKEY
+	partnerCode := MOMO_PARTNERCODE
 	requestId := hash_utils.GenerateTransactionId()
 
 	request := &entity.MomoRequestBody{
@@ -62,12 +67,12 @@ func (p *Momo) Payment() ([]byte, error) {
 		OrderId:     p.order.GetNumber(),
 		OrderInfo:   p.order.GetDescription(),
 		RedirectUrl: p.order.GetUrlReturn(),
-		IpnUrl:      p.conf.App.Url + "/v1/momo/notification",
+		IpnUrl:      APP_URL + "/v1/momo/notification",
 		RequestType: "captureWallet",
 		ExtraData:   "",
 		Lang:        "en",
 		AutoCapture: true,
-		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", p.conf.App.Url+"/v1/momo/notification", p.order.GetNumber(), p.order.GetDescription(), partnerCode, p.order.GetUrlReturn(), requestId, "captureWallet"),
+		Signature:   p.HashTransaction(accessKey, int(p.order.Amount), "", APP_URL+"/v1/momo/notification", p.order.GetNumber(), p.order.GetDescription(), partnerCode, p.order.GetUrlReturn(), requestId, "captureWallet"),
 	}
 
 	payload, _ := json.Marshal(&request)
@@ -93,7 +98,7 @@ func (p *Momo) Payment() ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +110,9 @@ func (p *Momo) Payment() ([]byte, error) {
  * Refund Method
  */
 func (p *Momo) Refund() ([]byte, error) {
-	url := p.conf.Momo.Url + "/v2/gateway/api/refund"
-	accessKey := p.conf.Momo.AccessKey
-	partnerCode := p.conf.Momo.PartnerCode
+	url := MOMO_URL + "/v2/gateway/api/refund"
+	accessKey := MOMO_ACCESSKEY
+	partnerCode := MOMO_PARTNERCODE
 	requestId := hash_utils.GenerateTransactionId()
 
 	request := &entity.MomoRefundRequestBody{
@@ -144,7 +149,7 @@ func (p *Momo) Refund() ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +158,7 @@ func (p *Momo) Refund() ([]byte, error) {
 }
 
 func (p *Momo) HashTransaction(accessKey string, amount int, extraData, ipnUrl, orderId, orderInfo, partnerCode, redirectUrl, requestId, requestType string) string {
-	secret := p.conf.Momo.SecretKey
+	secret := MOMO_ACCESSKEY
 	data := "accessKey=" + accessKey + "&amount=" + strconv.Itoa(amount) + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType
 	// Create a new HMAC by defining the hash type and the key (as byte array)
 	hm := hmac.New(sha256.New, []byte(secret))
@@ -165,7 +170,7 @@ func (p *Momo) HashTransaction(accessKey string, amount int, extraData, ipnUrl, 
 }
 
 func (p *Momo) HashRefund(accessKey string, amount int, description, orderId, partnerCode, requestId string, transId int) string {
-	secret := p.conf.Momo.SecretKey
+	secret := MOMO_ACCESSKEY
 	data := "accessKey=" + accessKey + "&amount=" + strconv.Itoa(amount) + "&description=" + description + "&orderId=" + orderId + "&partnerCode=" + partnerCode + "&requestId=" + requestId + "&transId=" + strconv.Itoa(transId)
 	// Create a new HMAC by defining the hash type and the key (as byte array)
 	hm := hmac.New(sha256.New, []byte(secret))

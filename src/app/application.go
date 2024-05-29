@@ -4,15 +4,19 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
+var (
+	APP_TZ   string = utils.GetEnv("APP_TZ")
+	LOG_PATH string = utils.GetEnv("LOG_PATH")
+)
+
 type Application struct {
-	cfg    *config.Secret
 	db     *gorm.DB
 	rds    *redis.Client
 	logger *logger.Logger
@@ -21,7 +25,6 @@ type Application struct {
 }
 
 func NewApplication(
-	cfg *config.Secret,
 	db *gorm.DB,
 	rds *redis.Client,
 	logger *logger.Logger,
@@ -29,7 +32,6 @@ func NewApplication(
 	ctx context.Context,
 ) *Application {
 	return &Application{
-		cfg:    cfg,
 		db:     db,
 		rds:    rds,
 		logger: logger,
@@ -39,7 +41,6 @@ func NewApplication(
 }
 
 type UrlMappings struct {
-	cfg    *config.Secret
 	db     *gorm.DB
 	rds    *redis.Client
 	logger *logger.Logger
@@ -48,7 +49,6 @@ type UrlMappings struct {
 }
 
 func NewUrlMappings(
-	cfg *config.Secret,
 	db *gorm.DB,
 	rds *redis.Client,
 	logger *logger.Logger,
@@ -56,7 +56,6 @@ func NewUrlMappings(
 	ctx context.Context,
 ) *UrlMappings {
 	return &UrlMappings{
-		cfg:    cfg,
 		db:     db,
 		rds:    rds,
 		logger: logger,
@@ -66,6 +65,6 @@ func NewUrlMappings(
 }
 
 func (a *Application) Start() *fiber.App {
-	urls := NewUrlMappings(a.cfg, a.db, a.rds, a.logger, a.zap, a.ctx)
+	urls := NewUrlMappings(a.db, a.rds, a.logger, a.zap, a.ctx)
 	return urls.mapUrls()
 }

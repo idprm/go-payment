@@ -7,19 +7,25 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
+)
+
+var (
+	JAZZCASH_URL            string = utils.GetEnv("JAZZCASH_URL")
+	JAZZCASH_MERCHANTID     string = utils.GetEnv("JAZZCASH_MERCHANTID")
+	JAZZCASH_PASSWORD       string = utils.GetEnv("JAZZCASH_PASSWORD")
+	JAZZCASH_INTEGERITYSALT string = utils.GetEnv("JAZZCASH_INTEGERITYSALT")
 )
 
 type JazzCash struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -28,7 +34,6 @@ type JazzCash struct {
 }
 
 func NewJazzCash(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -36,7 +41,6 @@ func NewJazzCash(
 	order *entity.Order,
 ) *JazzCash {
 	return &JazzCash{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -49,14 +53,14 @@ func NewJazzCash(
  * Payment Method
  */
 func (p *JazzCash) Payment() ([]byte, error) {
-	merchantId := p.conf.JazzCash.MerchantId
-	password := p.conf.JazzCash.Password
+	merchantId := JAZZCASH_MERCHANTID
+	password := JAZZCASH_PASSWORD
 
 	orderInfo := strings.ReplaceAll(p.order.Number, "-", "")
 
 	payload, _ := json.Marshal(&entity.JazzCashPaymentRequest{
 		Language:          "EN",
-		MerchantID:        p.conf.JazzCash.MerchantId,
+		MerchantID:        JAZZCASH_MERCHANTID,
 		Password:          password,
 		TxnRefNo:          p.order.GetNumber(),
 		Amount:            strconv.Itoa(int(p.order.Amount)),
@@ -69,7 +73,7 @@ func (p *JazzCash) Payment() ([]byte, error) {
 		MobileNumber:      p.PrefixMsisdn(),
 		CNIC:              247643,
 	})
-	req, err := http.NewRequest("POST", p.conf.JazzCash.Url, bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", JAZZCASH_URL, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return nil, errors.New(err.Error())
@@ -90,7 +94,7 @@ func (p *JazzCash) Payment() ([]byte, error) {
 		return nil, errors.New(err.Error())
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
@@ -125,7 +129,7 @@ func (p *JazzCash) PrefixMsisdn() string {
 }
 
 func (p *JazzCash) Hash(amount string, billRef string, cnic int, description string, lang string, merchantId string, mobileNumber string, password string, currency string, orderInfo string) string {
-	secret := p.conf.JazzCash.IntegeritySalt
+	secret := JAZZCASH_INTEGERITYSALT
 	data := secret + "&" + amount + "&" + billRef + "&" + strconv.Itoa(cnic) + "&" + description + "&" + lang + "&" + merchantId + "&" + mobileNumber + "&" + password + "&" + currency + "&" + p.TxTime() + "&" + p.TxTimeExp() + "&" + orderInfo
 
 	// Create a new HMAC by defining the hash type and the key (as byte array)
@@ -141,7 +145,7 @@ func (p *JazzCash) Hash(amount string, billRef string, cnic int, description str
 }
 
 func (p *JazzCash) SecureHashRefund(amount, merchantId, pin, password, currency, reffNo string) string {
-	secret := p.conf.JazzCash.IntegeritySalt
+	secret := JAZZCASH_INTEGERITYSALT
 	data := secret + "&" + amount + "&" + merchantId + "&" + pin + "&" + password + "&" + currency + "&" + reffNo
 
 	// Create a new HMAC by defining the hash type and the key (as byte array)

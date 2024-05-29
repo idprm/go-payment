@@ -8,27 +8,23 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/sirupsen/logrus"
 )
 
 type Callback struct {
-	conf   *config.Secret
 	logger *logger.Logger
 	app    *entity.Application
 	order  *entity.Order
 }
 
 func NewCallback(
-	conf *config.Secret,
 	logger *logger.Logger,
 	app *entity.Application,
 	order *entity.Order,
 ) *Callback {
 	return &Callback{
-		conf:   conf,
 		logger: logger,
 		app:    app,
 		order:  order,

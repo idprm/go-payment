@@ -2,26 +2,22 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/services"
 	"github.com/idprm/go-payment/src/utils/rest_errors"
 )
 
 type GatewayHandler struct {
-	cfg            *config.Secret
 	countryService services.ICountryService
 	gatewayService services.IGatewayService
 	channelService services.IChannelService
 }
 
 func NewGatewayHandler(
-	cfg *config.Secret,
 	countryService services.ICountryService,
 	gatewayService services.IGatewayService,
 	channelService services.IChannelService,
 ) *GatewayHandler {
 	return &GatewayHandler{
-		cfg:            cfg,
 		countryService: countryService,
 		gatewayService: gatewayService,
 		channelService: channelService,

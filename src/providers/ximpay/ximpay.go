@@ -9,14 +9,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
+var (
+	XIMPAY_URL_TSEL  string = utils.GetEnv("XIMPAY_URL_TSEL")
+	XIMPAY_URL_H3I   string = utils.GetEnv("XIMPAY_URL_H3I")
+	XIMPAY_URL_XL    string = utils.GetEnv("XIMPAY_URL_XL")
+	XIMPAY_URL_ISAT  string = utils.GetEnv("XIMPAY_URL_ISAT")
+	XIMPAY_URL_SF    string = utils.GetEnv("XIMPAY_URL_SF")
+	XIMPAY_URL_XLPIN string = utils.GetEnv("XIMPAY_URL_XLPIN")
+	XIMPAY_URL_SFPIN string = utils.GetEnv("XIMPAY_URL_SFPIN")
+	XIMPAY_PARTNERID string = utils.GetEnv("XIMPAY_PARTNERID")
+	XIMPAY_SECRETKEY string = utils.GetEnv("XIMPAY_SECRETKEY")
+	XIMPAY_USERNAME  string = utils.GetEnv("XIMPAY_USERNAME")
+)
+
 type Ximpay struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -26,7 +38,6 @@ type Ximpay struct {
 }
 
 func NewXimpay(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -35,7 +46,6 @@ func NewXimpay(
 	payment *entity.Payment,
 ) *Ximpay {
 	return &Ximpay{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -46,26 +56,26 @@ func NewXimpay(
 }
 
 func (p *Ximpay) token(itemcode string) string {
-	str := p.conf.Ximpay.PartnerId + itemcode + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	str := XIMPAY_PARTNERID + itemcode + p.order.GetNumber() + time.Now().Format("1/2/2006") + XIMPAY_SECRETKEY
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
 func (p *Ximpay) tokenSecond() string {
 	tax := p.order.GetAmount() * 0.11
-	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%.0f", p.order.GetAmount()+tax) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	str := XIMPAY_PARTNERID + fmt.Sprintf("%.0f", p.order.GetAmount()+tax) + p.order.GetNumber() + time.Now().Format("1/2/2006") + XIMPAY_SECRETKEY
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
 func (p *Ximpay) tokenWithoutTax() string {
-	str := p.conf.Ximpay.PartnerId + fmt.Sprintf("%.0f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + p.conf.Ximpay.SecretKey
+	str := XIMPAY_PARTNERID + fmt.Sprintf("%.0f", p.order.GetAmount()) + p.order.GetNumber() + time.Now().Format("1/2/2006") + XIMPAY_SECRETKEY
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
 
 func (p *Ximpay) tokenPin(ximpayId, pin string) string {
-	str := ximpayId + pin + p.conf.Ximpay.SecretKey
+	str := ximpayId + pin + XIMPAY_SECRETKEY
 	p.logger.Writer(strings.ToLower(str))
 	return hash_utils.GetMD5Hash(strings.ToLower(str))
 }
@@ -78,9 +88,9 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	var payload []byte
 
 	if p.channel.IsTsel() {
-		url = p.conf.Ximpay.UrlTsel
+		url = XIMPAY_URL_TSEL
 		req := &entity.XimpayTselRequestBody{
-			PartnerId: p.conf.Ximpay.PartnerId,
+			PartnerId: XIMPAY_PARTNERID,
 			CbParam:   p.order.GetNumber(),
 			Op:        "TSEL",
 			Msisdn:    p.order.GetMsisdn(),
@@ -100,9 +110,9 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	}
 
 	if p.channel.IsHti() {
-		url = p.conf.Ximpay.UrlHti
+		url = XIMPAY_URL_H3I
 		req := &entity.XimpayHtiRequestBody{
-			PartnerId: p.conf.Ximpay.PartnerId,
+			PartnerId: XIMPAY_PARTNERID,
 			CbParam:   p.order.GetNumber(),
 			Op:        "HTI",
 			Msisdn:    p.order.GetMsisdn(),
@@ -122,12 +132,12 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	}
 
 	if p.channel.IsIsat() {
-		url = p.conf.Ximpay.UrlIsat
+		url = XIMPAY_URL_ISAT
 		// added tax 11%
 		vat := int(p.order.GetAmount()) + int(p.order.GetAmount()*0.11)
 		payload, _ = json.Marshal(
 			&entity.XimpayIsatRequestBody{
-				PartnerId:  p.conf.Ximpay.PartnerId,
+				PartnerId:  XIMPAY_PARTNERID,
 				ItemName:   "Item",
 				ItemDesc:   "Item CEHAT",
 				Amount:     vat,
@@ -141,12 +151,12 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	}
 
 	if p.channel.IsXl() {
-		url = p.conf.Ximpay.UrlXl
+		url = XIMPAY_URL_XL
 		// added tax 11%
 		vat := int(p.order.GetAmount()) + int(p.order.GetAmount()*0.11)
 		payload, _ = json.Marshal(
 			&entity.XimpayXlRequestBody{
-				PartnerId: p.conf.Ximpay.PartnerId,
+				PartnerId: XIMPAY_PARTNERID,
 				ItemName:  "Item",
 				ItemDesc:  "Item CEHAT",
 				Amount:    vat,
@@ -159,10 +169,10 @@ func (p *Ximpay) Payment() ([]byte, error) {
 	}
 
 	if p.channel.IsSf() {
-		url = p.conf.Ximpay.UrlSf
+		url = XIMPAY_URL_SF
 		payload, _ = json.Marshal(
 			&entity.XimpaySfRequestBody{
-				PartnerId: p.conf.Ximpay.PartnerId,
+				PartnerId: XIMPAY_PARTNERID,
 				ItemName:  "Item",
 				ItemDesc:  "Item CEHAT",
 				AmountExc: int(p.order.GetAmount()),
@@ -209,7 +219,7 @@ func (p *Ximpay) Pin(ximpayId, pin string) ([]byte, error) {
 	var payload []byte
 
 	if p.channel.IsXl() {
-		url = p.conf.Ximpay.UrlXlPin
+		url = XIMPAY_URL_XLPIN
 		payload, _ = json.Marshal(
 			&entity.XimpayPinRequestBody{
 				XimpayId:    ximpayId,
@@ -220,7 +230,7 @@ func (p *Ximpay) Pin(ximpayId, pin string) ([]byte, error) {
 	}
 
 	if p.channel.IsSf() {
-		url = p.conf.Ximpay.UrlSfPin
+		url = XIMPAY_URL_SFPIN
 		payload, _ = json.Marshal(
 			&entity.XimpayPinRequestBody{
 				XimpayId:    ximpayId,

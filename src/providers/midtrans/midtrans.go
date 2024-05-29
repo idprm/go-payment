@@ -4,17 +4,24 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
+)
+
+var (
+	APP_URL             string = utils.GetEnv("APP_URL")
+	MIDTRANS_URL        string = utils.GetEnv("MIDTRANS_URL")
+	MIDTRANS_MERCHANTID string = utils.GetEnv("MIDTRANS_MERCHANTID")
+	MIDTRANS_CLIENTKEY  string = utils.GetEnv("MIDTRANS_CLIENTKEY")
+	MIDTRANS_SERVERKEY  string = utils.GetEnv("MIDTRANS_SERVERKEY")
 )
 
 type Midtrans struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -23,7 +30,6 @@ type Midtrans struct {
 }
 
 func NewMidtrans(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -31,7 +37,6 @@ func NewMidtrans(
 	order *entity.Order,
 ) *Midtrans {
 	return &Midtrans{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -60,7 +65,7 @@ type MidtransRequestBody struct {
  * Payment Method
  */
 func (p *Midtrans) Payment() ([]byte, error) {
-	url := p.conf.Midtrans.Url + "/transactions"
+	url := MIDTRANS_URL + "/transactions"
 
 	var request entity.MidtransPaymentRequestBody
 	request.ReqCustomer.FirstName = p.order.GetName()
@@ -77,9 +82,9 @@ func (p *Midtrans) Payment() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	var basic = "Basic " + base64.StdEncoding.EncodeToString([]byte(p.conf.Midtrans.ServerKey))
+	var basic = "Basic " + base64.StdEncoding.EncodeToString([]byte(MIDTRANS_SERVERKEY))
 	req.Header.Add("Authorization", basic)
-	req.Header.Add("X-Override-Notification", p.conf.App.Url+"/v1/midtrans/notification")
+	req.Header.Add("X-Override-Notification", APP_URL+"/v1/midtrans/notification")
 	req.Header.Set("Content-Type", "application/json")
 	tr := &http.Transport{
 		Proxy:              http.ProxyFromEnvironment,
@@ -97,7 +102,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +114,7 @@ func (p *Midtrans) Payment() ([]byte, error) {
  * Refund Method
  */
 func (p *Midtrans) Refund() ([]byte, error) {
-	url := p.conf.Midtrans.Url + "/refunds"
+	url := MIDTRANS_URL + "/refunds"
 
 	var request entity.MidtransPaymentRequestBody
 	request.ReqCustomer.FirstName = p.order.GetNumber()
@@ -139,7 +144,7 @@ func (p *Midtrans) Refund() ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

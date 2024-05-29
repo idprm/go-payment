@@ -8,14 +8,20 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
+	"github.com/idprm/go-payment/src/utils"
 	"github.com/idprm/go-payment/src/utils/hash_utils"
 )
 
+var (
+	APP_URL             string = utils.GetEnv("APP_URL")
+	NICEPAY_URL         string = utils.GetEnv("NICEPAY_URL")
+	NICEPAY_MERCHANTID  string = utils.GetEnv("NICEPAY_MERCHANTID")
+	NICEPAY_MERCHANTKEY string = utils.GetEnv("NICEPAY_MERCHANTKEY")
+)
+
 type Nicepay struct {
-	conf        *config.Secret
 	logger      *logger.Logger
 	application *entity.Application
 	gateway     *entity.Gateway
@@ -24,7 +30,6 @@ type Nicepay struct {
 }
 
 func NewNicepay(
-	conf *config.Secret,
 	logger *logger.Logger,
 	application *entity.Application,
 	gateway *entity.Gateway,
@@ -32,7 +37,6 @@ func NewNicepay(
 	order *entity.Order,
 ) *Nicepay {
 	return &Nicepay{
-		conf:        conf,
 		logger:      logger,
 		application: application,
 		gateway:     gateway,
@@ -45,11 +49,11 @@ func NewNicepay(
  * Payment Method
  */
 func (p *Nicepay) Payment() ([]byte, error) {
-	url := p.conf.Nicepay.Url + "/nicepay/direct/v2/registration"
+	url := NICEPAY_URL + "/nicepay/direct/v2/registration"
 
 	request := &entity.NicepayRequestBody{
 		TimeStamp:         p.TimeStamp(),
-		MerchantId:        p.conf.Nicepay.MerchantId,
+		MerchantId:        NICEPAY_MERCHANTID,
 		PaymentMethod:     "05",
 		MitraCode:         p.channel.GetParam(),
 		Currency:          p.gateway.GetCurrency(),
@@ -64,7 +68,7 @@ func (p *Nicepay) Payment() ([]byte, error) {
 		BillingState:      "Jakarta",
 		BillingPostNumber: "12345",
 		BillingCountry:    "Indonesia",
-		NotificationUrl:   p.conf.App.Url + "/v1/nicepay/notification",
+		NotificationUrl:   APP_URL + "/v1/nicepay/notification",
 		MerchantToken:     p.Token(),
 	}
 
@@ -113,7 +117,7 @@ func (p *Nicepay) Refund() ([]byte, error) {
 }
 
 func (p *Nicepay) Token() string {
-	valueToken := []byte(p.TimeStamp() + p.conf.Nicepay.MerchantId + p.order.Number + strconv.Itoa(int(p.order.Amount)) + p.conf.Nicepay.MerchantKey)
+	valueToken := []byte(p.TimeStamp() + NICEPAY_MERCHANTID + p.order.Number + strconv.Itoa(int(p.order.Amount)) + NICEPAY_MERCHANTKEY)
 	return hash_utils.EncryptSHA256(valueToken)
 }
 

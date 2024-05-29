@@ -2,7 +2,11 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
+	"github.com/idprm/go-payment/src/utils"
+)
+
+var (
+	APP_NAME string = utils.GetEnv("APP_NAME")
 )
 
 const (
@@ -19,17 +23,12 @@ const (
 )
 
 type BaseHandler struct {
-	cfg *config.Secret
 }
 
-func NewBaseHandler(
-	cfg *config.Secret,
-) *BaseHandler {
-	return &BaseHandler{
-		cfg: cfg,
-	}
+func NewBaseHandler() *BaseHandler {
+	return &BaseHandler{}
 }
 
 func (h *BaseHandler) Base(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "app_name": h.cfg.App.Name})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"error": false, "app_name": APP_NAME})
 }

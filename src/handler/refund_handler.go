@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/idprm/go-payment/src/config"
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/idprm/go-payment/src/logger"
 	"github.com/idprm/go-payment/src/providers/razer"
@@ -12,7 +11,6 @@ import (
 )
 
 type RefundHandler struct {
-	cfg                *config.Secret
 	logger             *logger.Logger
 	zap                *zap.SugaredLogger
 	applicationService services.IApplicationService
@@ -23,7 +21,6 @@ type RefundHandler struct {
 }
 
 func NewRefundHandler(
-	cfg *config.Secret,
 	logger *logger.Logger,
 	zap *zap.SugaredLogger,
 	applicationService services.IApplicationService,
@@ -33,7 +30,6 @@ func NewRefundHandler(
 	transactionService services.ITransactionService,
 ) *RefundHandler {
 	return &RefundHandler{
-		cfg:                cfg,
 		logger:             logger,
 		zap:                zap,
 		applicationService: applicationService,
@@ -149,7 +145,7 @@ func (h *RefundHandler) Razer(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": true, "message": "Error payment"})
 	}
 
-	provider := razer.NewRazer(h.cfg, h.logger, application, order.Channel.Gateway, order.Channel, order, payment)
+	provider := razer.NewRazer(h.logger, application, order.Channel.Gateway, order.Channel, order, payment)
 	rz, err := provider.Refund()
 	if err != nil {
 		h.zap.Error(err)
