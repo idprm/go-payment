@@ -279,5 +279,44 @@ func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
 
 		}
 	}
+}
 
+func (h *CallbackHandler) Xendit(req *entity.NotifXenditRequestBody) {
+	// get order
+	order, err := h.orderService.GetByNumber(req.GetReferenceId())
+	if err != nil {
+		h.zap.Error(err)
+	}
+
+	if req.IsValid() {
+
+		if !h.paymentService.CountByOrderId(int(order.GetId())) {
+			// insert payment
+			payment, err := h.paymentService.Save(&entity.Payment{OrderID: order.GetId(), IsPaid: true})
+			if err != nil {
+				h.zap.Error(err)
+			}
+
+			// hit callback
+			provider := callback.NewCallback(h.logger, order.Application, order)
+			cb, err := provider.Hit()
+			if err != nil {
+				h.zap.Error(err)
+			}
+
+			dataJson, _ := json.Marshal(req)
+			// insert transaction
+			h.transactionService.Save(&entity.Transaction{
+				ApplicationID: order.Application.GetId(),
+				Action:        PAYMENT + XENDIT,
+				Payload:       string(dataJson),
+			})
+			// insert callback
+			h.callbackService.Save(&entity.Callback{
+				PaymentID: payment.GetId(),
+				Payload:   string(cb),
+			})
+
+		}
+	}
 }

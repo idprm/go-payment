@@ -10,16 +10,17 @@ var (
 )
 
 const (
-	ORDER     = "ORDER_"
-	PAYMENT   = "PAYMENT_"
-	REFUND    = "REFUND_"
-	DRAGONPAY = "DRAGONPAY"
-	JAZZCASH  = "JAZZCASH"
-	MIDTRANS  = "MIDTRANS"
-	MOMO      = "MOMO"
-	NICEPAY   = "NICEPAY"
-	RAZER     = "RAZER"
-	XIMPAY    = "XIMPAY"
+	ORDER     string = "ORDER_"
+	PAYMENT   string = "PAYMENT_"
+	REFUND    string = "REFUND_"
+	DRAGONPAY string = "DRAGONPAY"
+	JAZZCASH  string = "JAZZCASH"
+	MIDTRANS  string = "MIDTRANS"
+	MOMO      string = "MOMO"
+	NICEPAY   string = "NICEPAY"
+	RAZER     string = "RAZER"
+	XIMPAY    string = "XIMPAY"
+	XENDIT    string = "XENDIT"
 )
 
 type BaseHandler struct {

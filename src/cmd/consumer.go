@@ -114,6 +114,10 @@ var callbackCmd = &cobra.Command{
 				h.Ximpay(req.NotifXimpayRequestBody)
 			}
 
+			if req.IsXimpay() {
+				h.Ximpay(req.NotifXimpayRequestBody)
+			}
+
 			// Wait a random amount of time before popping the next item
 			time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
 		}

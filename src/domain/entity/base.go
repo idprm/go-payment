@@ -1232,6 +1232,77 @@ func (e *NotifXimpayRequestParam) IsValid() bool {
 	return e.GetXimpayStatus() == "1" && e.GetFailCode() == "0"
 }
 
+type XenditPayoutRequest struct {
+	ExternalId         string  `json:"external_id"`
+	Amount             float64 `json:"amount"`
+	Email              string  `json:"email"`
+	InvoiceDuration    int     `json:"invoice_duration"`
+	SuccessRedirectUrl string  `json:"success_redirect_url"`
+	FailureRedirectUrl string  `json:"failure_redirect_url"`
+}
+
+func (e *XenditPayoutRequest) SetExternalId(v string) {
+	e.ExternalId = v
+}
+
+func (e *XenditPayoutRequest) SetAmount(v float64) {
+	e.Amount = v
+}
+
+func (e *XenditPayoutRequest) SetInvoiceDuration(v int) {
+	e.InvoiceDuration = v
+}
+
+func (e *XenditPayoutRequest) SetSuccessRedirectUrl(v string) {
+	e.SuccessRedirectUrl = v
+}
+
+func (e *XenditPayoutRequest) SetFailureRedirectUrl(v string) {
+	e.FailureRedirectUrl = v
+}
+
+type XenditPayoutResponse struct {
+	Id                  string `json:"id"`
+	ExternalId          string `json:"external_id"`
+	Amount              int    `json:"amount"`
+	MerchantName        string `json:"merchant_name"`
+	Status              string `json:"status"`
+	ExpirationTimestamp string `json:"expiration_timestamp"`
+	Created             string `json:"created"`
+	PayoutUrl           string `json:"payout_url"`
+}
+
+func (e *XenditPayoutResponse) GetExternalId() string {
+	return e.ExternalId
+}
+
+func (e *XenditPayoutResponse) GetStatus() string {
+	return e.Status
+}
+
+func (e *XenditPayoutResponse) GetPayoutUrl() string {
+	return e.PayoutUrl
+}
+
+type NotifXenditRequestBody struct {
+	Event string `json:"event"`
+	Data  struct {
+		ReferenceId string `json:"reference_id"`
+		ChannelCode string `json:"channel_code"`
+		Currency    string `json:"currency"`
+		Amount      int    `json:"amount"`
+		Status      string `json:"status"`
+	} `json:"data"`
+}
+
+func (e *NotifXenditRequestBody) GetReferenceId() string {
+	return e.Data.ReferenceId
+}
+
+func (e *NotifXenditRequestBody) IsValid() bool {
+	return e.Event == "payout.succeeded" || e.Data.Status == "SUCCEEDED"
+}
+
 type CallbackRequestBody struct {
 	Number string    `json:"number"`
 	IsPaid bool      `json:"is_paid"`
@@ -1258,6 +1329,7 @@ type NotifRequestBody struct {
 	NotifMomoRequestBody      *NotifMomoRequestBody
 	NotifRazerRequestBody     *NotifRazerRequestBody
 	NotifXimpayRequestBody    *NotifXimpayRequestParam
+	NotifXenditRequestBody    *NotifXenditRequestBody
 	Channel                   string `json:"channel"`
 }
 
@@ -1295,4 +1367,8 @@ func (r *NotifRequestBody) IsRazer() bool {
 
 func (r *NotifRequestBody) IsXimpay() bool {
 	return r.GetChannel() == "XIMPAY"
+}
+
+func (r *NotifRequestBody) IsXendit() bool {
+	return r.GetChannel() == "XENDIT"
 }

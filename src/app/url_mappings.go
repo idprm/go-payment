@@ -18,7 +18,13 @@ import (
 )
 
 func (u *UrlMappings) mapUrls() *fiber.App {
-	engine := html.New("./src/presenter/views", ".html")
+
+	path, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	engine := html.New(path+"/views", ".html")
 
 	/**
 	 * Init Fiber
@@ -33,7 +39,7 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	/**
 	 * Access log on browser
 	 */
-	router.Use("/logs", filesystem.New(filesystem.Config{
+	router.Use(LOG_PATH, filesystem.New(filesystem.Config{
 		Root:         http.Dir(LOG_PATH),
 		Browse:       true,
 		Index:        "index.html",
@@ -57,10 +63,6 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 		Output:     file,
 	}))
 
-	path, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
 	router.Static("/static", path+"/public")
 
 	// init country
@@ -181,6 +183,10 @@ func (u *UrlMappings) mapUrls() *fiber.App {
 	ximpay.Post("order", orderHandler.Ximpay)
 	ximpay.Post("pin", orderHandler.XimpayPIN)
 	ximpay.Get("notification", paymentHandler.Ximpay)
+
+	xendit := v1.Group("xendit")
+	xendit.Post("order", orderHandler.Xendit)
+	xendit.Post("notification", paymentHandler.Xendit)
 
 	/**
 	 * AUTHENTICATED ROUTING

@@ -58,21 +58,23 @@ func (p *JazzCash) Payment() ([]byte, error) {
 
 	orderInfo := strings.ReplaceAll(p.order.Number, "-", "")
 
-	payload, _ := json.Marshal(&entity.JazzCashPaymentRequest{
-		Language:          "EN",
-		MerchantID:        JAZZCASH_MERCHANTID,
-		Password:          password,
-		TxnRefNo:          p.order.GetNumber(),
-		Amount:            strconv.Itoa(int(p.order.Amount)),
-		TxnCurrency:       p.gateway.GetCurrency(),
-		TxnDateTime:       p.TxTime(),
-		BillReference:     "billRef",
-		Description:       p.order.GetDescription(),
-		TxnExpiryDateTime: p.TxTimeExp(),
-		SecureHash:        p.Hash(strconv.Itoa(int(p.order.Amount)), "billRef", 247643, p.order.GetDescription(), "EN", merchantId, p.PrefixMsisdn(), password, p.gateway.GetCurrency(), orderInfo),
-		MobileNumber:      p.PrefixMsisdn(),
-		CNIC:              247643,
-	})
+	payload, _ := json.Marshal(
+		&entity.JazzCashPaymentRequest{
+			Language:          "EN",
+			MerchantID:        JAZZCASH_MERCHANTID,
+			Password:          password,
+			TxnRefNo:          p.order.GetNumber(),
+			Amount:            strconv.Itoa(int(p.order.Amount)),
+			TxnCurrency:       p.gateway.GetCurrency(),
+			TxnDateTime:       p.TxTime(),
+			BillReference:     "billRef",
+			Description:       p.order.GetDescription(),
+			TxnExpiryDateTime: p.TxTimeExp(),
+			SecureHash:        p.Hash(strconv.Itoa(int(p.order.Amount)), "billRef", 247643, p.order.GetDescription(), "EN", merchantId, p.PrefixMsisdn(), password, p.gateway.GetCurrency(), orderInfo),
+			MobileNumber:      p.PrefixMsisdn(),
+			CNIC:              247643,
+		},
+	)
 	req, err := http.NewRequest("POST", JAZZCASH_URL, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {

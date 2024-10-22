@@ -80,7 +80,7 @@ func (h *PaymentHandler) Midtrans(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifMidtransRequestBody: req,
 	}
-	notifRequest.SetChannel("MIDTRANS")
+	notifRequest.SetChannel(MIDTRANS)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
@@ -107,7 +107,7 @@ func (h *PaymentHandler) Nicepay(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifNicepayRequestBody: req,
 	}
-	notifRequest.SetChannel("NICEPAY")
+	notifRequest.SetChannel(NICEPAY)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
@@ -134,7 +134,7 @@ func (h *PaymentHandler) DragonPay(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifDragonPayRequestBody: req,
 	}
-	notifRequest.SetChannel("DRAGONPAY")
+	notifRequest.SetChannel(DRAGONPAY)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
@@ -157,7 +157,7 @@ func (h *PaymentHandler) JazzCash(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifJazzCashRequestBody: req,
 	}
-	notifRequest.SetChannel("JAZZCASH")
+	notifRequest.SetChannel(JAZZCASH)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
@@ -188,7 +188,7 @@ func (h *PaymentHandler) Momo(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifMomoRequestBody: req,
 	}
-	notifRequest.SetChannel("MOMO")
+	notifRequest.SetChannel(MOMO)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
@@ -216,7 +216,7 @@ func (h *PaymentHandler) Razer(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifRazerRequestBody: req,
 	}
-	notifRequest.SetChannel("RAZER")
+	notifRequest.SetChannel(RAZER)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
@@ -253,7 +253,46 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 	notifRequest := &entity.NotifRequestBody{
 		NotifXimpayRequestBody: req,
 	}
-	notifRequest.SetChannel("XIMPAY")
+	notifRequest.SetChannel(XIMPAY)
+	dataJson, _ := json.Marshal(notifRequest)
+
+	go producer(h.rds, h.logger, h.ctx, dataJson)
+
+	return c.Status(fiber.StatusOK).SendString("Success")
+}
+
+func (h *PaymentHandler) Xendit(c *fiber.Ctx) error {
+	l := h.logger.Init("payment", true)
+
+	req := new(entity.NotifXenditRequestBody)
+	if err := c.QueryParser(req); err != nil {
+		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XENDIT")
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
+	}
+	h.logger.Writer(req)
+	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_XENDIT")
+
+	// checking order number
+	if !h.orderService.CountByNumber(req.GetReferenceId()) {
+		l.WithFields(logrus.Fields{"request": req}).Error("XENDIT_NOT_FOUND")
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
+	}
+
+	if !req.IsValid() {
+		l.WithFields(logrus.Fields{"request": req}).Error("XENDIT_NOT_VALID")
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
+	}
+
+	order, _ := h.orderService.GetByNumber(req.GetReferenceId())
+	// checking already success
+	if h.paymentService.CountByOrderId(int(order.GetId())) {
+		return c.Status(fiber.StatusOK).SendString("Processed")
+	}
+
+	notifRequest := &entity.NotifRequestBody{
+		NotifXenditRequestBody: req,
+	}
+	notifRequest.SetChannel(XENDIT)
 	dataJson, _ := json.Marshal(notifRequest)
 
 	go producer(h.rds, h.logger, h.ctx, dataJson)
