@@ -898,7 +898,7 @@ func (h *OrderHandler) Xendit(c *fiber.Ctx) error {
 	h.orderService.Save(order)
 	h.transactionService.Save(transaction)
 
-	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(res.GetPayoutUrl()))
+	return c.Status(fiber.StatusCreated).JSON(entity.NewStatusCreatedOrderBodyResponse(res.GetInvoiceUrl()))
 }
 
 func (h *OrderHandler) isValidApplication(urlCallback string) bool {

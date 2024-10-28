@@ -283,7 +283,7 @@ func (h *CallbackHandler) Ximpay(req *entity.NotifXimpayRequestParam) {
 
 func (h *CallbackHandler) Xendit(req *entity.NotifXenditRequestBody) {
 	// get order
-	order, err := h.orderService.GetByNumber(req.GetReferenceId())
+	order, err := h.orderService.GetByNumber(req.GetExternalId())
 	if err != nil {
 		h.zap.Error(err)
 	}

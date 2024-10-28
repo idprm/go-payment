@@ -273,7 +273,7 @@ func (h *PaymentHandler) Xendit(c *fiber.Ctx) error {
 	l.WithFields(logrus.Fields{"request": req}).Info("REQUEST_XENDIT")
 
 	// checking order number
-	if !h.orderService.CountByNumber(req.GetReferenceId()) {
+	if !h.orderService.CountByNumber(req.GetExternalId()) {
 		l.WithFields(logrus.Fields{"request": req}).Error("XENDIT_NOT_FOUND")
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
@@ -283,7 +283,7 @@ func (h *PaymentHandler) Xendit(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
 
-	order, _ := h.orderService.GetByNumber(req.GetReferenceId())
+	order, _ := h.orderService.GetByNumber(req.GetExternalId())
 	// checking already success
 	if h.paymentService.CountByOrderId(int(order.GetId())) {
 		return c.Status(fiber.StatusOK).SendString("Processed")

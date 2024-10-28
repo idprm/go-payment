@@ -1262,14 +1262,15 @@ func (e *XenditPayoutRequest) SetFailureRedirectUrl(v string) {
 }
 
 type XenditPayoutResponse struct {
-	Id                  string `json:"id"`
-	ExternalId          string `json:"external_id"`
-	Amount              int    `json:"amount"`
-	MerchantName        string `json:"merchant_name"`
-	Status              string `json:"status"`
-	ExpirationTimestamp string `json:"expiration_timestamp"`
-	Created             string `json:"created"`
-	PayoutUrl           string `json:"payout_url"`
+	Id           string `json:"id"`
+	ExternalId   string `json:"external_id"`
+	Amount       int    `json:"amount"`
+	MerchantName string `json:"merchant_name"`
+	Status       string `json:"status"`
+	ExpiryDate   string `json:"expiry_date"`
+	Created      string `json:"created"`
+	InvoiceUrl   string `json:"invoice_url"`
+	Currency     string `json:"currency"`
 }
 
 func (e *XenditPayoutResponse) GetExternalId() string {
@@ -1280,27 +1281,24 @@ func (e *XenditPayoutResponse) GetStatus() string {
 	return e.Status
 }
 
-func (e *XenditPayoutResponse) GetPayoutUrl() string {
-	return e.PayoutUrl
+func (e *XenditPayoutResponse) GetInvoiceUrl() string {
+	return e.InvoiceUrl
 }
 
 type NotifXenditRequestBody struct {
-	Event string `json:"event"`
-	Data  struct {
-		ReferenceId string `json:"reference_id"`
-		ChannelCode string `json:"channel_code"`
-		Currency    string `json:"currency"`
-		Amount      int    `json:"amount"`
-		Status      string `json:"status"`
-	} `json:"data"`
+	ExternalId string `json:"external_id"`
+	Status     string `json:"status"`
+	Amount     int    `json:"amount"`
+	PaidAmount int    `json:"paid_amount"`
+	Currency   string `json:"currency"`
 }
 
-func (e *NotifXenditRequestBody) GetReferenceId() string {
-	return e.Data.ReferenceId
+func (e *NotifXenditRequestBody) GetExternalId() string {
+	return e.ExternalId
 }
 
 func (e *NotifXenditRequestBody) IsValid() bool {
-	return e.Event == "payout.succeeded" || e.Data.Status == "SUCCEEDED"
+	return e.Status == "PAID"
 }
 
 type CallbackRequestBody struct {
