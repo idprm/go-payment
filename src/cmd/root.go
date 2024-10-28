@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/idprm/go-payment/src/domain/entity"
 	"github.com/redis/go-redis/v9"
@@ -38,6 +39,9 @@ const (
 )
 
 func init() {
+	// setup timezone
+	loc, _ := time.LoadLocation(APP_TZ)
+	time.Local = loc
 	/**
 	 * WEBSERVER SERVICE
 	 */
