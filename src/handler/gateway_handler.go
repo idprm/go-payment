@@ -127,6 +127,18 @@ func (h *GatewayHandler) Ximpay(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(channels)
 }
 
+func (h *GatewayHandler) Xendit(c *fiber.Ctx) error {
+	gateway, err := h.gatewayService.GetByCode(XENDIT)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	channels, err := h.channelService.GetAllByGateway(int(gateway.ID))
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(rest_errors.NewBadGatewayError())
+	}
+	return c.Status(fiber.StatusOK).JSON(channels)
+}
+
 func (h *GatewayHandler) IsValidCountry(locale string) bool {
 	return h.countryService.CountByLocale(locale)
 }

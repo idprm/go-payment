@@ -114,7 +114,7 @@ var callbackCmd = &cobra.Command{
 				h.Ximpay(req.NotifXimpayRequestBody)
 			}
 
-			if req.IsXimpay() {
+			if req.IsXendit() {
 				h.Ximpay(req.NotifXimpayRequestBody)
 			}
 
