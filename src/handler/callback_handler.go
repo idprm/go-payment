@@ -139,7 +139,7 @@ func (h *CallbackHandler) DragonPay(req *entity.NotifDragonPayRequestBody) {
 			}
 			provider := callback.NewCallback(h.logger, order.Application, order)
 			cb, err := provider.Hit()
-			h.zap.Info(cb)
+			h.zap.Info(string(cb))
 			if err != nil {
 				h.zap.Error(err)
 			}
