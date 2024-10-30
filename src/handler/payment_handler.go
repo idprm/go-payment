@@ -262,6 +262,7 @@ func (h *PaymentHandler) Ximpay(c *fiber.Ctx) error {
 }
 
 func (h *PaymentHandler) Xendit(c *fiber.Ctx) error {
+	h.zap.Info(string(c.Body()))
 	l := h.logger.Init("payment", true)
 
 	req := new(entity.NotifXenditRequestBody)
