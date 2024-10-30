@@ -115,7 +115,7 @@ var callbackCmd = &cobra.Command{
 			}
 
 			if req.IsXendit() {
-				h.Ximpay(req.NotifXimpayRequestBody)
+				h.Xendit(req.NotifXenditRequestBody)
 			}
 
 			// Wait a random amount of time before popping the next item
