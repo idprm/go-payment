@@ -266,7 +266,7 @@ func (h *PaymentHandler) Xendit(c *fiber.Ctx) error {
 	l := h.logger.Init("payment", true)
 
 	req := new(entity.NotifXenditRequestBody)
-	if err := c.QueryParser(req); err != nil {
+	if err := c.BodyParser(req); err != nil {
 		l.WithFields(logrus.Fields{"error": err}).Error("REQUEST_XENDIT")
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid Payment")
 	}
